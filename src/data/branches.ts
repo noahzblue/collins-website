@@ -14,7 +14,7 @@ export interface Branch {
 export const branches: Branch[] = [
   {
     status: "active",
-    tag: "Branch 01 · Active",
+    tag: "Active Branch",
     city: "Dubai",
     address: "Ras Al Khor 2, Dubai, UAE",
     phone: "(+971) 052 399 5373",

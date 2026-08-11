@@ -1,5 +1,6 @@
 ---
 /** Bright accent strip of trust points below the hero. */
+import Icon from "../ui/Icon.astro";
 import { trustPoints } from "../../data/content";
 ---
 
@@ -10,7 +11,8 @@ import { trustPoints } from "../../data/content";
     {
       trustPoints.map((point) => (
         <div class="flex items-center gap-[10px] font-extrabold text-[13px] tracking-[0.4px] uppercase text-white max-mob:text-[11px] max-xs:text-[10px] max-xs:gap-[6px]">
-          ✓ {point}
+          <Icon name="check" size={16} class="[stroke-width:3]" />
+          {point}
         </div>
       ))
     }

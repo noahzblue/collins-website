@@ -1,4 +1,4 @@
-/** Navigation links for the header nav and footer link columns. */
+ /** Navigation links for the header nav and footer link columns. */
 
 export interface NavLink {
   label: string;

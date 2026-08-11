@@ -3,6 +3,7 @@
 import Section from "../ui/Section.astro";
 import Eyebrow from "../ui/Eyebrow.astro";
 import Button from "../ui/Button.astro";
+import Icon from "../ui/Icon.astro";
 import { buyRent } from "../../data/content";
 
 const { sample } = buyRent;
@@ -27,14 +28,7 @@ const { sample } = buyRent;
           {
             buyRent.points.map((point) => (
               <li class="flex gap-3 items-start text-[14.5px] text-[#444] mb-3">
-                <svg
-                  class="shrink-0 mt-[2px]"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 16 16"
-                >
-                  <path d="M2 8l4 4 8-8" stroke="#0050F0" stroke-width="2" fill="none" />
-                </svg>
+                <Icon name="check" size={16} class="text-brand mt-[2px]" />
                 {point}
               </li>
             ))

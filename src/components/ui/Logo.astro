@@ -1,50 +1,36 @@
 ---
 /**
- * Collins wordmark + mark. `variant` recolours it for the light header
- * or the dark footer. Text comes from the site config.
+ * Collins brand wordmark. The SVG is imported raw and inlined so its colour
+ * follows `currentColor` — `variant` recolours it for the light header
+ * (brand blue) or the dark footer (white). `tagline` toggles the small
+ * "EQUIPMENTS LLC" line beneath it; text comes from the site config.
  */
 import { site } from "../../config/site";
+import wordmark from "../../assets/collins-logo.svg?raw";
 
 interface Props {
   variant?: "header" | "footer";
+  tagline?: boolean;
   class?: string;
 }
 
-const { variant = "header", class: extra = "" } = Astro.props;
+const { variant = "header", tagline = true, class: extra = "" } = Astro.props;
 const isFooter = variant === "footer";
 
-const markColor = isFooter ? "#2F6FFF" : "#0050F0";
-const line1Color = isFooter ? "text-white" : "text-brand";
-const line2Color = isFooter ? "text-[#999]" : "text-navy";
+const wordmarkColor = isFooter ? "text-white" : "text-brand";
+const taglineColor = isFooter ? "text-[#999]" : "text-navy";
 ---
 
-<div class:list={["flex items-center gap-[11px]", extra]}>
-  <svg
-    class="w-[38px] h-[38px] max-mob:w-[30px] max-mob:h-[30px]"
-    viewBox="0 0 40 40"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    aria-hidden="true"
-  >
-    <path
-      d="M20 2 L36 11 V29 L20 38 L4 29 V11 Z"
-      stroke={markColor}
-      stroke-width="2.4"
-      fill="none"></path>
-    <circle cx="20" cy="20" r="6" fill={markColor}></circle>
-  </svg>
-  <span class="flex flex-col leading-none">
-    <span
-      class:list={[
-        "font-display text-[24px] tracking-[1px] max-mob:text-[19px]",
-        line1Color,
-      ]}>{site.wordmark.line1}</span
-    >
-    <span
-      class:list={[
-        "text-[9px] font-bold tracking-[2.5px] mt-[2px] max-mob:text-[7px] max-mob:tracking-[1.6px] max-xs:hidden",
-        line2Color,
-      ]}>{site.wordmark.line2}</span
-    >
-  </span>
-</div>
+<a
+  href="/"
+  class:list={["inline-flex flex-col leading-none", extra]}
+  aria-label={`${site.name} — home`}
+>
+  <span
+    class:list={[
+      wordmarkColor,
+      "[&>svg]:h-[35px] [&>svg]:w-auto [&>svg]:block max-mob:[&>svg]:h-[24px]",
+    ]}
+    set:html={wordmark}
+  />
+</a>

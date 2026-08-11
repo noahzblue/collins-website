@@ -67,9 +67,9 @@ export const quoteBand = {
 };
 
 export const branchesSection = {
-  eyebrow: "Locations",
-  title: ["Our Branches"],
-  intro: "Two locations across the UAE, each with local stock, contact and support.",
+  eyebrow: "Location",
+  title: ["Our Branch"],
+  intro: "Our Dubai branch holds local stock and handles sales, rental and support across the UAE.",
 };
 
 export const about = {

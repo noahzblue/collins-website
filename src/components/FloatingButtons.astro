@@ -1,9 +1,10 @@
 ---
 /** Fixed call + WhatsApp quick-contact buttons. */
 import { site } from "../config/site";
+import Icon from "./ui/Icon.astro";
 
 const btnBase =
-  "w-14 h-14 rounded-full flex items-center justify-center text-white shadow-[0_8px_22px_rgba(0,0,0,0.25)] transition-transform duration-150 hover:scale-[1.08] max-xs:w-[46px] max-xs:h-[46px] max-xs:text-[14px]";
+  "w-14 h-14 rounded-full flex items-center justify-center text-white shadow-[0_8px_22px_rgba(0,0,0,0.25)] transition-transform duration-150 hover:scale-[1.08] max-xs:w-[46px] max-xs:h-[46px]";
 ---
 
 <div
@@ -12,13 +13,17 @@ const btnBase =
   <a
     href={site.phone.href}
     class:list={[btnBase, "bg-brand"]}
-    aria-label={`Call ${site.name}`}>📞</a
+    aria-label={`Call ${site.name}`}
   >
+    <Icon name="phone" size={22} class="max-xs:w-[18px] max-xs:h-[18px]" />
+  </a>
   <a
     href={site.whatsapp.href}
     target="_blank"
     rel="noopener"
     class:list={[btnBase, "bg-whatsapp"]}
-    aria-label={`WhatsApp ${site.name}`}>💬</a
+    aria-label={`WhatsApp ${site.name}`}
   >
+    <Icon name="whatsapp" size={24} class="max-xs:w-[20px] max-xs:h-[20px]" />
+  </a>
 </div>

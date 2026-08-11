@@ -4,6 +4,8 @@
  * across the header, footer, floating buttons, quote band and <head>.
  */
 
+import type { IconName } from "../components/ui/icons";
+
 export interface ContactLink {
   /** Human-readable text shown on the page. */
   display: string;
@@ -12,8 +14,10 @@ export interface ContactLink {
 }
 
 export interface SocialLink {
-  /** Short label rendered in the footer badge (e.g. "IG"). */
+  /** Full network name — used as the link's accessible label. */
   label: string;
+  /** Icon key from the shared icon set (see components/ui/icons.ts). */
+  icon: IconName;
   href: string;
 }
 
@@ -44,10 +48,14 @@ export const site = {
   address: "Ras Al Khor 2, Dubai, UAE",
 
   social: [
-    { label: "IG", href: "https://www.instagram.com/collinsequipments/" },
-    { label: "FB", href: "#" },
-    { label: "YT", href: "#" },
-    { label: "IN", href: "#" },
+    {
+      label: "Instagram",
+      icon: "instagram",
+      href: "https://www.instagram.com/collinsequipments/",
+    },
+    { label: "Facebook", icon: "facebook", href: "#" },
+    { label: "YouTube", icon: "youtube", href: "#" },
+    { label: "LinkedIn", icon: "linkedin", href: "#" },
   ] satisfies SocialLink[],
 
   /** Credit shown in the footer bar. */
