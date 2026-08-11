@@ -1,0 +1,21 @@
+---
+/**
+ * Standard content section: vertical padding + optional tone background.
+ * Children decide their own inner container (`.wrap`) since some grids
+ * are intentionally full-bleed.
+ */
+interface Props {
+  id?: string;
+  tone?: "light" | "dark" | "gray";
+  class?: string;
+}
+
+const { id, tone = "light", class: extra = "" } = Astro.props;
+
+const toneClass =
+  tone === "dark" ? "bg-ink text-white" : tone === "gray" ? "bg-surface" : "";
+---
+
+<section id={id} class:list={["py-24 max-mob:py-[60px]", toneClass, extra]}>
+  <slot />
+</section>

@@ -1,0 +1,95 @@
+---
+/** Per-product buy/rent flow demo with an interactive intent toggle. */
+import Section from "../ui/Section.astro";
+import Eyebrow from "../ui/Eyebrow.astro";
+import Button from "../ui/Button.astro";
+import { buyRent } from "../../data/content";
+
+const { sample } = buyRent;
+---
+
+<Section id="rental">
+  <div class="wrap">
+    <div
+      class="grid grid-cols-[0.9fr_1.1fr] gap-[60px] items-center max-nav:grid-cols-1 max-mob:gap-8"
+    >
+      <!-- Copy -->
+      <div>
+        <Eyebrow class="mb-[16px]">{buyRent.eyebrow}</Eyebrow>
+        <h2
+          class="text-[clamp(28px,4vw,44px)] mb-[18px]"
+          set:html={buyRent.title.join("<br>")}
+        />
+        <p class="text-[#666] text-[15px] mb-[14px] max-w-[460px]">
+          {buyRent.body}
+        </p>
+        <ul class="mt-5">
+          {
+            buyRent.points.map((point) => (
+              <li class="flex gap-3 items-start text-[14.5px] text-[#444] mb-3">
+                <svg
+                  class="shrink-0 mt-[2px]"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 16 16"
+                >
+                  <path d="M2 8l4 4 8-8" stroke="#0050F0" stroke-width="2" fill="none" />
+                </svg>
+                {point}
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+
+      <!-- Sample product card -->
+      <div class="border border-[#e5e5e5]">
+        <div
+          class="h-[260px] flex items-center justify-center text-[#999] font-display tracking-[1px] text-[14px] bg-[linear-gradient(135deg,#e9e9e9,#cfcfcf)]"
+        >
+          {sample.imageLabel}
+        </div>
+        <div class="p-[26px]" data-br-card>
+          <h4 class="text-[22px] mb-[6px]">{sample.title}</h4>
+          <div class="text-[13px] text-[#777] mb-[18px]">{sample.spec}</div>
+          <div class="flex border-2 border-ink mb-[14px]" data-toggle>
+            {
+              sample.toggles.map((label, i) => (
+                <button
+                  type="button"
+                  data-toggle-btn
+                  class:list={[
+                    "flex-1 p-3 font-extrabold text-[12.5px] tracking-[1px] uppercase cursor-pointer",
+                    i === 0 && "bg-ink text-white",
+                  ]}
+                >
+                  {label}
+                </button>
+              ))
+            }
+          </div>
+          <Button variant="primary" href="#quote" class="w-full" data-enquire>
+            {`${sample.ctaPrefix} ${sample.toggles[0]}`}
+          </Button>
+        </div>
+      </div>
+    </div>
+  </div>
+</Section>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>("[data-toggle-btn]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const group = btn.closest("[data-toggle]");
+      group?.querySelectorAll("[data-toggle-btn]").forEach((b) => {
+        b.classList.remove("bg-ink", "text-white");
+      });
+      btn.classList.add("bg-ink", "text-white");
+
+      const enquire = btn
+        .closest("[data-br-card]")
+        ?.querySelector("[data-enquire]");
+      if (enquire) enquire.textContent = `Enquire to ${btn.textContent?.trim()}`;
+    });
+  });
+</script>

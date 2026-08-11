@@ -1,0 +1,22 @@
+---
+/** Manufacturer trust strip. */
+import { partners } from "../../data/catalog";
+import { partnersLabel } from "../../data/content";
+---
+
+<div class="py-[52px] border-y border-[#ececec]">
+  <div class="wrap">
+    <div
+      class="text-center text-[12px] font-bold tracking-[2px] text-[#999] mb-[30px]"
+    >
+      {partnersLabel}
+    </div>
+    <div class="flex justify-between items-center flex-wrap gap-[30px] opacity-55">
+      {
+        partners.map((name) => (
+          <span class="font-display text-[20px] tracking-[1px]">{name}</span>
+        ))
+      }
+    </div>
+  </div>
+</div>

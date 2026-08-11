@@ -1,0 +1,66 @@
+---
+/** Utility bar + sticky primary header/nav. */
+import Logo from "./ui/Logo.astro";
+import Button from "./ui/Button.astro";
+import { site } from "../config/site";
+import { mainNav } from "../data/navigation";
+---
+
+<!-- UTILITY BAR -->
+<div class="bg-ink text-white text-[12.5px]">
+  <div
+    class="wrap flex justify-between items-center h-[36px] text-[#c9c9c9] max-mob:h-auto max-mob:py-2 max-mob:flex-wrap max-mob:gap-[6px] max-mob:gap-y-[4px]"
+  >
+    <div class="flex gap-[22px] max-mob:gap-[10px] max-mob:text-[10.5px] max-mob:flex-wrap">
+      <span class="text-brand-bright font-semibold">{site.hours}</span>
+      <span class="font-semibold max-xs:hidden">{site.locations}</span>
+    </div>
+    <div class="flex gap-[14px] max-mob:gap-[10px]">
+      <a
+        href={`mailto:${site.email}`}
+        class="transition-colors hover:text-brand-bright max-xs:text-[10px]"
+        >{site.email}</a
+      >
+      <a
+        href={site.phone.href}
+        class="transition-colors hover:text-brand-bright max-xs:text-[10px]"
+        >{site.phone.display}</a
+      >
+    </div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header class="bg-white border-b border-[#ececec] sticky top-0 z-50">
+  <div class="wrap flex items-center justify-between h-[82px] max-mob:h-[64px] max-xs:h-[58px]">
+    <Logo variant="header" />
+
+    <nav class="flex items-center gap-[34px] max-nav:hidden">
+      {
+        mainNav.map((link) => (
+          <a
+            href={link.href}
+            class="relative py-[6px] text-[14px] font-semibold text-ink after:content-[''] after:absolute after:left-0 after:bottom-0 after:h-[2px] after:w-0 after:bg-brand after:transition-[width] after:duration-200 hover:after:w-full"
+          >
+            {link.label}
+          </a>
+        ))
+      }
+    </nav>
+
+    <div class="flex items-center gap-[14px] max-mob:gap-2">
+      <Button variant="outline" href="#quote" class="max-mob:hidden">
+        Get a Quote
+      </Button>
+      <Button
+        variant="whatsapp"
+        href={site.whatsapp.href}
+        target="_blank"
+        rel="noopener"
+        class="max-mob:px-4 max-mob:py-[10px] max-mob:text-[11px] max-mob:tracking-[0.6px] max-xs:px-[13px] max-xs:py-[9px] max-xs:text-[10px]"
+      >
+        WhatsApp
+      </Button>
+    </div>
+  </div>
+</header>

@@ -1,0 +1,43 @@
+---
+/**
+ * Section header: eyebrow + heading on the left, optional intro on the right.
+ * `title` may be a string or an array of lines (rendered on separate lines).
+ */
+import Eyebrow from "./Eyebrow.astro";
+
+interface Props {
+  eyebrow: string;
+  title: string | string[];
+  intro?: string;
+  tone?: "light" | "dark";
+  class?: string;
+}
+
+const { eyebrow, title, intro, tone = "light", class: extra = "" } = Astro.props;
+
+const lines = Array.isArray(title) ? title : [title];
+const h2Color = tone === "dark" ? "text-white" : "";
+const introColor = tone === "dark" ? "text-[#aaa]" : "text-[#666]";
+---
+
+<div
+  class:list={[
+    "flex justify-between items-end gap-6 flex-wrap mb-[52px] max-mob:mb-[34px] max-mob:gap-4",
+    extra,
+  ]}
+>
+  <div>
+    <Eyebrow tone={tone === "dark" ? "brand-bright" : "brand"} class="mb-[14px]">
+      {eyebrow}
+    </Eyebrow>
+    <h2
+      class:list={["text-[clamp(32px,4vw,52px)] max-mob:mb-[6px]", h2Color]}
+      set:html={lines.join("<br>")}
+    />
+  </div>
+  {
+    intro && (
+      <p class:list={["max-w-[420px] text-[15px]", introColor]}>{intro}</p>
+    )
+  }
+</div>

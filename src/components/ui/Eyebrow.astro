@@ -1,0 +1,44 @@
+---
+/**
+ * Small accent label above headings.
+ * - kind "label": bold 12px tracked caps (section heads, copy blocks).
+ * - kind "hero":  larger inherited size used in the hero & quote band.
+ * `bar` toggles the short accent rule before the text.
+ */
+interface Props {
+  kind?: "label" | "hero";
+  tone?: "brand" | "brand-bright";
+  bar?: boolean;
+  class?: string;
+}
+
+const {
+  kind = "label",
+  tone = kind === "hero" ? "brand-bright" : "brand",
+  bar = true,
+  class: extra = "",
+} = Astro.props;
+
+const textColor = tone === "brand-bright" ? "text-brand-bright" : "text-brand";
+const barColor = tone === "brand-bright" ? "bg-brand-bright" : "bg-brand";
+
+const typo =
+  kind === "hero"
+    ? "text-base font-normal max-mob:text-[11px] max-mob:mb-[16px]"
+    : "text-[12px] font-bold tracking-[2.5px] uppercase";
+
+const barW = kind === "hero" ? "w-[34px]" : "w-[24px]";
+---
+
+<div
+  class:list={[
+    "font-sans",
+    typo,
+    textColor,
+    bar && "flex items-center gap-[10px]",
+    extra,
+  ]}
+>
+  {bar && <span class:list={["h-[2px]", barColor, barW]} aria-hidden="true" />}
+  <slot />
+</div>

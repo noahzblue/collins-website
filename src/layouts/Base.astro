@@ -1,19 +1,22 @@
 ---
-import '@fontsource/anton';
-import '@fontsource-variable/archivo';
-import '@fontsource-variable/spline-sans-mono';
-import '../styles/tokens.css';
+import "../styles/global.css";
+import FloatingButtons from "../components/FloatingButtons.astro";
+import { site } from "../config/site";
 
-const {
-  title = 'Collins Equipments | Heavy Machinery Rental & Sales in the UAE',
-  description = 'Reliable, top-quality branded heavy equipment — to buy or hire — delivered fast from two UAE yards. Generators, forklifts, air compressors, earthmovers and more.',
-} = Astro.props;
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { title = site.seo.title, description = site.seo.description } =
+  Astro.props;
 ---
+
 <!doctype html>
 <html lang="en">
   <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="icon" href="/favicon.ico" />
     <title>{title}</title>
@@ -21,50 +24,15 @@ const {
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
-    <script is:inline>
-      (function () { try { if (localStorage.getItem('theme') === 'dark') document.documentElement.setAttribute('data-theme', 'dark'); } catch (e) {} })();
-    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
   </head>
   <body>
-    <!--
-    IMPECCABLE DIRECTION CONTRACT — "The Working Drawing" · seed 08c5912a · persuade
-    THESIS: Collins' catalog rendered as an engineer's working drawings — every machine a dimensioned, titled, buy-or-hire-stamped sheet. Refuses the competitor's sunset-silhouette + safety-yellow-shout hero.
-    OWN-WORLD: Drafting-paper ground by default (light); dark blueprint (#000000) is an opt-in theme via data-theme=dark. Navy/white hairline linework that flips per theme, dimension callouts, title blocks, buy/hire stamps. Safety-yellow #FFDD04 primary CTA fills (sharp 0px), construction-orange #DF790D secondary + thin accents on light, Collins navy/blue in linework tint + logo only. Anton caps · Spline mono spec numerals · Archivo body.
-    STORY: Visitor sees an engineering-grade supplier with a full spec'd range to BUY or HIRE from two UAE yards; picks a machine, sets intent, requests a quote.
-    FIRST VIEWPORT: Full-bleed black blueprint; a hero machine drawn in white linework with live dimension callouts; a title-block strip carrying a Buy/Hire toggle + Request-a-Quote.
-    FORM: Working-drawing world, candidate 4; seed 08c5912a.
-    FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, and DESIGN.md.
-    -->
     <slot />
-
-    <!-- always-on contact affordances: orange Call over green WhatsApp -->
-    <div class="fab" aria-label="Contact Collins">
-      <a class="fab__btn fab__btn--call" href="tel:+971523995373" aria-label="Call Collins">
-        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M4.5 5.5c0 8 6 14 14 14 .8 0 1.5-.7 1.5-1.5v-2.3c0-.7-.5-1.3-1.2-1.5l-2.6-.5c-.6-.1-1.2.1-1.6.6l-.8 1c-2-1-3.6-2.6-4.6-4.6l1-.8c.5-.4.7-1 .6-1.6l-.5-2.6C9.6 5 9 4.5 8.3 4.5H6C5.2 4.5 4.5 5.2 4.5 6z"/>
-        </svg>
-      </a>
-      <a class="fab__btn fab__btn--wa" href="https://wa.me/971523995373" target="_blank" rel="noopener" aria-label="WhatsApp Collins">
-        <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor" aria-hidden="true">
-          <path d="M12 2a10 10 0 0 0-8.6 15l-1.3 4.9 5-1.3A10 10 0 1 0 12 2zm0 2a8 8 0 1 1-4.1 14.8l-.4-.2-2.6.7.7-2.5-.2-.4A8 8 0 0 1 12 4zm-2.5 3.6c-.2 0-.4 0-.6.1-.3.3-.9.9-.9 2.1 0 1.3.9 2.5 1 2.7.2.2 1.8 2.8 4.4 3.8 2.2.9 2.6.7 3.1.7.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.1-1.2 0-.1-.2-.2-.5-.3l-1.4-.7c-.2-.1-.4-.1-.5.1l-.6.8c-.1.2-.3.2-.5.1-.7-.3-1.4-.6-2.2-1.6-.6-.7-.8-1.2-.9-1.4-.1-.2 0-.3.1-.4l.4-.5c.1-.1.1-.3.2-.4v-.4c0-.1-.5-1.3-.7-1.7-.1-.4-.3-.3-.4-.3z"/>
-        </svg>
-      </a>
-    </div>
-
-    <style>
-      .fab{
-        position:fixed; right:clamp(14px,3vw,26px); bottom:clamp(14px,3vw,26px);
-        z-index:60; display:flex; flex-direction:column; gap:12px;
-      }
-      .fab__btn{
-        width:54px; height:54px; display:grid; place-items:center; color:#fff;
-        box-shadow:0 8px 24px rgba(0,0,0,.5); transition:transform .18s var(--ease), filter .18s var(--ease);
-        border:1px solid rgba(255,255,255,.14);
-      }
-      .fab__btn--call{background:var(--orange)}
-      .fab__btn--wa{background:var(--green)}
-      .fab__btn:hover{transform:translateY(-2px) scale(1.04); filter:brightness(1.06)}
-      @media (prefers-reduced-motion:reduce){.fab__btn{transition:none}}
-    </style>
+    <FloatingButtons />
   </body>
 </html>

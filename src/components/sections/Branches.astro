@@ -1,0 +1,79 @@
+---
+/** Branch locations — active vs. pending styling driven by `status`. */
+import Section from "../ui/Section.astro";
+import SectionHeading from "../ui/SectionHeading.astro";
+import Button from "../ui/Button.astro";
+import { branches } from "../../data/branches";
+import { branchesSection } from "../../data/content";
+---
+
+<Section id="branches" tone="gray">
+  <div class="wrap">
+    <SectionHeading
+      eyebrow={branchesSection.eyebrow}
+      title={branchesSection.title}
+      intro={branchesSection.intro}
+    />
+    <div class="grid grid-cols-2 gap-[2px] bg-[#e7e7e7] max-nav:grid-cols-1">
+      {
+        branches.map((branch) => {
+          const active = branch.status === "active";
+          return (
+            <div class="bg-white">
+              <div class="branch-map h-[220px] relative">
+                <svg
+                  class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-full w-[34px] h-[34px]"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                >
+                  <path
+                    d="M12 2C7.6 2 4 5.6 4 10c0 6 8 12 8 12s8-6 8-12c0-4.4-3.6-8-8-8z"
+                    fill={active ? "#0050F0" : "#999"}
+                  />
+                  <circle cx="12" cy="10" r="3" fill="#fff" />
+                </svg>
+              </div>
+              <div class="p-[30px]">
+                <span
+                  class:list={[
+                    "inline-block text-[11px] font-extrabold tracking-[1.5px] px-[10px] py-[5px] mb-[14px]",
+                    active ? "bg-brand-bright text-white" : "bg-[#e5e5e5] text-[#888]",
+                  ]}
+                >
+                  {branch.tag}
+                </span>
+                <h3 class="text-[26px] mb-[14px]">{branch.city}</h3>
+                <div class="flex gap-[10px] text-[14px] text-[#555] mb-2">
+                  📍 {branch.address}
+                </div>
+                <div class="flex gap-[10px] text-[14px] text-[#555] mb-2">
+                  📞 {branch.phone}
+                </div>
+                <div class="flex gap-[10px] text-[14px] text-[#555] mb-2">
+                  🕒 {branch.hours}
+                </div>
+                <Button
+                  variant="outline"
+                  href={branch.directionsHref}
+                  class={`mt-[18px] ${active ? "" : "opacity-50 pointer-events-none"}`}
+                >
+                  Get Directions
+                </Button>
+              </div>
+            </div>
+          );
+        })
+      }
+    </div>
+  </div>
+</Section>
+
+<style>
+  .branch-map {
+    background:
+      linear-gradient(#0000 0 0),
+      repeating-linear-gradient(0deg, #dcdcdc 0 1px, transparent 1px 34px),
+      repeating-linear-gradient(90deg, #dcdcdc 0 1px, transparent 1px 34px);
+    background-color: #eef0ec;
+  }
+</style>

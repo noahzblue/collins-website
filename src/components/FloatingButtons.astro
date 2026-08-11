@@ -1,0 +1,24 @@
+---
+/** Fixed call + WhatsApp quick-contact buttons. */
+import { site } from "../config/site";
+
+const btnBase =
+  "w-14 h-14 rounded-full flex items-center justify-center text-white shadow-[0_8px_22px_rgba(0,0,0,0.25)] transition-transform duration-150 hover:scale-[1.08] max-xs:w-[46px] max-xs:h-[46px] max-xs:text-[14px]";
+---
+
+<div
+  class="fixed right-[26px] bottom-[26px] flex flex-col gap-3 z-[60] max-xs:right-[14px] max-xs:bottom-[14px] max-xs:gap-2"
+>
+  <a
+    href={site.phone.href}
+    class:list={[btnBase, "bg-brand"]}
+    aria-label={`Call ${site.name}`}>📞</a
+  >
+  <a
+    href={site.whatsapp.href}
+    target="_blank"
+    rel="noopener"
+    class:list={[btnBase, "bg-whatsapp"]}
+    aria-label={`WhatsApp ${site.name}`}>💬</a
+  >
+</div>

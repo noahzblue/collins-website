@@ -1,0 +1,47 @@
+---
+/**
+ * Button / CTA. Renders an <a> when `href` is set, otherwise a <button>.
+ * All button styling in the design lives here — pick a `variant`.
+ */
+interface Props {
+  href?: string;
+  variant?: "primary" | "outline" | "outline-white" | "whatsapp";
+  type?: "button" | "submit";
+  class?: string;
+  [key: string]: unknown;
+}
+
+const {
+  href,
+  variant = "primary",
+  type = "button",
+  class: extra = "",
+  ...rest
+} = Astro.props;
+
+const base =
+  "inline-flex items-center justify-center gap-2 font-extrabold text-[13px] tracking-[1px] uppercase whitespace-nowrap rounded-none transition-colors cursor-pointer";
+
+const variants: Record<NonNullable<Props["variant"]>, string> = {
+  primary: "px-[26px] py-[13px] bg-brand-bright text-white hover:bg-brand-hover",
+  outline:
+    "px-[24px] py-[11px] bg-transparent border-2 border-ink text-ink hover:bg-ink hover:text-white",
+  "outline-white":
+    "px-[24px] py-[11px] bg-transparent border-2 border-white text-white hover:bg-white hover:text-ink",
+  whatsapp: "px-[26px] py-[13px] bg-whatsapp text-white",
+};
+
+const cls = `${base} ${variants[variant]} ${extra}`;
+---
+
+{
+  href ? (
+    <a href={href} class={cls} {...rest}>
+      <slot />
+    </a>
+  ) : (
+    <button type={type} class={cls} {...rest}>
+      <slot />
+    </button>
+  )
+}

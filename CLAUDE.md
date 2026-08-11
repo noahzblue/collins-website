@@ -11,14 +11,14 @@ Node 22 + bun 1.3 are inside. **This repo uses `bun`, not npm.**
 Do not conclude the project "can't be built/tested" because `node` is missing —
 run it inside the container.
 
-### Canonical way to run anything (node/bun/impeccable)
+### Canonical way to run anything (node/bun)
 
 One-shot, non-interactive (preferred for agents — shell state does not persist
 between commands, so an interactive shell won't hold):
 
 ```bash
 docker exec -u node devbox sh -c 'cd /workspace/paid-to-type/collins-website && bun run build'
-docker exec -u node devbox sh -c 'cd /workspace/paid-to-type/collins-website && node <script.mjs>'
+docker exec -u node devbox sh -c 'cd /workspace/paid-to-type/collins-website && bun install'
 ```
 
 Interactive equivalent (human at a terminal): `orb` (alias → `cd ~/code-lab/.orbstack`)
@@ -29,21 +29,7 @@ root-owned files into `node_modules/.vite` / `.astro`, which then break the next
 `node`-user run with `EACCES`. Heal with `make -C ~/code-lab/.orbstack fix-perms`
 (the entrypoint also self-heals on container start).
 
-## Running impeccable
-
-Impeccable's own scripts are node, so every `node .claude/skills/impeccable/scripts/*.mjs`
-step (context.mjs, concept-seed.mjs, serve-question.mjs, surface-brief.mjs,
-live.mjs, detect.mjs, …) runs through the container wrapper above. Example:
-
-```bash
-docker exec -u node devbox sh -c 'cd /workspace/paid-to-type/collins-website && node .claude/skills/impeccable/scripts/context.mjs'
-```
-
-The design-detector **hook** in `.claude/settings.local.json` is already wired to
-exec into `devbox` (it also `sed`-rewrites the host paths in its stdin payload to
-`/workspace/…`). It is verified working — leave it unless it starts erroring.
-
-## Dev server (for browser checks / impeccable live mode)
+## Dev server (for browser checks)
 
 A dev server bound to `localhost` inside the container is **not** reachable from
 the host or from the Playwright MCP container. Bind `0.0.0.0` and reach it via the
@@ -55,8 +41,6 @@ docker inspect devbox --format '{{range .NetworkSettings.Networks}}{{.IPAddress}
 # → browse / navigate Playwright to http://<devbox-ip>:3001/
 ```
 
-(`repos.list` in `.orbstack/` reserves port 3001 for this repo but has it
-commented out; `make dev REPO=paid-to-type/collins-website` works once uncommented.)
 Do **not** use `host.docker.internal` or `*.orb.local` for the dev server — Astro
 rejects the unknown Host header with a bare 403. Use numeric IPs.
 
@@ -66,20 +50,28 @@ rejects the unknown Host header with a bare 403. Use numeric IPs.
   `astro dev` in the background. Ask the user to start it (ideally with `--host 0.0.0.0` so
   screenshots via the Playwright container still work at the devbox IP). Work from code +
   screenshots the user shares when their server is down.
-- **No global project memory.** Keep durable knowledge in the repo (`CLAUDE.md`,
-  `docs/BUILD_STATUS.md`, and impeccable's own files), not in `~/.claude/.../memory/`.
-
-## Resuming design work (impeccable)
-
-This project uses the `impeccable` skill; its context lives in-repo: `PRODUCT.md` (product
-truth), `DESIGN.md` (design system — write via `/impeccable document`), `.impeccable/surfaces/*.md`
-(per-route strategy), `.impeccable/config.local.json`, and the design-detector hook.
-A new session: run `/impeccable` — it executes `context.mjs` (through the container) to load
-these automatically. Current progress + what's left: **`docs/BUILD_STATUS.md`**. Every
-impeccable node script runs inside `devbox` via the `docker exec -u node` wrapper above.
 
 ## Project
 
-Astro 7 static site. Rebuild of collinscouae.com in the visual style of
-spheavyrental.ae. Product/design brief: `docs/Collins_Website_Rebuild_Brief.md`.
-Locked visual direction: "The Working Drawing" (blueprint world, SP black+yellow palette).
+Astro 7 static site for Collins Equipments LLC — industrial & heavy machinery
+sales and rental in the UAE (generators, forklifts, air compressors, cranes,
+tower lights, spare parts), to buy or rent.
+
+Current visual direction: **blue theme** — white background, `#0050F0` / `#2F6FFF`
+blue accents, black (`#000000`) dark sections, Bebas Neue display + Inter body
+(loaded from Google Fonts). The design is a faithful build of the client-provided
+reference prototype `Collins_Website_Blue_Theme.html`.
+
+### Structure
+
+- `src/styles/global.css` — the entire design system + all component styles (`:root`
+  variables, reset, section styles, responsive breakpoints). One global stylesheet.
+- `src/layouts/Base.astro` — `<head>` (meta, fonts, favicon), imports `global.css`,
+  renders the page `<slot/>` and the fixed call/WhatsApp floating buttons.
+- `src/components/Header.astro` — utility bar + sticky header/nav.
+- `src/components/Footer.astro` — footer.
+- `src/pages/index.astro` — the single-page site: hero, trust strip, product grid,
+  capabilities, partners, buy/rent demo, quote band, branches, about teaser, plus
+  the Buy/Rent toggle script.
+- `public/images/` — `hero-bg.jpg` and `about-photo.jpg` (extracted from the
+  reference prototype's inline base64 backgrounds).

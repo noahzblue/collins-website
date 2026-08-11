@@ -1,84 +1,77 @@
 ---
-// Site-wide footer — rendered as a drafting title block.
-const equipment = [
-  ['Generators','/generators/'],['Forklifts','/forklifts/'],['Tower Lights','/tower-lights/'],
-  ['Air Compressors','/air-compressors/'],['Heavy Equipment','/heavy-equipment/'],['Spare Parts','/spare-parts/'],
-  ['Industrial Equipment','/industrial-equipments/'],['Oil & Gas','/oil-and-gas-equipments/'],['Used Cars','/used-cars/'],
-];
+/** Site-wide footer. */
+import Logo from "./ui/Logo.astro";
+import { site } from "../config/site";
+import { footerColumns } from "../data/navigation";
+
+const year = new Date().getFullYear();
 ---
-<footer class="ft">
-  <div class="wrap ft__grid">
-    <div class="ft__brand">
-      <a href="/" class="logo" aria-label="Collins Equipments LLC">
-        <svg class="logo__mark" viewBox="0 0 40 44" width="34" height="37" aria-hidden="true">
-          <path d="M20 2 36 11.5v21L20 42 4 32.5v-21z" fill="none" stroke="#0050F0" stroke-width="2.4"/>
-          <path d="M25 16a7.5 7.5 0 1 0 0 12" fill="none" stroke="#0050F0" stroke-width="2.4" stroke-linecap="round"/>
-        </svg>
-        <span class="logo__txt"><span class="logo__word">COLLINS</span><span class="logo__sub">Equipments LLC</span></span>
-      </a>
-      <p class="ft__tag">Heavy machinery to buy or hire, delivered fast from two Dubai yards.</p>
-      <a href="https://www.instagram.com/collinsequipments/" target="_blank" rel="noopener" class="ft__ig" aria-label="Collins on Instagram">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
-          <rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1.1" fill="currentColor" stroke="none"/>
-        </svg>
-        <span>@collinsequipments</span>
-      </a>
+
+<footer id="contact" class="bg-ink text-[#bdbdbd] pt-20 max-mob:pt-14">
+  <div class="wrap">
+    <div
+      class="grid grid-cols-[1.3fr_0.8fr_0.8fr_1fr] gap-[44px] pb-[60px] border-b border-[#262626] max-nav:grid-cols-2 max-cmp:grid-cols-1"
+    >
+      <!-- Brand -->
+      <div>
+        <Logo variant="footer" />
+        <p class="text-[13.5px] text-[#999] mt-4 mb-[22px] max-w-[280px]">
+          {site.blurb}
+        </p>
+        <div class="flex gap-[10px]">
+          {
+            site.social.map((s) => (
+              <a
+                href={s.href}
+                target="_blank"
+                rel="noopener"
+                class="w-9 h-9 border border-[#333] rounded-full flex items-center justify-center text-[13px] transition-colors hover:border-brand-bright hover:text-brand-bright"
+              >
+                {s.label}
+              </a>
+            ))
+          }
+        </div>
+      </div>
+
+      <!-- Link columns -->
+      {
+        footerColumns.map((col) => (
+          <div>
+            <h5 class="relative text-white text-[13px] font-extrabold tracking-[1.5px] uppercase mb-2 pb-3 after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-[28px] after:h-[2px] after:bg-brand-bright">
+              {col.title}
+            </h5>
+            <ul class="mt-[14px]">
+              {col.links.map((link) => (
+                <li class="mb-[10px] text-[13.5px]">
+                  <a href={link.href} class="transition-colors hover:text-brand-bright">
+                    {link.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))
+      }
+
+      <!-- Contact -->
+      <div>
+        <h5 class="relative text-white text-[13px] font-extrabold tracking-[1.5px] uppercase mb-2 pb-3 after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-[28px] after:h-[2px] after:bg-brand-bright">
+          Contact
+        </h5>
+        <ul class="mt-[14px]">
+          <li class="mb-[10px] text-[13.5px]">{site.address}</li>
+          <li class="mb-[10px] text-[13.5px]">{site.phone.display}</li>
+          <li class="mb-[10px] text-[13.5px]">{site.email}</li>
+        </ul>
+      </div>
     </div>
 
-    <nav class="ft__col" aria-label="Services">
-      <h3 class="ft__h">Services</h3>
-      <a href="/services/">General Trading &amp; Rental</a>
-      <a href="/services/">Equipment Sourcing</a>
-      <a href="/services/">Logistics &amp; Export</a>
-      <a href="/request-a-quote/">Request a Quote</a>
-    </nav>
-
-    <nav class="ft__col ft__col--equip" aria-label="Equipment">
-      <h3 class="ft__h">Equipment</h3>
-      {equipment.map(([label, href]) => <a href={href}>{label}</a>)}
-    </nav>
-
-    <div class="ft__col">
-      <h3 class="ft__h">Get in touch</h3>
-      <a href="tel:+971523995373" class="mono">+971 52 399 5373</a>
-      <a href="tel:+971509132703" class="mono">+971 50 913 2703</a>
-      <a href="tel:+971556752784" class="mono">055 675 2784 <span class="ft__note">— car parts</span></a>
-      <a href="mailto:info@collinscouae.com">info@collinscouae.com</a>
-      <p class="ft__addr">Ras Al Khor 2,<br>Dubai, UAE</p>
+    <div
+      class="py-6 flex justify-between flex-wrap gap-[10px] text-[12.5px] text-[#777] max-xs:flex-col max-xs:items-start max-xs:gap-2"
+    >
+      <span>© {year} {site.legalName}. All rights reserved.</span>
+      <span>{site.credit}</span>
     </div>
   </div>
-
-  <div class="wrap ft__base">
-    <p class="mono">© 2026 Collins Equipments LLC</p>
-    <p class="mono ft__base-r">DWG. COLLINS-WEB · REV A · DUBAI, UAE</p>
-  </div>
-
-  <style>
-    .ft{border-top:1px solid var(--line-2);background:var(--ink-1);padding-top:clamp(40px,6vw,72px)}
-    .ft__grid{display:grid;grid-template-columns:1.5fr 1fr 1fr 1.1fr;gap:clamp(28px,4vw,56px);padding-bottom:clamp(36px,5vw,60px)}
-    .ft__brand .logo{display:flex;align-items:center;gap:11px}
-    .ft__brand .logo__word{font-family:var(--f-display);font-size:1.85rem;line-height:.8;color:var(--blue);letter-spacing:.02em;display:block}
-    .ft__brand .logo__sub{font-family:var(--f-mono);font-size:.58rem;letter-spacing:.32em;text-transform:uppercase;color:var(--fg-dim);display:block;margin-top:3px}
-    .ft__tag{margin-top:18px;max-width:30ch;color:var(--fg-dim);font-size:.92rem}
-    .ft__ig{display:inline-flex;align-items:center;gap:10px;margin-top:20px;color:var(--fg-dim);font-family:var(--f-mono);font-size:.78rem;letter-spacing:.04em;transition:color .15s}
-    .ft__ig:hover{color:var(--fg)}
-    .ft__h{font-family:var(--f-mono);font-size:.72rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--fg);margin-bottom:18px;padding-bottom:10px;position:relative}
-    .ft__h::after{content:"";position:absolute;left:0;bottom:0;width:30px;height:3px;background:var(--accent-line)}
-    .ft__col{display:flex;flex-direction:column;gap:11px}
-    .ft__col a{color:var(--fg-dim);font-size:.9rem;transition:color .15s}
-    .ft__col a:hover{color:var(--fg)}
-    .ft__col--equip{display:grid;grid-template-columns:1fr 1fr;gap:11px 20px}
-    .ft__col--equip .ft__h{grid-column:1 / -1}
-    .ft__note{color:var(--fg-faint)}
-    .ft__addr{color:var(--fg-dim);font-size:.9rem;margin-top:4px}
-    .ft__base{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;padding-block:20px;border-top:1px solid var(--line);color:var(--fg-faint);font-size:.72rem;letter-spacing:.06em}
-    @media (max-width:900px){
-      .ft__grid{grid-template-columns:1fr 1fr}
-      .ft__brand{grid-column:1 / -1}
-    }
-    @media (max-width:520px){
-      .ft__grid{grid-template-columns:1fr}
-      .ft__col--equip{grid-template-columns:1fr 1fr}
-    }
-  </style>
 </footer>

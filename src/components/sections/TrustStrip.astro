@@ -1,0 +1,18 @@
+---
+/** Bright accent strip of trust points below the hero. */
+import { trustPoints } from "../../data/content";
+---
+
+<div class="bg-brand-bright">
+  <div
+    class="wrap flex justify-between flex-wrap gap-[14px] py-5 max-mob:justify-center max-mob:py-4"
+  >
+    {
+      trustPoints.map((point) => (
+        <div class="flex items-center gap-[10px] font-extrabold text-[13px] tracking-[0.4px] uppercase text-white max-mob:text-[11px] max-xs:text-[10px] max-xs:gap-[6px]">
+          ✓ {point}
+        </div>
+      ))
+    }
+  </div>
+</div>

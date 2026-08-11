@@ -1,0 +1,50 @@
+---
+/** Leadership message teaser with framed portrait. */
+import Eyebrow from "../ui/Eyebrow.astro";
+import Button from "../ui/Button.astro";
+import { about } from "../../data/content";
+---
+
+<section id="about" class="py-24 max-mob:py-[60px]">
+  <div class="wrap">
+    <div
+      class="grid grid-cols-[0.9fr_1.1fr] gap-[70px] items-center max-nav:grid-cols-1"
+    >
+      <div
+        class="about-photo aspect-[4/5] relative flex items-end p-[26px] rounded-[4px] overflow-hidden max-mob:aspect-square"
+      >
+        <div class="relative z-[2] text-white">
+          <b class="font-display text-[20px] tracking-[0.5px]"
+            >{about.photoCaption.name}</b
+          ><span class="text-[12.5px] text-[#bbb]">{about.photoCaption.title}</span>
+        </div>
+      </div>
+
+      <div>
+        <Eyebrow bar={false} class="mb-[16px]">{about.eyebrow}</Eyebrow>
+        <blockquote
+          class="text-[20px] leading-[1.5] font-medium text-[#222] border-l-4 border-brand pl-6 mb-6 max-xs:text-[17px] max-xs:pl-[18px]"
+        >
+          {about.quote}
+        </blockquote>
+        <div class="font-display text-[18px] text-navy">
+          {about.author}<span
+            class="block font-sans text-[12px] text-[#888] font-semibold mt-[2px] uppercase tracking-[1px]"
+            >{about.role}</span
+          >
+        </div>
+        <Button variant="outline" href={about.cta.href} class="mt-[28px]">
+          {about.cta.label}
+        </Button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .about-photo {
+    background:
+      linear-gradient(180deg, rgba(0, 0, 0, 0) 55%, rgba(0, 0, 0, 0.85) 100%),
+      url("/images/about-photo.jpg") center 20% / cover no-repeat;
+  }
+</style>
