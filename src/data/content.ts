@@ -1,86 +1,86 @@
 /**
  * Editable marketing copy for each page section.
  * Multi-line headings are arrays — each item renders on its own line.
+ *
+ * Voice: calm, confident, sentence case — matched to the minimal premium
+ * design. Placeholder stats & testimonials are marked; swap for real ones.
  */
 
 export const hero = {
-  eyebrow: "INDUSTRIAL & HEAVY MACHINERY · SALES & RENTAL · UAE",
+  eyebrow: "Industrial & Heavy Machinery · Sales & Rental · UAE",
   /** Title is split so the middle phrase can be colour-emphasised. */
   title: {
     lead: "Excellence in ",
-    emphasis: "Industrial & Heavy Machinery",
-    tail: " Rental and Sales Solutions",
+    emphasis: "industrial & heavy machinery",
+    tail: " rental and sales.",
   },
-  sub: "We provide the most reliable, top-quality branded equipment — built around your industry-specific needs, from Ras Al Khor to Sharjah and beyond.",
+  sub: "Reliable, top-quality branded equipment — generators, forklifts, compressors and cranes — to buy or rent, delivered fast across the UAE.",
   ctas: [
-    { label: "Request a Quote", href: "#quote", variant: "primary" as const },
-    { label: "Explore Equipment", href: "#products", variant: "outline-white" as const },
+    { label: "Request a quote", href: "/#contact", variant: "primary" as const },
+    { label: "Explore equipment", href: "/#equipment", variant: "outline" as const },
   ],
 };
 
-export const trustPoints: string[] = [
-  "Top International Brands",
-  "Flexible Sales & Rental",
-  "Wide Equipment Range",
-  "Fast Delivery & Ready Stock",
-];
+/** "Why Collins" — big statement + tabbed proof card. */
+export const trust = {
+  eyebrow: "What we do",
+  statement: "We Offer Expert Equipment Sourcing and Global Export Solutions",
+  /** Constant headline over the photo card; tabs swap image + copy below it. */
+  cardTitle: ["Built to keep", "your site moving."],
+};
 
+/** Equipment categories grid. */
 export const fleet = {
-  eyebrow: "Our Fleet",
-  title: ["Equipment Built", "For The Job"],
+  eyebrow: "Equipment",
+  title: ["Built for the job,", "ready when you are."],
   intro:
-    "Explore our full catalogue — every category available for both purchase and rental, with per-unit enquiry built in.",
+    "Every category available to buy or rent, with per-unit enquiry built in — from a single generator to a full fleet.",
+  viewAll: { label: "View all equipment", href: "/#equipment" },
 };
 
-export const capabilitiesSection = {
-  eyebrow: "Capabilities",
-  title: ["What We", "Do More"],
+/** Services overview. */
+export const servicesSection = {
+  eyebrow: "Services",
+  title: ["What we do", "beyond the sale."],
+  intro:
+    "Trading, rental and logistics under one roof — structured around your project timeline.",
 };
 
-export const partnersLabel = "Trusted By Leading Manufacturers";
+/** Accessible label for the manufacturer wordmark strip in the hero. */
+export const partnersLabel = "Trusted by the world's leading manufacturers";
 
-export const buyRent = {
-  eyebrow: "Per-Product Flow",
-  title: ["Buy It. Or", "Rent It. Your Call."],
-  body: "Every product page carries a clear intent toggle instead of one generic enquiry form — the equipment name and your choice (Buy or Rent) pre-fill automatically.",
-  points: [
-    "Intent captured before the form loads",
-    "Equipment name auto-filled, zero re-typing",
-    "Routed straight to the sales team on submit",
-  ],
-  sample: {
-    imageLabel: "GENERATOR — PRODUCT PHOTO",
-    title: "Diesel Generator 250 KVA",
-    spec: "Silent canopy · Cummins engine · Auto-start ready",
-    /** First option is the default active toggle. */
-    toggles: ["Rent", "Buy"],
-    ctaPrefix: "Enquire to",
+/** Industries photo grid. */
+export const industriesSection = {
+  eyebrow: "Industries",
+  title: ["Wherever the work is,", "we're already there."],
+  intro:
+    "Eight sectors, one supplier — power, lifting, access and parts matched to how your industry actually works.",
+};
+
+/** Testimonials — split photo + rotating pull quote. */
+export const testimonialsSection = {
+  eyebrow: "Case studies",
+  imageAlt:
+    "Generator and tower light running on a construction site at dawn",
+};
+
+/** About teaser — mission line, stats and head-office info. */
+export const aboutSection = {
+  eyebrow: "About Collins",
+  title: ["A partner built for", "uptime and scale."],
+  body: "We deliver high-performance power solutions and heavy machinery built to exceed industrial standards — where innovation meets execution.",
+  cta: { label: "Read our story", href: "#" },
+  office: {
+    tag: "Head Office",
+    city: "Dubai",
+    address: "Ras Al Khor 2, Dubai, UAE",
+    hours: "Mon–Fri, 8:00am–6:30pm",
   },
 };
 
-export const quoteBand = {
-  eyebrow: "Request A Quote",
-  title: ["Get Our Catalogue", "& Pricing"],
+/** Contact CTA band. */
+export const contactSection = {
+  eyebrow: "Get in touch",
+  title: ["Let's get your", "equipment moving."],
   body: "Tell us what you need and how long you need it for — our team responds with pricing and availability within one business day.",
-  callPrompt: "Prefer to talk?",
-  formLabel: "Fill In The Form Below",
-};
-
-export const branchesSection = {
-  eyebrow: "Location",
-  title: ["Our Branch"],
-  intro: "Our Dubai branch holds local stock and handles sales, rental and support across the UAE.",
-};
-
-export const about = {
-  eyebrow: "A Message From Leadership",
-  quote:
-    "“At Collins Equipments, we deliver high-performance power solutions and heavy machinery built to exceed industrial standards — where innovation meets execution.”",
-  author: "Rohan Robert",
-  role: "Managing Director",
-  photoCaption: {
-    name: "ROHAN ROBERT",
-    title: "Managing Director, Collins Equipments",
-  },
-  cta: { label: "Read Our Full Story", href: "#" },
 };

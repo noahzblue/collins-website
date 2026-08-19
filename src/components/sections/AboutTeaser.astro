@@ -1,50 +1,131 @@
 ---
-/** Leadership message teaser with framed portrait. */
-import Eyebrow from "../ui/Eyebrow.astro";
+/** About teaser — mission + borderless stat band (count-up) + head-office strip. */
+import Section from "../ui/Section.astro";
+import SectionHeading from "../ui/SectionHeading.astro";
 import Button from "../ui/Button.astro";
-import { about } from "../../data/content";
+import Icon from "../ui/Icon.astro";
+import { stats } from "../../data/catalog";
+import { aboutSection } from "../../data/content";
+import { site } from "../../config/site";
+
+const office = aboutSection.office;
+
+/** Split "500+" / "24h" into the animatable number and its suffix. */
+const parseStat = (value: string) => {
+  const match = value.match(/^(\d+)(.*)$/);
+  return match
+    ? { target: Number(match[1]), suffix: match[2] }
+    : { target: 0, suffix: value };
+};
 ---
 
-<section id="about" class="py-24 max-mob:py-[60px]">
+<Section id="about">
   <div class="wrap">
+    <SectionHeading
+      eyebrow={aboutSection.eyebrow}
+      title={aboutSection.title}
+      intro={aboutSection.body}
+    />
+
+    <!-- Stat band — borderless, hairline-divided, numbers count up on scroll. -->
     <div
-      class="grid grid-cols-[0.9fr_1.1fr] gap-[70px] items-center max-nav:grid-cols-1"
+      id="stat-band"
+      class="grid grid-cols-3 border-y border-line divide-x divide-line max-cmp:grid-cols-1 max-cmp:divide-x-0 max-cmp:divide-y max-cmp:divide-line"
+    >
+      {
+        stats.map((s) => {
+          const { target, suffix } = parseStat(s.value);
+          return (
+            <div class="py-10 px-10 first:pl-0 max-cmp:px-0 max-cmp:py-7">
+              <div class="font-display font-semibold text-ink leading-none text-[clamp(40px,4.8vw,60px)]">
+                <span class="stat-num" data-target={target}>{target}</span>{suffix}
+              </div>
+              <div class="text-[14.5px] text-muted mt-3">{s.label}</div>
+            </div>
+          );
+        })
+      }
+    </div>
+
+    <!-- Head-office strip -->
+    <div
+      class="card overflow-hidden mt-14 grid grid-cols-[1fr_1.1fr] max-nav:grid-cols-1 max-mob:mt-10"
     >
       <div
-        class="about-photo aspect-[4/5] relative flex items-end p-[26px] rounded-[4px] overflow-hidden max-mob:aspect-square"
+        class="office-photo min-h-[320px] max-nav:min-h-[240px]"
+        style="background-image:linear-gradient(180deg,rgba(10,14,23,0) 45%,rgba(10,14,23,0.5) 100%),url('/images/about-office.jpg')"
       >
-        <div class="relative z-[2] text-white">
-          <b class="font-display text-[20px] tracking-[0.5px]"
-            >{about.photoCaption.name}</b
-          ><span class="text-[12.5px] text-[#bbb]">{about.photoCaption.title}</span>
-        </div>
       </div>
-
-      <div>
-        <Eyebrow bar={false} class="mb-[16px]">{about.eyebrow}</Eyebrow>
-        <blockquote
-          class="text-[20px] leading-[1.5] font-medium text-[#222] border-l-4 border-brand pl-6 mb-6 max-xs:text-[17px] max-xs:pl-[18px]"
+      <div class="p-10 flex flex-col justify-center max-xs:p-7">
+        <span
+          class="self-start inline-block rounded-full bg-brand-tint text-brand text-[11px] font-semibold tracking-[1px] uppercase px-[12px] py-[6px]"
         >
-          {about.quote}
-        </blockquote>
-        <div class="font-display text-[18px] text-navy">
-          {about.author}<span
-            class="block font-sans text-[12px] text-[#888] font-semibold mt-[2px] uppercase tracking-[1px]"
-            >{about.role}</span
-          >
+          {office.tag}
+        </span>
+        <h3 class="text-[clamp(28px,3vw,38px)] mt-4 mb-5">{office.city}</h3>
+        {(
+          [
+            { icon: "pin", text: office.address },
+            { icon: "clock", text: office.hours },
+            { icon: "phone", text: site.phone.display },
+          ] as const
+        ).map((row) => (
+          <div class="flex items-center gap-3 text-[15px] text-body mb-[10px]">
+            <Icon name={row.icon} size={17} class="text-brand shrink-0" />
+            <span>{row.text}</span>
+          </div>
+        ))}
+        <div class="flex gap-3 mt-6 flex-wrap">
+          <Button variant="primary" href={site.phone.href}>
+            Call the branch
+          </Button>
+          <Button variant="outline" href={aboutSection.cta.href}>
+            {aboutSection.cta.label}
+          </Button>
         </div>
-        <Button variant="outline" href={about.cta.href} class="mt-[28px]">
-          {about.cta.label}
-        </Button>
       </div>
     </div>
   </div>
-</section>
+</Section>
 
 <style>
-  .about-photo {
-    background:
-      linear-gradient(180deg, rgba(0, 0, 0, 0) 55%, rgba(0, 0, 0, 0.85) 100%),
-      url("/images/about-photo.jpg") center 20% / cover no-repeat;
+  .office-photo {
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
   }
 </style>
+
+<script>
+  const band = document.getElementById("stat-band");
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (band && !reduced) {
+    const nums = [...band.querySelectorAll<HTMLElement>(".stat-num")];
+    const DURATION = 1200;
+
+    const run = (el: HTMLElement) => {
+      const target = Number(el.dataset.target ?? "0");
+      const start = performance.now();
+      const tick = (now: number) => {
+        const t = Math.min((now - start) / DURATION, 1);
+        const eased = 1 - Math.pow(1 - t, 3);
+        el.textContent = String(Math.round(target * eased));
+        if (t < 1) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    };
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            nums.forEach(run);
+            io.disconnect();
+          }
+        });
+      },
+      { threshold: 0.4 },
+    );
+    io.observe(band);
+  }
+</script>

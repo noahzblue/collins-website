@@ -47,6 +47,9 @@ export const site = {
   locations: "Dubai · Sharjah",
   address: "Ras Al Khor 2, Dubai, UAE",
 
+  /** Head-office coordinates — used for the hero's technical detail tag. */
+  geo: { lat: "25.1776", lng: "55.3488" },
+
   social: [
     {
       label: "Instagram",

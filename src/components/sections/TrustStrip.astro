@@ -1,20 +1,178 @@
 ---
-/** Bright accent strip of trust points below the hero. */
-import Icon from "../ui/Icon.astro";
-import { trustPoints } from "../../data/content";
+/**
+ * "Why Collins" — big statement, then one dark photo card with a constant
+ * headline, a mono counter, and four tabs along the base that swap the
+ * photo + copy (siteassist.com pattern). Auto-advances every 6s, pauses
+ * while hovered, and holds still for reduced-motion users.
+ */
+import Section from "../ui/Section.astro";
+import Eyebrow from "../ui/Eyebrow.astro";
+import { trustFeatures } from "../../data/catalog";
+import { trust } from "../../data/content";
 ---
 
-<div class="bg-brand-bright">
-  <div
-    class="wrap flex justify-between flex-wrap gap-[14px] py-5 max-mob:justify-center max-mob:py-4"
-  >
-    {
-      trustPoints.map((point) => (
-        <div class="flex items-center gap-[10px] font-extrabold text-[13px] tracking-[0.4px] uppercase text-white max-mob:text-[11px] max-xs:text-[10px] max-xs:gap-[6px]">
-          <Icon name="check" size={16} class="[stroke-width:3]" />
-          {point}
-        </div>
-      ))
-    }
+<Section id="why-collins">
+  <div class="wrap">
+    <Eyebrow class="mb-[16px]">{trust.eyebrow}</Eyebrow>
+    <h2 class="text-[clamp(28px,3.6vw,44px)] leading-[1.12] max-w-[820px]">
+      {trust.statement}
+    </h2>
+
+    <div
+      id="why-card"
+      class="relative overflow-hidden rounded-[18px] bg-ink mt-[56px] min-h-[620px] flex flex-col justify-between max-mob:mt-[36px] max-mob:min-h-0"
+    >
+      {
+        trustFeatures.map((f, i) => (
+          <div
+            class:list={["tab-img absolute inset-0 bg-cover bg-center", i === 0 && "is-active"]}
+            style={`background-image:url('${f.image}')`}
+            aria-hidden="true"
+          />
+        ))
+      }
+
+      <!-- Scrim: headline zone up top, tab rail along the base. -->
+      <div
+        class="absolute inset-0 bg-[linear-gradient(180deg,rgba(6,10,20,0.55)_0%,rgba(6,10,20,0.08)_38%,rgba(6,10,20,0.78)_100%)]"
+        aria-hidden="true"
+      >
+      </div>
+
+      <div class="relative flex items-start justify-between gap-6 p-10 max-xs:p-6">
+        <h3
+          class="text-white text-[clamp(26px,2.8vw,38px)] leading-[1.1]"
+          set:html={trust.cardTitle.join("<br>")}
+        />
+        <span
+          id="why-num"
+          class="font-mono text-[clamp(28px,3vw,40px)] text-white/85 leading-none pt-1"
+        >
+          01
+        </span>
+      </div>
+
+      <div
+        class="relative grid grid-cols-4 gap-8 px-10 pb-9 pt-16 max-nav:grid-cols-2 max-nav:gap-6 max-cmp:grid-cols-1 max-xs:px-6 max-xs:pb-6"
+        role="tablist"
+        aria-label={trust.eyebrow}
+      >
+        {
+          trustFeatures.map((f, i) => (
+            <button
+              type="button"
+              role="tab"
+              class="why-tab group text-left cursor-pointer"
+              aria-selected={i === 0 ? "true" : "false"}
+              data-index={i}
+            >
+              <span class="block text-[16.5px] font-medium text-white/65 transition-colors duration-300 group-aria-selected:text-white">
+                {f.title}
+              </span>
+              <span class="desc-wrap grid transition-[grid-template-rows] duration-500 ease-out">
+                <span class="block overflow-hidden">
+                  <span class="block pt-2 text-[13.5px] leading-relaxed text-white/70">
+                    {f.body}
+                  </span>
+                </span>
+              </span>
+              <span class="bar relative block h-px mt-4 bg-white/25 overflow-hidden">
+                <span class="bar-fill absolute inset-y-0 left-0 w-0 bg-brand-bright" />
+              </span>
+            </button>
+          ))
+        }
+      </div>
+    </div>
   </div>
-</div>
+</Section>
+
+<style>
+  .tab-img {
+    opacity: 0;
+    transition: opacity 0.65s ease;
+  }
+  .tab-img.is-active {
+    opacity: 1;
+  }
+
+  .desc-wrap {
+    grid-template-rows: 0fr;
+  }
+  .why-tab[aria-selected="true"] .desc-wrap {
+    grid-template-rows: 1fr;
+  }
+
+  /* Progress line fills across the auto-advance interval — keep the 6s in
+     sync with INTERVAL in the script below. Hover pauses fill + rotation. */
+  .why-tab[aria-selected="true"] .bar-fill {
+    animation: why-progress 6s linear forwards;
+  }
+  #why-card:hover .bar-fill {
+    animation-play-state: paused;
+  }
+  @keyframes why-progress {
+    from {
+      width: 0;
+    }
+    to {
+      width: 100%;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tab-img,
+    .desc-wrap {
+      transition: none;
+    }
+    .why-tab[aria-selected="true"] .bar-fill {
+      animation: none;
+      width: 100%;
+    }
+  }
+</style>
+
+<script>
+  const card = document.getElementById("why-card");
+  if (card) {
+    const tabs = [...card.querySelectorAll<HTMLButtonElement>(".why-tab")];
+    const imgs = [...card.querySelectorAll<HTMLElement>(".tab-img")];
+    const num = card.querySelector<HTMLElement>("#why-num")!;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const INTERVAL = 6000;
+    let idx = 0;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+
+    // Re-trigger the CSS fill animation from zero on the active tab.
+    const restartFill = () => {
+      const fill = tabs[idx].querySelector<HTMLElement>(".bar-fill");
+      if (!fill) return;
+      fill.style.animation = "none";
+      void fill.offsetWidth;
+      fill.style.animation = "";
+    };
+
+    const arm = () => {
+      clearTimeout(timer);
+      if (!reduced) {
+        timer = setTimeout(() => select((idx + 1) % tabs.length), INTERVAL);
+      }
+    };
+
+    const select = (i: number) => {
+      idx = i;
+      tabs.forEach((t, j) => t.setAttribute("aria-selected", String(j === i)));
+      imgs.forEach((im, j) => im.classList.toggle("is-active", j === i));
+      num.textContent = String(i + 1).padStart(2, "0");
+      arm();
+    };
+
+    tabs.forEach((t, i) => t.addEventListener("click", () => select(i)));
+    card.addEventListener("mouseenter", () => clearTimeout(timer));
+    card.addEventListener("mouseleave", () => {
+      restartFill();
+      arm();
+    });
+    arm();
+  }
+</script>

@@ -1,5 +1,5 @@
 ---
-/** Product catalogue grid. Cards are full-bleed with a hover flip to dark. */
+/** Equipment categories grid — photo tiles in the house grade, per-unit enquiry. */
 import Section from "../ui/Section.astro";
 import SectionHeading from "../ui/SectionHeading.astro";
 import Icon from "../ui/Icon.astro";
@@ -7,38 +7,56 @@ import { products } from "../../data/catalog";
 import { fleet } from "../../data/content";
 ---
 
-<Section id="products">
+<Section id="equipment" tone="gray">
   <div class="wrap">
     <SectionHeading
       eyebrow={fleet.eyebrow}
       title={fleet.title}
       intro={fleet.intro}
     />
-  </div>
 
-  <div
-    class="grid grid-cols-3 gap-[2px] bg-[#e7e7e7] max-nav:grid-cols-2 max-cmp:grid-cols-1"
-  >
-    {
-      products.map((product) => (
-        <a
-          href={product.href}
-          class="group relative flex flex-col justify-end overflow-hidden min-h-[230px] bg-white px-[30px] py-[38px] transition-[background] duration-200 hover:bg-ink max-xs:px-5 max-xs:py-[26px] max-xs:min-h-[170px]"
-        >
-          <span class="absolute top-[26px] right-[30px] font-display text-[15px] text-[#d8d8d8]">
-            {product.num}
-          </span>
-          <span class="font-display text-[28px] tracking-[0.5px] mb-2 transition-colors duration-200 group-hover:text-white max-xs:text-[20px]">
-            {product.title}
-          </span>
-          <span class="text-[13.5px] text-[#777] mb-5 transition-colors duration-200 group-hover:text-white">
-            {product.sub}
-          </span>
-          <span class="flex items-center justify-center w-[38px] h-[38px] rounded-full border-2 border-ink transition-all duration-200 group-hover:bg-brand-bright group-hover:border-brand-bright group-hover:text-white group-hover:translate-x-1">
-            <Icon name="arrow-right" size={16} />
-          </span>
-        </a>
-      ))
-    }
+    <div class="grid grid-cols-3 gap-5 max-nav:grid-cols-2 max-cmp:grid-cols-1">
+      {
+        products.map((product) => (
+          <a
+            href={product.href}
+            class="group card relative flex flex-col overflow-hidden transition-all duration-200 hover:border-line-strong hover:shadow-[0_20px_50px_-28px_rgba(10,14,23,0.32)] hover:-translate-y-[3px]"
+          >
+            <div class="relative aspect-[4/3] overflow-hidden">
+              <div
+                class="absolute inset-0 bg-cover bg-center transition-transform duration-500 ease-out group-hover:scale-[1.05]"
+                style={`background-image:url('${product.image}')`}
+                aria-hidden="true"
+              />
+              <span class="absolute top-4 right-4 font-mono text-[11.5px] tracking-[0.5px] text-white/90 bg-ink/35 backdrop-blur-sm rounded-full px-[10px] py-[5px]">
+                {product.num}
+              </span>
+            </div>
+            <div class="flex flex-col flex-1 p-7 max-xs:p-6">
+              <h3 class="text-[21px] font-semibold">{product.title}</h3>
+              <p class="text-[14px] text-muted mt-1">{product.sub}</p>
+              <span class="mt-5 inline-flex items-center gap-[6px] text-[13px] font-semibold text-brand">
+                Buy or rent
+                <Icon
+                  name="arrow-up-right"
+                  size={15}
+                  class="transition-transform duration-200 group-hover:translate-x-[3px] group-hover:-translate-y-[3px]"
+                />
+              </span>
+            </div>
+          </a>
+        ))
+      }
+    </div>
+
+    <div class="mt-10 text-center">
+      <a
+        href={fleet.viewAll.href}
+        class="inline-flex items-center gap-2 text-[15px] font-semibold text-ink transition-colors hover:text-brand"
+      >
+        {fleet.viewAll.label}
+        <Icon name="arrow-right" size={17} />
+      </a>
+    </div>
   </div>
 </Section>

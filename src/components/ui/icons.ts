@@ -44,10 +44,59 @@ export const icons = {
     mode: "stroke",
     body: `<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>`,
   },
+  /** Outline envelope — email. */
+  mail: {
+    mode: "stroke",
+    body: `<rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>`,
+  },
   /** Outline right arrow — card / link affordance. */
   "arrow-right": {
     mode: "stroke",
     body: `<path d="M5 12h14M13 6l6 6-6 6"/>`,
+  },
+  /** Diagonal up-right arrow — card / "view all" affordance. */
+  "arrow-up-right": {
+    mode: "stroke",
+    body: `<path d="M7 17 17 7M8 7h9v9"/>`,
+  },
+  /** Medal / award — top brands. */
+  award: {
+    mode: "stroke",
+    body: `<circle cx="12" cy="8" r="6"/><path d="M15.5 12.9 17 22l-5-3-5 3 1.5-9.1"/>`,
+  },
+  /** Price tag — flexible sales & rental. */
+  tag: {
+    mode: "stroke",
+    body: `<path d="M12.6 2.6A2 2 0 0 0 11.2 2H4a2 2 0 0 0-2 2v7.2a2 2 0 0 0 .6 1.4l8.7 8.7a2.4 2.4 0 0 0 3.4 0l6.6-6.6a2.4 2.4 0 0 0 0-3.4Z"/><circle cx="7.5" cy="7.5" r="1.2"/>`,
+  },
+  /** Stacked layers — wide range. */
+  layers: {
+    mode: "stroke",
+    body: `<path d="M12.8 2.2a2 2 0 0 0-1.6 0L2.6 6.1a1 1 0 0 0 0 1.8l8.6 3.9a2 2 0 0 0 1.6 0l8.6-3.9a1 1 0 0 0 0-1.8Z"/><path d="m22 17.7-9.2 4.1a2 2 0 0 1-1.6 0L2 17.7"/><path d="m22 12.7-9.2 4.1a2 2 0 0 1-1.6 0L2 12.7"/>`,
+  },
+  /** Delivery truck — fast delivery / logistics. */
+  truck: {
+    mode: "stroke",
+    body: `<path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.7a1 1 0 0 0-.2-.6l-3.5-4.4A1 1 0 0 0 17.5 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/>`,
+  },
+  /** Refresh cycle — buy or rent. */
+  refresh: {
+    mode: "stroke",
+    body: `<path d="M21 12a9 9 0 0 0-9-9 9.8 9.8 0 0 0-6.7 2.7L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.8 9.8 0 0 0 6.7-2.7L21 16"/><path d="M16 16h5v5"/>`,
+  },
+  /** Magnifier — sourcing. */
+  search: {
+    mode: "stroke",
+    body: `<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>`,
+  },
+  /** Globe — export / regional reach. */
+  globe: {
+    mode: "stroke",
+    body: `<circle cx="12" cy="12" r="10"/><path d="M12 2a15 15 0 0 1 0 20 15 15 0 0 1 0-20"/><path d="M2 12h20"/>`,
+  },
+  /** Solid star — testimonial ratings. */
+  star: {
+    body: `<path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>`,
   },
   /** WhatsApp glyph (brand). */
   whatsapp: {

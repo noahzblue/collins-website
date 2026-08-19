@@ -1,0 +1,168 @@
+---
+/**
+ * Services — icon accordion on the left, photo on the right with a floating
+ * mini data-card (siteassist "Platform" pattern). Selecting a row swaps the
+ * photo and the data-card; the first row starts open.
+ */
+import Section from "../ui/Section.astro";
+import Eyebrow from "../ui/Eyebrow.astro";
+import Icon from "../ui/Icon.astro";
+import { services } from "../../data/catalog";
+import { servicesSection } from "../../data/content";
+---
+
+<Section id="services">
+  <div class="wrap">
+    <div
+      id="services-split"
+      class="grid grid-cols-[0.9fr_1.1fr] gap-16 items-center max-nav:grid-cols-1 max-nav:gap-10"
+      data-stats={JSON.stringify(services.map((s) => s.stat))}
+    >
+      <!-- Left: heading + accordion -->
+      <div>
+        <Eyebrow class="mb-4">{servicesSection.eyebrow}</Eyebrow>
+        <h2
+          class="text-[clamp(30px,3.8vw,46px)] leading-[1.06] mb-4"
+          set:html={servicesSection.title.join("<br>")}
+        />
+        <p class="text-[16px] leading-relaxed text-muted max-w-[440px] mb-10">
+          {servicesSection.intro}
+        </p>
+
+        <div class="border-t border-line">
+          {
+            services.map((s, i) => (
+              <button
+                type="button"
+                class="svc-row group block w-full text-left border-b border-line py-6 cursor-pointer"
+                aria-expanded={i === 0 ? "true" : "false"}
+                data-index={i}
+              >
+                <span class="flex items-center gap-4">
+                  <span class="svc-icon flex items-center justify-center w-[44px] h-[44px] rounded-[13px] shrink-0 transition-colors duration-300">
+                    <Icon name={s.icon} size={21} />
+                  </span>
+                  <span class="svc-title text-[18px] font-semibold transition-colors duration-300">
+                    {s.title}
+                  </span>
+                </span>
+                <span class="svc-body grid transition-[grid-template-rows] duration-500 ease-out">
+                  <span class="block overflow-hidden">
+                    <span class="block pt-3 pl-[60px] text-[15px] leading-relaxed text-muted max-xs:pl-0">
+                      {s.body}
+                    </span>
+                  </span>
+                </span>
+              </button>
+            ))
+          }
+        </div>
+      </div>
+
+      <!-- Right: photo panel + floating data-card -->
+      <div class="relative rounded-[18px] overflow-hidden aspect-[4/3] max-nav:aspect-[16/10]">
+        {
+          services.map((s, i) => (
+            <div
+              class:list={["svc-img absolute inset-0 bg-cover bg-center", i === 0 && "is-active"]}
+              style={`background-image:url('${s.image}')`}
+              aria-hidden="true"
+            />
+          ))
+        }
+        <div
+          class="absolute left-5 bottom-5 max-w-[290px] rounded-[14px] bg-white/92 backdrop-blur-md border border-white/60 shadow-[0_18px_44px_-22px_rgba(10,14,23,0.45)] p-5 max-xs:left-4 max-xs:bottom-4 max-xs:p-4"
+        >
+          <div class="flex items-center gap-3">
+            <span
+              id="svc-card-icon"
+              class="flex items-center justify-center w-[38px] h-[38px] rounded-[11px] bg-brand-tint text-brand shrink-0"
+            >
+              {
+                services.map((s, i) => (
+                  <span class:list={["svc-card-glyph", i !== 0 && "hidden"]} data-index={i}>
+                    <Icon name={s.icon} size={18} />
+                  </span>
+                ))
+              }
+            </span>
+            <span id="svc-card-title" class="text-[15px] font-semibold text-ink">
+              {services[0].stat.title}
+            </span>
+          </div>
+          <p id="svc-card-line" class="text-[13.5px] leading-relaxed text-muted mt-2 mb-0">
+            {services[0].stat.line}
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</Section>
+
+<style>
+  .svc-icon {
+    background: var(--color-surface-2);
+    color: var(--color-muted);
+  }
+  .svc-row[aria-expanded="true"] .svc-icon {
+    background: var(--color-brand-tint);
+    color: var(--color-brand);
+  }
+  .svc-title {
+    color: var(--color-muted);
+  }
+  .svc-row:hover .svc-title,
+  .svc-row[aria-expanded="true"] .svc-title {
+    color: var(--color-ink);
+  }
+
+  .svc-body {
+    grid-template-rows: 0fr;
+  }
+  .svc-row[aria-expanded="true"] .svc-body {
+    grid-template-rows: 1fr;
+  }
+
+  .svc-img {
+    opacity: 0;
+    transition: opacity 0.6s ease;
+  }
+  .svc-img.is-active {
+    opacity: 1;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .svc-img,
+    .svc-body {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  const split = document.getElementById("services-split");
+  if (split) {
+    const rows = [...split.querySelectorAll<HTMLButtonElement>(".svc-row")];
+    const imgs = [...split.querySelectorAll<HTMLElement>(".svc-img")];
+    const glyphs = [...split.querySelectorAll<HTMLElement>(".svc-card-glyph")];
+    const cardTitle = split.querySelector<HTMLElement>("#svc-card-title")!;
+    const cardLine = split.querySelector<HTMLElement>("#svc-card-line")!;
+    // Data-card copy mirrors the `stat` field per service in data/catalog.ts.
+    const stats = JSON.parse(split.dataset.stats ?? "[]") as {
+      title: string;
+      line: string;
+    }[];
+
+    const select = (i: number) => {
+      rows.forEach((r, j) => r.setAttribute("aria-expanded", String(j === i)));
+      imgs.forEach((im, j) => im.classList.toggle("is-active", j === i));
+      glyphs.forEach((g, j) => g.classList.toggle("hidden", j !== i));
+      if (stats[i]) {
+        cardTitle.textContent = stats[i].title;
+        cardLine.textContent = stats[i].line;
+      }
+    };
+
+    rows.forEach((r, i) => r.addEventListener("click", () => select(i)));
+  }
+</script>

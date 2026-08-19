@@ -2,6 +2,7 @@
 import "../styles/global.css";
 import FloatingButtons from "../components/FloatingButtons.astro";
 import { site } from "../config/site";
+import Header from "../components/Header.astro";
 
 interface Props {
   title?: string;
@@ -27,11 +28,12 @@ const { title = site.seo.title, description = site.seo.description } =
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Inter+Tight:wght@500;600;700&display=swap"
       rel="stylesheet"
     />
   </head>
   <body>
+    <Header />
     <slot />
     <FloatingButtons />
   </body>

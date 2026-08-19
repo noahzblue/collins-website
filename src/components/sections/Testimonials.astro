@@ -1,0 +1,133 @@
+---
+/**
+ * Testimonials — split layout: site photo one side, one large pull quote the
+ * other. Quotes rotate (auto every 7s, dots for manual control); slides stack
+ * in a single grid cell so the block keeps the height of the tallest quote.
+ */
+import Section from "../ui/Section.astro";
+import Eyebrow from "../ui/Eyebrow.astro";
+import Icon from "../ui/Icon.astro";
+import { testimonials } from "../../data/catalog";
+import { testimonialsSection } from "../../data/content";
+---
+
+<Section>
+  <div class="wrap">
+    <div
+      id="quote-split"
+      class="grid grid-cols-[0.85fr_1.15fr] gap-16 items-stretch max-nav:grid-cols-1 max-nav:gap-8"
+    >
+      <div
+        class="rounded-[18px] bg-cover bg-center min-h-[480px] max-nav:min-h-0 max-nav:aspect-[16/10]"
+        style="background-image:url('/images/testimonial-site.jpg')"
+        role="img"
+        aria-label={testimonialsSection.imageAlt}
+      >
+      </div>
+
+      <div class="flex flex-col justify-center py-4">
+        <Eyebrow class="mb-7">{testimonialsSection.eyebrow}</Eyebrow>
+
+        <div class="grid">
+          {
+            testimonials.map((t, i) => (
+              <figure
+                class:list={["quote-slide col-start-1 row-start-1", i === 0 && "is-active"]}
+              >
+                <div class="flex gap-[3px] text-brand">
+                  {Array.from({ length: t.rating }).map(() => (
+                    <Icon name="star" size={15} />
+                  ))}
+                </div>
+                <blockquote class="font-display text-[clamp(22px,2.5vw,31px)] font-semibold leading-[1.32] tracking-[-0.015em] text-ink mt-5">
+                  “{t.quote}”
+                </blockquote>
+                <figcaption class="mt-7">
+                  <div class="text-ink font-semibold text-[15px]">{t.name}</div>
+                  <div class="text-[13.5px] text-faint mt-0.5">{t.role}</div>
+                </figcaption>
+              </figure>
+            ))
+          }
+        </div>
+
+        <div class="flex items-center gap-[7px] mt-10" aria-label="Choose testimonial">
+          {
+            testimonials.map((t, i) => (
+              <button
+                type="button"
+                class="quote-dot h-[7px] rounded-full cursor-pointer transition-all duration-300"
+                aria-label={`Testimonial ${i + 1}`}
+                aria-current={i === 0 ? "true" : "false"}
+                data-index={i}
+              />
+            ))
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</Section>
+
+<style>
+  .quote-slide {
+    opacity: 0;
+    transform: translateY(8px);
+    transition:
+      opacity 0.5s ease,
+      transform 0.5s ease;
+    pointer-events: none;
+  }
+  .quote-slide.is-active {
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
+  }
+
+  .quote-dot {
+    width: 7px;
+    background: var(--color-line-strong);
+  }
+  .quote-dot[aria-current="true"] {
+    width: 22px;
+    background: var(--color-brand);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .quote-slide {
+      transition: none;
+      transform: none;
+    }
+  }
+</style>
+
+<script>
+  const block = document.getElementById("quote-split");
+  if (block) {
+    const slides = [...block.querySelectorAll<HTMLElement>(".quote-slide")];
+    const dots = [...block.querySelectorAll<HTMLButtonElement>(".quote-dot")];
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const INTERVAL = 7000;
+    let idx = 0;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+
+    const arm = () => {
+      clearTimeout(timer);
+      if (!reduced) {
+        timer = setTimeout(() => select((idx + 1) % slides.length), INTERVAL);
+      }
+    };
+
+    const select = (i: number) => {
+      idx = i;
+      slides.forEach((s, j) => s.classList.toggle("is-active", j === i));
+      dots.forEach((d, j) => d.setAttribute("aria-current", String(j === i)));
+      arm();
+    };
+
+    dots.forEach((d, i) => d.addEventListener("click", () => select(i)));
+    block.addEventListener("mouseenter", () => clearTimeout(timer));
+    block.addEventListener("mouseleave", arm);
+    arm();
+  }
+</script>

@@ -2,6 +2,7 @@
 /**
  * Section header: eyebrow + heading on the left, optional intro on the right.
  * `title` may be a string or an array of lines (rendered on separate lines).
+ * Sentence-case, airy — the premium editorial pattern.
  */
 import Eyebrow from "./Eyebrow.astro";
 
@@ -10,34 +11,60 @@ interface Props {
   title: string | string[];
   intro?: string;
   tone?: "light" | "dark";
+  align?: "split" | "center";
   class?: string;
 }
 
-const { eyebrow, title, intro, tone = "light", class: extra = "" } = Astro.props;
+const {
+  eyebrow,
+  title,
+  intro,
+  tone = "light",
+  align = "split",
+  class: extra = "",
+} = Astro.props;
 
 const lines = Array.isArray(title) ? title : [title];
 const h2Color = tone === "dark" ? "text-white" : "";
-const introColor = tone === "dark" ? "text-[#aaa]" : "text-[#666]";
+const introColor = tone === "dark" ? "text-[#aab2c0]" : "text-muted";
+const centered = align === "center";
 ---
 
 <div
   class:list={[
-    "flex justify-between items-end gap-6 flex-wrap mb-[52px] max-mob:mb-[34px] max-mob:gap-4",
+    "gap-8 mb-[60px] max-mob:mb-[40px]",
+    centered
+      ? "flex flex-col items-center text-center max-w-[640px] mx-auto"
+      : "flex justify-between items-end flex-wrap max-mob:gap-4",
     extra,
   ]}
 >
-  <div>
-    <Eyebrow tone={tone === "dark" ? "brand-bright" : "brand"} class="mb-[14px]">
+  <div class:list={[centered && "flex flex-col items-center"]}>
+    <Eyebrow
+      tone={tone === "dark" ? "brand-bright" : "brand"}
+      class={centered ? "mb-[16px] justify-center" : "mb-[16px]"}
+    >
       {eyebrow}
     </Eyebrow>
     <h2
-      class:list={["text-[clamp(32px,4vw,52px)] max-mob:mb-[6px]", h2Color]}
+      class:list={[
+        "text-[clamp(30px,3.8vw,46px)] leading-[1.06] max-mob:mb-[4px]",
+        h2Color,
+      ]}
       set:html={lines.join("<br>")}
     />
   </div>
   {
     intro && (
-      <p class:list={["max-w-[420px] text-[15px]", introColor]}>{intro}</p>
+      <p
+        class:list={[
+          "text-[16px] leading-relaxed",
+          centered ? "max-w-[560px]" : "max-w-[430px]",
+          introColor,
+        ]}
+      >
+        {intro}
+      </p>
     )
   }
 </div>

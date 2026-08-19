@@ -7,23 +7,38 @@
      --font-display       -> font-display
      --breakpoint-nav     -> nav: / max-nav: variants
    Change a value here and it updates everywhere.
+
+   Direction: "Refined Blue + Slate" — a calm, minimal, premium
+   system (Apple / Stripe school). Mostly quiet neutrals doing the
+   structural work, with blue reserved as a precise accent.
    ============================================================ */
 @theme {
-  /* Brand palette (blue theme) */
-  --color-brand: #0050f0;          /* deep brand blue — eyebrows, pins, primary accents */
-  --color-brand-bright: #2f6fff;   /* vivid action blue — primary buttons, trust strip */
-  --color-brand-hover: #5588ff;    /* primary button hover */
-  --color-ink: #000000;            /* black — dark sections & primary text */
+  /* Brand — used sparingly, so it stays loud when it appears. */
+  --color-brand: #0050f0;          /* deep brand blue — eyebrows, links, pins */
+  --color-brand-bright: #2f6fff;   /* action blue — primary buttons / CTAs */
+  --color-brand-hover: #0246d6;    /* darker press state for primary buttons */
+  --color-brand-tint: #eef3ff;     /* faint blue wash — accent surfaces / chips */
+
+  /* Neutrals — the premium scale that carries the layout. */
+  --color-ink: #0a0e17;            /* near-black (softened) — dark sections & text */
+  --color-ink-soft: #141a26;       /* slightly lifted near-black — dark cards */
+  --color-body: #33383f;           /* default body text on white */
+  --color-muted: #5b6472;          /* slate — secondary / supporting text */
+  --color-faint: #8a919c;          /* tertiary — captions, meta, disabled */
+  --color-line: #e7e9ee;           /* hairline borders / dividers */
+  --color-line-strong: #d6dae2;    /* slightly stronger hairline */
+  --color-surface: #f7f8fa;        /* off-white section background */
+  --color-surface-2: #eef1f5;      /* second-step off-white */
+
+  /* Support */
   --color-navy: #081459;           /* deep navy — wordmark sub, signature */
   --color-whatsapp: #25d366;       /* WhatsApp green */
-  --color-surface: #f2f2f2;        /* light gray section background */
 
   /* Fonts (loaded from Google Fonts in Base.astro) */
-  --font-sans: "Inter", system-ui, sans-serif;      /* document default (body) */
-  --font-display: "Bebas Neue", "Arial Narrow", sans-serif; /* headings */
+  --font-sans: "Inter", system-ui, sans-serif;                 /* body */
+  --font-display: "Inter Tight", "Inter", system-ui, sans-serif; /* headings */
 
-  /* Breakpoints — this design is desktop-first, so responsive rules are
-     written with the max-* variants of these named stops. */
+  /* Breakpoints — desktop-first; responsive rules use the max-* variants. */
   --breakpoint-nav: 980px;  /* nav hides, two-column splits & grids collapse */
   --breakpoint-mob: 900px;  /* mobile spacing / typography pass */
   --breakpoint-cmp: 600px;  /* compact single-column */
@@ -36,30 +51,43 @@
 @layer base {
   html {
     scroll-behavior: smooth;
+    /* Anchor jumps clear the floating fixed header. */
+    scroll-padding-top: 96px;
   }
   body {
-    color: var(--color-ink);
-    line-height: 1.5;
+    color: var(--color-body);
+    background: #ffffff;
+    line-height: 1.6;
     -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
   }
-  /* Headings are Bebas Neue, uppercase across the site by default;
-     individual sizes are set with utilities per component. */
+  /* Headings: Inter Tight, sentence case, tight optical tracking.
+     Sizes/weights are set per component; this is the shared feel. */
   h1, h2, h3, h4 {
     font-family: var(--font-display);
-    font-weight: 400;
-    letter-spacing: 0.5px;
-    line-height: 1.02;
-    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.08;
+    color: var(--color-ink);
+    text-wrap: balance;
+  }
+  ::selection {
+    background: var(--color-brand);
+    color: #fff;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-brand-bright);
+    outline-offset: 2px;
   }
 }
 
 /* ============================================================
-   COMPONENTS — one reusable layout helper.
-   .wrap = the centered max-width container used by every section.
+   COMPONENTS — shared layout + surface helpers.
    ============================================================ */
 @layer components {
+  /* Centered max-width container used by every section. */
   .wrap {
-    max-width: 1240px;
+    max-width: 1200px;
     margin-inline: auto;
     padding-inline: 32px;
   }
@@ -68,5 +96,13 @@
   }
   @media (max-width: 520px) {
     .wrap { padding-inline: 16px; }
+  }
+
+  /* Premium card: white surface, hairline border, soft rounding.
+     Padding + hover behaviour are added per component. */
+  .card {
+    background: #ffffff;
+    border: 1px solid var(--color-line);
+    border-radius: 18px;
   }
 }

@@ -1,5 +1,5 @@
 ---
-/** Site-wide footer. */
+/** Site-wide footer — light surface matching the blue/white system. */
 import Logo from "./ui/Logo.astro";
 import Icon from "./ui/Icon.astro";
 import { site } from "../config/site";
@@ -8,15 +8,15 @@ import { footerColumns } from "../data/navigation";
 const year = new Date().getFullYear();
 ---
 
-<footer id="contact" class="bg-ink text-[#bdbdbd] pt-20 max-mob:pt-14">
+<footer class="bg-surface border-t border-line text-muted pt-24 max-mob:pt-16">
   <div class="wrap">
     <div
-      class="grid grid-cols-[1.3fr_0.8fr_0.8fr_1fr] gap-[44px] pb-[60px] border-b border-[#262626] max-nav:grid-cols-2 max-cmp:grid-cols-1"
+      class="grid grid-cols-[1.4fr_0.9fr_0.9fr_1fr] gap-12 pb-16 border-b border-line max-nav:grid-cols-2 max-nav:gap-10 max-cmp:grid-cols-1"
     >
       <!-- Brand -->
       <div>
-        <Logo variant="footer" />
-        <p class="text-[13.5px] text-[#999] mt-4 mb-[22px] max-w-[280px]">
+        <Logo variant="header" />
+        <p class="text-[14px] leading-relaxed text-muted mt-5 mb-6 max-w-[280px]">
           {site.blurb}
         </p>
         <div class="flex gap-[10px]">
@@ -27,7 +27,7 @@ const year = new Date().getFullYear();
                 target="_blank"
                 rel="noopener"
                 aria-label={s.label}
-                class="w-9 h-9 border border-[#333] rounded-full flex items-center justify-center text-[#bdbdbd] transition-colors hover:border-brand-bright hover:text-brand-bright"
+                class="w-9 h-9 border border-line-strong rounded-full flex items-center justify-center text-muted transition-colors hover:border-brand hover:text-brand"
               >
                 <Icon name={s.icon} size={15} />
               </a>
@@ -40,13 +40,16 @@ const year = new Date().getFullYear();
       {
         footerColumns.map((col) => (
           <div>
-            <h5 class="relative text-white text-[13px] font-extrabold tracking-[1.5px] uppercase mb-2 pb-3 after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-[28px] after:h-[2px] after:bg-brand-bright">
+            <h5 class="text-ink text-[13px] font-semibold tracking-[1.5px] uppercase mb-5">
               {col.title}
             </h5>
-            <ul class="mt-[14px]">
+            <ul class="flex flex-col gap-[11px]">
               {col.links.map((link) => (
-                <li class="mb-[10px] text-[13.5px]">
-                  <a href={link.href} class="transition-colors hover:text-brand-bright">
+                <li class="text-[14px]">
+                  <a
+                    href={link.href}
+                    class="transition-colors hover:text-ink"
+                  >
                     {link.label}
                   </a>
                 </li>
@@ -58,19 +61,31 @@ const year = new Date().getFullYear();
 
       <!-- Contact -->
       <div>
-        <h5 class="relative text-white text-[13px] font-extrabold tracking-[1.5px] uppercase mb-2 pb-3 after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-[28px] after:h-[2px] after:bg-brand-bright">
+        <h5 class="text-ink text-[13px] font-semibold tracking-[1.5px] uppercase mb-5">
           Contact
         </h5>
-        <ul class="mt-[14px]">
-          <li class="mb-[10px] text-[13.5px]">{site.address}</li>
-          <li class="mb-[10px] text-[13.5px]">{site.phone.display}</li>
-          <li class="mb-[10px] text-[13.5px]">{site.email}</li>
+        <ul class="flex flex-col gap-[11px] text-[14px]">
+          <li>{site.address}</li>
+          <li>
+            <a href={site.phone.href} class="transition-colors hover:text-ink">
+              {site.phone.display}
+            </a>
+          </li>
+          <li>
+            <a
+              href={`mailto:${site.email}`}
+              class="transition-colors hover:text-ink"
+            >
+              {site.email}
+            </a>
+          </li>
+          <li class="text-faint">{site.hours}</li>
         </ul>
       </div>
     </div>
 
     <div
-      class="py-6 flex justify-between flex-wrap gap-[10px] text-[12.5px] text-[#777] max-xs:flex-col max-xs:items-start max-xs:gap-2"
+      class="py-7 flex justify-between flex-wrap gap-[10px] text-[13px] text-faint max-xs:flex-col max-xs:items-start max-xs:gap-2"
     >
       <span>© {year} {site.legalName}. All rights reserved.</span>
       <span>{site.credit}</span>

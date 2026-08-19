@@ -1,0 +1,161 @@
+---
+/**
+ * Contact CTA — contact methods beside a minimal quote form.
+ * The form has no backend: submitting opens WhatsApp with the request
+ * pre-filled (fields carry real name/required attrs so a POST endpoint
+ * can be dropped in later without markup changes).
+ */
+import Section from "../ui/Section.astro";
+import Eyebrow from "../ui/Eyebrow.astro";
+import Button from "../ui/Button.astro";
+import Icon from "../ui/Icon.astro";
+import { site } from "../../config/site";
+import { contactSection } from "../../data/content";
+import { equipmentCategories } from "../../data/catalog";
+
+const mapsHref = `https://maps.google.com/?q=${site.geo.lat},${site.geo.lng}`;
+
+const methods = [
+  { icon: "phone", label: "Call us", value: site.phone.display, href: site.phone.href },
+  { icon: "whatsapp", label: "WhatsApp", value: "Chat with our team", href: site.whatsapp.href },
+  { icon: "mail", label: "Email", value: site.email, href: `mailto:${site.email}` },
+  { icon: "pin", label: "Visit", value: site.address, href: mapsHref },
+] as const;
+---
+
+<Section id="contact" tone="gray">
+  <div class="wrap">
+    <div
+      class="grid grid-cols-[0.9fr_1.1fr] gap-16 items-start max-nav:grid-cols-1 max-nav:gap-10"
+    >
+      <!-- Left: pitch + contact methods -->
+      <div>
+        <Eyebrow class="mb-4">{contactSection.eyebrow}</Eyebrow>
+        <h2
+          class="text-[clamp(30px,3.8vw,46px)] leading-[1.06] mb-5"
+          set:html={contactSection.title.join("<br>")}
+        />
+        <p class="text-[16px] leading-relaxed text-muted max-w-[440px] mb-9">
+          {contactSection.body}
+        </p>
+
+        <div class="flex flex-col gap-3">
+          {
+            methods.map((m) => (
+              <a
+                href={m.href}
+                target={m.href.startsWith("http") ? "_blank" : undefined}
+                rel={m.href.startsWith("http") ? "noopener" : undefined}
+                class="group flex items-center gap-4 rounded-[14px] bg-white border border-line p-4 transition-all duration-200 hover:border-line-strong hover:shadow-[0_12px_30px_-20px_rgba(10,14,23,0.3)]"
+              >
+                <span class="flex items-center justify-center w-[44px] h-[44px] rounded-[12px] bg-brand-tint text-brand shrink-0">
+                  <Icon name={m.icon} size={20} />
+                </span>
+                <span>
+                  <span class="block text-[12.5px] text-faint">{m.label}</span>
+                  <span class="block text-[15px] font-semibold text-ink">
+                    {m.value}
+                  </span>
+                </span>
+              </a>
+            ))
+          }
+        </div>
+      </div>
+
+      <!-- Right: quote form -->
+      <form
+        id="quote-form"
+        data-wa={site.whatsapp.href}
+        class="card p-9 shadow-[0_24px_60px_-36px_rgba(10,14,23,0.4)] max-xs:p-6"
+      >
+        <label class="block text-[13px] font-semibold text-ink mb-5">
+          Request a quote — we reply within one business day.
+        </label>
+        <div class="grid grid-cols-2 gap-3 max-cmp:grid-cols-1">
+          <input class="q-field" type="text" name="first_name" autocomplete="given-name" placeholder="First name" required />
+          <input class="q-field" type="text" name="last_name" autocomplete="family-name" placeholder="Last name" />
+        </div>
+        <div class="grid grid-cols-2 gap-3 max-cmp:grid-cols-1">
+          <input class="q-field" type="email" name="email" autocomplete="email" placeholder="Email" required />
+          <input class="q-field" type="tel" name="phone" autocomplete="tel" placeholder="Phone" required />
+        </div>
+        <select class="q-field" name="category" required>
+          <option value="">Choose equipment category</option>
+          {equipmentCategories.map((category) => <option>{category}</option>)}
+        </select>
+        <div class="grid grid-cols-2 gap-3 max-cmp:grid-cols-1">
+          <select class="q-field" name="mode">
+            <option value="">Buy or rent</option>
+            <option>Buy</option>
+            <option>Rent</option>
+          </select>
+          <input class="q-field" type="text" name="duration" placeholder="Duration (if renting)" />
+        </div>
+        <textarea class="q-field" name="message" rows="3" placeholder="Tell us what you need"></textarea>
+        <Button variant="primary" type="submit" class="w-full mt-2">
+          Submit request
+        </Button>
+        <p class="text-[12.5px] text-faint mt-4 mb-0 text-center">
+          Submitting opens WhatsApp with your request pre-filled — or email us at
+          {" "}<a href={`mailto:${site.email}`} class="underline hover:text-ink">{site.email}</a>.
+        </p>
+      </form>
+    </div>
+  </div>
+</Section>
+
+<style>
+  .q-field {
+    width: 100%;
+    background: #fff;
+    border: 1px solid var(--color-line-strong);
+    border-radius: 10px;
+    color: var(--color-ink);
+    padding: 12px 14px;
+    font-size: 14px;
+    font-family: inherit;
+    margin-bottom: 12px;
+    transition:
+      border-color 0.15s ease,
+      box-shadow 0.15s ease;
+  }
+  .q-field::placeholder {
+    color: var(--color-faint);
+  }
+  .q-field:focus {
+    outline: none;
+    border-color: var(--color-brand-bright);
+    box-shadow: 0 0 0 3px rgba(47, 111, 255, 0.15);
+  }
+  select.q-field:invalid {
+    color: var(--color-faint);
+  }
+</style>
+
+<script>
+  const form = document.getElementById("quote-form") as HTMLFormElement | null;
+  if (form) {
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const data = new FormData(form);
+      const get = (key: string) => String(data.get(key) ?? "").trim();
+
+      const lines = [
+        "New quote request — collinscouae.com",
+        `Name: ${[get("first_name"), get("last_name")].filter(Boolean).join(" ")}`,
+        `Email: ${get("email")}`,
+        `Phone: ${get("phone")}`,
+        `Equipment: ${get("category")}`,
+        get("mode") &&
+          `Buy or rent: ${get("mode")}${get("duration") ? ` · ${get("duration")}` : ""}`,
+        get("message") && `Details: ${get("message")}`,
+      ].filter(Boolean);
+
+      window.open(
+        `${form.dataset.wa}?text=${encodeURIComponent(lines.join("\n"))}`,
+        "_blank",
+      );
+    });
+  }
+</script>

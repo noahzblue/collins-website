@@ -1,0 +1,95 @@
+---
+/**
+ * Per-industry page — banner photo, how we help, commonly supplied
+ * equipment and a quote CTA. Pages are generated from data/industries.ts.
+ */
+import Base from "../../layouts/Base.astro";
+import Footer from "../../components/Footer.astro";
+import Section from "../../components/ui/Section.astro";
+import Button from "../../components/ui/Button.astro";
+import Icon from "../../components/ui/Icon.astro";
+import { industries } from "../../data/industries";
+import { site } from "../../config/site";
+
+export function getStaticPaths() {
+  return industries.map((industry) => ({
+    params: { slug: industry.slug },
+    props: { industry },
+  }));
+}
+
+const { industry } = Astro.props;
+---
+
+<Base
+  title={`${industry.name} | ${site.name}`}
+  description={`${industry.tagline} Equipment sales & rental for ${industry.name.toLowerCase()} across the UAE.`}
+>
+  <!-- Banner -->
+  <section class="relative overflow-hidden min-h-[440px] flex items-end max-mob:min-h-[360px]">
+    <div
+      class="absolute inset-0 bg-cover bg-center"
+      style={`background-image:url('${industry.image}')`}
+      aria-hidden="true"
+    >
+    </div>
+    <div
+      class="absolute inset-0 bg-[linear-gradient(180deg,rgba(6,10,20,0.35)_0%,rgba(6,10,20,0.2)_45%,rgba(6,10,20,0.75)_100%)]"
+      aria-hidden="true"
+    >
+    </div>
+    <div class="wrap relative z-[1] w-full pt-[180px] pb-[52px] max-mob:pt-[130px] max-mob:pb-[40px]">
+      <nav class="text-[13px] text-white/65 mb-4" aria-label="Breadcrumb">
+        <a href="/#industries" class="transition-colors hover:text-white">Industries</a>
+        <span class="mx-2">/</span>
+        <span class="text-white/90">{industry.name}</span>
+      </nav>
+      <h1 class="text-white text-[clamp(36px,5vw,56px)] leading-[1.05] tracking-[-0.025em]">
+        {industry.name}
+      </h1>
+      <p class="mt-4 max-w-[560px] text-[17px] leading-relaxed text-white/80">
+        {industry.tagline}
+      </p>
+    </div>
+  </section>
+
+  <Section>
+    <div class="wrap">
+      <div class="grid grid-cols-[1.15fr_0.85fr] gap-16 items-start max-nav:grid-cols-1 max-nav:gap-10">
+        <div>
+          <h2 class="text-[clamp(26px,3vw,36px)] leading-[1.12] mb-6">
+            How we support {industry.name.toLowerCase()} teams
+          </h2>
+          <p class="text-[16.5px] leading-relaxed text-body max-w-[600px]">
+            {industry.body}
+          </p>
+        </div>
+
+        <div class="card p-8 max-xs:p-6">
+          <h3 class="text-[19px] font-semibold mb-5">Commonly supplied</h3>
+          <ul class="flex flex-col gap-[12px] mb-8">
+            {
+              industry.equipment.map((item) => (
+                <li>
+                  <a
+                    href="/#equipment"
+                    class="flex items-center gap-3 text-[15px] text-body transition-colors hover:text-brand"
+                  >
+                    <Icon name="check" size={16} class="text-brand shrink-0" />
+                    {item}
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+          <div class="flex gap-3 flex-wrap">
+            <Button variant="primary" href="/#contact">Request a quote</Button>
+            <Button variant="outline" href={site.whatsapp.href}>WhatsApp us</Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </Section>
+
+  <Footer />
+</Base>

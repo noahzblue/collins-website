@@ -1,8 +1,10 @@
 ---
 /**
- * Standard content section: vertical padding + optional tone background.
+ * Standard content section: generous vertical padding + optional tone.
  * Children decide their own inner container (`.wrap`) since some grids
  * are intentionally full-bleed.
+ *
+ * Padding is deliberately roomy — the airy rhythm is what sells "premium".
  */
 interface Props {
   id?: string;
@@ -16,6 +18,9 @@ const toneClass =
   tone === "dark" ? "bg-ink text-white" : tone === "gray" ? "bg-surface" : "";
 ---
 
-<section id={id} class:list={["py-24 max-mob:py-[60px]", toneClass, extra]}>
+<section
+  id={id}
+  class:list={["py-[110px] max-mob:py-[72px]", toneClass, extra]}
+>
   <slot />
 </section>
