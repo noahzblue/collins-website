@@ -38,7 +38,7 @@ export const fleet = {
   viewAll: { label: "View all 12 categories", href: "/equipment" },
 };
 
-/** /equipment hub — the full twelve, grouped by family. */
+/** /equipment hub — the full twelve, listed in sortOrder. */
 export const equipmentHub = {
   eyebrow: "Equipment",
   title: ["Everything we supply,", "to buy or to hire."],

@@ -7,15 +7,6 @@
 
 import { site } from '../config/site';
 
-export const FAMILIES = [
-  'Power & air',
-  'Material handling',
-  'Access',
-  'Lifting',
-  'Earthmoving',
-] as const;
-
-export type Family = (typeof FAMILIES)[number];
 export type Mode = 'hire' | 'buy';
 export type Availability = 'yard' | 'on_request' | 'sourced';
 

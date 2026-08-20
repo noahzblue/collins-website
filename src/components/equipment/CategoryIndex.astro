@@ -3,54 +3,43 @@
  * Sticky index rail beside the hub's category rows.
  *
  * Twelve full-height rows is a long scroll, so the rail is what keeps the
- * catalogue navigable: every category numbered and grouped by family, with the
- * one you are level with highlighted. Desktop only — below the `nav`
- * breakpoint the rows stack and the header's family jump links take over.
+ * catalogue navigable: every category numbered, in the same order as the rows,
+ * with the one you are level with highlighted. Desktop only — below the `nav`
+ * breakpoint the rows stack and you scroll them.
  */
 import type { CollectionEntry } from "astro:content";
-import type { Family } from "../../lib/equipment";
 
 interface Props {
-  groups: { family: Family; items: CollectionEntry<"equipment">[] }[];
+  categories: CollectionEntry<"equipment">[];
 }
 
-const { groups } = Astro.props;
+const { categories } = Astro.props;
 ---
 
 {/* The outer div is the grid cell and stretches to the full height of the rows
     beside it; `sticky` only has room to travel because of that. */}
 <div class="max-nav:hidden">
-<nav
-  class="sticky top-[104px] flex flex-col gap-7"
-  aria-label="Equipment categories"
->
-  {
-    groups.map(({ family, items }) => (
-      <div>
-        <p class="text-[10.5px] font-semibold uppercase tracking-[1.6px] text-faint mb-[10px]">
-          {family}
-        </p>
-        <ul class="flex flex-col border-l border-line">
-          {items.map((item) => (
-            <li>
-              <a
-                href={`#${item.id}`}
-                data-index-link={item.id}
-                class="idx flex items-center gap-[10px] py-[6px] pl-[13px] -ml-px border-l border-transparent transition-colors duration-200"
-              >
-                <span class="idx-num font-mono text-[11px] tracking-[0.5px] text-faint transition-colors duration-200">
-                  {String(item.data.sortOrder).padStart(2, "0")}
-                </span>
-                <span class="idx-label text-[13.5px] leading-[1.3] text-muted transition-colors duration-200">
-                  {item.data.name}
-                </span>
-              </a>
-            </li>
-          ))}
-        </ul>
-      </div>
-    ))
-  }
+<nav class="sticky top-[104px]" aria-label="Equipment categories">
+  <ul class="flex flex-col border-l border-line">
+    {
+      categories.map((item) => (
+        <li>
+          <a
+            href={`#${item.id}`}
+            data-index-link={item.id}
+            class="idx flex items-center gap-[10px] py-[6px] pl-[13px] -ml-px border-l border-transparent transition-colors duration-200"
+          >
+            <span class="idx-num font-mono text-[11px] tracking-[0.5px] text-faint transition-colors duration-200">
+              {String(item.data.sortOrder).padStart(2, "0")}
+            </span>
+            <span class="idx-label text-[13.5px] leading-[1.3] text-muted transition-colors duration-200">
+              {item.data.name}
+            </span>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
 </nav>
 </div>
 
