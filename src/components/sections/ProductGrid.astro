@@ -1,10 +1,19 @@
 ---
-/** Equipment categories grid — photo tiles in the house grade, per-unit enquiry. */
+/**
+ * Equipment teaser — the six `featured` categories; the full twelve live on
+ * /equipment. Reads the same collection as the hub and the category pages, so
+ * the homepage can't drift from the catalogue.
+ */
+import { getCollection } from "astro:content";
 import Section from "../ui/Section.astro";
 import SectionHeading from "../ui/SectionHeading.astro";
 import Icon from "../ui/Icon.astro";
-import { products } from "../../data/catalog";
+import CategoryCard from "../equipment/CategoryCard.astro";
 import { fleet } from "../../data/content";
+
+const featured = (await getCollection("equipment"))
+  .filter((category) => category.data.featured)
+  .sort((a, b) => a.data.sortOrder - b.data.sortOrder);
 ---
 
 <Section id="equipment" tone="gray">
@@ -17,34 +26,14 @@ import { fleet } from "../../data/content";
 
     <div class="grid grid-cols-3 gap-5 max-nav:grid-cols-2 max-cmp:grid-cols-1">
       {
-        products.map((product) => (
-          <a
-            href={product.href}
-            class="group card relative flex flex-col overflow-hidden transition-all duration-200 hover:border-line-strong hover:shadow-[0_20px_50px_-28px_rgba(10,14,23,0.32)] hover:-translate-y-[3px]"
-          >
-            <div class="relative aspect-[4/3] overflow-hidden">
-              <div
-                class="absolute inset-0 bg-cover bg-center transition-transform duration-500 ease-out group-hover:scale-[1.05]"
-                style={`background-image:url('${product.image}')`}
-                aria-hidden="true"
-              />
-              <span class="absolute top-4 right-4 font-mono text-[11.5px] tracking-[0.5px] text-white/90 bg-ink/35 backdrop-blur-sm rounded-full px-[10px] py-[5px]">
-                {product.num}
-              </span>
-            </div>
-            <div class="flex flex-col flex-1 p-7 max-xs:p-6">
-              <h3 class="text-[21px] font-semibold">{product.title}</h3>
-              <p class="text-[14px] text-muted mt-1">{product.sub}</p>
-              <span class="mt-5 inline-flex items-center gap-[6px] text-[13px] font-semibold text-brand">
-                Buy or rent
-                <Icon
-                  name="arrow-up-right"
-                  size={15}
-                  class="transition-transform duration-200 group-hover:translate-x-[3px] group-hover:-translate-y-[3px]"
-                />
-              </span>
-            </div>
-          </a>
+        featured.map((category) => (
+          /* Number is the catalogue position out of twelve, matching the hub —
+             so the sequence reads 01, 02, 03, 05, 09, 10 rather than 01–06. */
+          <CategoryCard
+            category={category}
+            index={category.data.sortOrder}
+            showCardLine={false}
+          />
         ))
       }
     </div>

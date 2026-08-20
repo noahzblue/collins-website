@@ -1,0 +1,80 @@
+---
+/**
+ * One equipment category as a card — photo tile, name, range line and the
+ * buy/hire badges. Used by the hub grid and by the "related" row on a
+ * category page.
+ */
+import type { CollectionEntry } from "astro:content";
+import Icon from "../ui/Icon.astro";
+
+interface Props {
+  category: CollectionEntry<"equipment">;
+  /** Two-digit index in the corner of the tile. Omit to hide it. */
+  index?: number;
+  /** Hub cards carry the extra sentence; related cards stay compact. */
+  showCardLine?: boolean;
+}
+
+const { category, index, showCardLine = true } = Astro.props;
+const { name, rangeLabel, cardLine, heroImage, availableHire, availableSale } =
+  category.data;
+
+const badges = [
+  availableHire && "Hire",
+  availableSale && "Buy",
+].filter(Boolean) as string[];
+---
+
+<a
+  href={`/equipment/${category.id}`}
+  class="group card relative flex flex-col overflow-hidden transition-all duration-200 hover:border-line-strong hover:shadow-[0_20px_50px_-28px_rgba(10,14,23,0.32)] hover:-translate-y-[3px]"
+>
+  {/* Light neutral behind the photo: the six categories still waiting on a
+      hero image read as a quiet empty tile rather than a black hole. */}
+  <div class="relative aspect-[4/3] overflow-hidden bg-surface-2">
+    {
+      heroImage && (
+        <div
+          class="absolute inset-0 bg-cover bg-center transition-transform duration-500 ease-out group-hover:scale-[1.05]"
+          style={`background-image:url('${heroImage}')`}
+          aria-hidden="true"
+        />
+      )
+    }
+    {
+      index !== undefined && (
+        <span class="absolute top-4 right-4 font-mono text-[11.5px] tracking-[0.5px] text-white/90 bg-ink/35 backdrop-blur-sm rounded-full px-[10px] py-[5px]">
+          {String(index).padStart(2, "0")}
+        </span>
+      )
+    }
+  </div>
+
+  <div class="flex flex-col flex-1 p-7 max-xs:p-6">
+    <h3 class="text-[21px] font-semibold">{name}</h3>
+    <p class="text-[14px] text-muted mt-1">{rangeLabel}</p>
+    {
+      showCardLine && (
+        <p class="text-[14.5px] leading-relaxed text-muted mt-3">{cardLine}</p>
+      )
+    }
+
+    <div class="flex items-center gap-2 mt-5">
+      {
+        badges.map((badge) => (
+          <span class="inline-flex items-center rounded-full border border-line-strong px-[10px] py-[3px] text-[12px] font-medium text-muted">
+            {badge}
+          </span>
+        ))
+      }
+      <span class="ml-auto inline-flex items-center gap-[6px] text-[13px] font-semibold text-brand">
+        View
+        <Icon
+          name="arrow-up-right"
+          size={15}
+          class="transition-transform duration-200 group-hover:translate-x-[3px] group-hover:-translate-y-[3px]"
+        />
+      </span>
+    </div>
+  </div>
+</a>

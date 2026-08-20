@@ -1,0 +1,112 @@
+---
+/**
+ * The sizes/ratings table for one category, with a per-row enquiry link.
+ *
+ * Rendered per `mode` and tagged `data-mode-panel` so the buy/hire toggle can
+ * be dropped in later by emitting both panels and hiding one with CSS — no
+ * re-render, no hrefs rewritten in JS.
+ *
+ * Below 600px the rows stack: rating + type on one line, duty beneath,
+ * availability and the enquiry link on the last line.
+ */
+import type { CollectionEntry } from "astro:content";
+import Icon from "../ui/Icon.astro";
+import {
+  AVAILABILITY_LABEL,
+  AVAILABILITY_TONE,
+  enquireHref,
+  type Mode,
+} from "../../lib/equipment";
+
+type Ranges = CollectionEntry<"equipment">["data"]["ranges"];
+
+interface Props {
+  ranges: Ranges;
+  /** Category name — words the enquiry message ("a 250 kVA generator"). */
+  name: string;
+  mode?: Mode;
+}
+
+const { ranges, name, mode = "hire" } = Astro.props;
+
+/* Columns only appear when the data fills them — crawler cranes and
+   compressors carry no power type, so that column would sit empty. */
+const hasPowerType = ranges.some((r) => r.powerType);
+const hasDuty = ranges.some((r) => r.typicalDuty);
+
+const th =
+  "px-6 py-[13px] text-[11.5px] font-semibold uppercase tracking-[1.4px] text-faint max-xs:px-5";
+const td = "px-6 py-[17px] align-middle max-cmp:p-0 max-xs:px-5";
+---
+
+<div data-mode-panel={mode} class="card overflow-hidden">
+  <table class="w-full border-collapse text-left max-cmp:block">
+    <thead class="max-cmp:hidden">
+      <tr class="bg-surface border-b border-line">
+        <th scope="col" class={th}>Size / rating</th>
+        {hasPowerType && <th scope="col" class={th}>Type</th>}
+        {hasDuty && <th scope="col" class={`${th} w-full`}>Typical duty</th>}
+        <th scope="col" class={th}>Availability</th>
+        <th scope="col" class={`${th} text-right`}>
+          <span class="sr-only">Enquire</span>
+        </th>
+      </tr>
+    </thead>
+    <tbody class="max-cmp:block">
+      {
+        ranges.map((range) => (
+          <tr class="border-b border-line last:border-0 transition-colors hover:bg-surface max-cmp:block max-cmp:px-5 max-cmp:py-5">
+            <td class={`${td} whitespace-nowrap text-[15.5px] font-semibold text-ink max-cmp:inline-flex max-cmp:text-[17px]`}>
+              {range.label}
+            </td>
+
+            {hasPowerType && (
+              <td class={`${td} whitespace-nowrap max-cmp:inline-flex max-cmp:ml-3`}>
+                {range.powerType && (
+                  <span class="inline-flex items-center rounded-full border border-line-strong px-[10px] py-[3px] text-[12.5px] text-muted">
+                    {range.powerType}
+                  </span>
+                )}
+              </td>
+            )}
+
+            {hasDuty && (
+              <td class={`${td} text-[14.5px] leading-relaxed text-muted max-cmp:block max-cmp:mt-[10px]`}>
+                {range.typicalDuty}
+              </td>
+            )}
+
+            <td class={`${td} whitespace-nowrap max-cmp:inline-flex max-cmp:mt-[14px]`}>
+              <span class="inline-flex items-center gap-[7px] text-[13px] font-medium text-body">
+                <span
+                  class:list={[
+                    "w-[6px] h-[6px] rounded-full",
+                    AVAILABILITY_TONE[range.availability],
+                  ]}
+                  aria-hidden="true"
+                />
+                {AVAILABILITY_LABEL[mode][range.availability]}
+              </span>
+            </td>
+
+            <td class={`${td} whitespace-nowrap text-right max-cmp:inline-flex max-cmp:ml-5 max-cmp:mt-[14px]`}>
+              <a
+                href={enquireHref(name, mode, range.label)}
+                target="_blank"
+                rel="noopener"
+                class="group inline-flex items-center gap-[5px] text-[13.5px] font-semibold text-brand transition-colors hover:text-brand-hover"
+              >
+                Enquire
+                <Icon
+                  name="arrow-up-right"
+                  size={14}
+                  class="transition-transform duration-200 group-hover:translate-x-[2px] group-hover:-translate-y-[2px]"
+                />
+              </a>
+            </td>
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
+</div>

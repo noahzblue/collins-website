@@ -34,8 +34,23 @@ export const fleet = {
   eyebrow: "Equipment",
   title: ["Built for the job,", "ready when you are."],
   intro:
-    "Every category available to buy or rent, with per-unit enquiry built in — from a single generator to a full fleet.",
-  viewAll: { label: "View all equipment", href: "/#equipment" },
+    "Twelve categories to buy or rent, with per-unit enquiry built in — from a single generator to a full fleet. Six of them below.",
+  viewAll: { label: "View all 12 categories", href: "/equipment" },
+};
+
+/** /equipment hub — the full twelve, grouped by family. */
+export const equipmentHub = {
+  eyebrow: "Equipment",
+  title: ["Everything we supply,", "to buy or to hire."],
+  intro:
+    "Twelve categories across power, lifting, access, earthmoving and material handling — every size we carry, with availability on the line and a direct enquiry beside it.",
+  seoTitle: "Equipment for Sale & Hire in the UAE | Collins Equipments",
+  seoDescription:
+    "Twelve categories of industrial and heavy equipment to buy outright or hire — generators, forklifts, cranes, access platforms, earthmoving and material handling, delivered across the UAE.",
+  closing: {
+    title: "Not seeing the machine you need?",
+    body: "The twelve above are what we carry day to day. Tell us the job and we'll source to spec — most enquiries come back the same day.",
+  },
 };
 
 /** Services overview. */

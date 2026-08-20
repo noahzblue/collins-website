@@ -24,3 +24,22 @@
       fallback. Consider a WebM (VP9/AV1) source alongside the MP4.
 - [ ] Remove superseded hero assets once the hero is signed off:
       `public/images/hero-industrial.jpg`, `public/images/hero-bg.jpg`.
+- [ ] **Equipment slice, remaining steps** — the content collection, the twelve
+      category pages, the hub and their components are in
+      (`src/content.config.ts`, `src/content/equipment/categories.json`,
+      `src/lib/equipment.ts`, `src/components/equipment/`,
+      `src/pages/equipment/index.astro`, `src/pages/equipment/[slug].astro`).
+      The homepage grid and the quote-form dropdown read the same collection.
+      Still open:
+      - **Hero imagery** — all twelve are in place at 1200x896 JPEG. Six were
+        generated 2026-08-20 via Higgsfield (Nano Banana 2, except
+        crawler-cranes and skid-steer-loaders which only completed on Seedream
+        4.5) and downscaled with `sips -Z 1200 --setProperty format jpeg`.
+        The house grade is "slate-blue dawn haze": single unbranded machine,
+        three-quarter front, damp concrete yard, flat overcast light, chain-link
+        fence and low sheds dissolving into fog, no people or text.
+      - **Buy/hire toggle + quote links.** Static build has no request-time
+        `?mode=`, so render both panels and swap client-side; `RangeTable` and
+        `IncludedList` already take `mode` and emit `data-mode-panel`.
+      - **Duty guide copy** — `dutyGuide` is populated for generators only. Each
+        category's block appears the moment its array stops being empty.

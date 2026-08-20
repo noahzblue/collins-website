@@ -1,4 +1,6 @@
-/** Equipment catalogue data — products, features, services, partners, proof. */
+/** Site data — proof points, services, partners and stats.
+ *  Equipment categories live in the `equipment` content collection
+ *  (src/content/equipment/categories.json). */
 
 import type { IconName } from "../components/ui/icons";
 
@@ -37,28 +39,6 @@ export const trustFeatures: Feature[] = [
     body: "Local UAE stock dispatched fast — most units leave our Dubai yard within hours of confirmation, with export handling across the wider region.",
     image: "/images/why-delivery.jpg",
   },
-];
-
-/* ---------- Equipment categories grid ---------- */
-
-export interface Product {
-  /** Two-digit index shown in the card corner. */
-  num: string;
-  title: string;
-  /** Spec / range line under the title. */
-  sub: string;
-  href: string;
-  /** Photo tile shown in the equipment grid. */
-  image: string;
-}
-
-export const products: Product[] = [
-  { num: "01", title: "Generators", sub: "10 KVA – 1250 KVA", href: "/#equipment", image: "/images/equipment-generators.jpg" },
-  { num: "02", title: "Forklifts", sub: "1.4T – 15T · Diesel & Electric", href: "/#equipment", image: "/images/equipment-forklifts.jpg" },
-  { num: "03", title: "Air Compressors", sub: "135 – 1050 CFM", href: "/#equipment", image: "/images/equipment-compressors.jpg" },
-  { num: "04", title: "Heavy Equipment", sub: "Cranes, Dozers, Excavators", href: "/#equipment", image: "/images/equipment-heavy.jpg" },
-  { num: "05", title: "Tower Lights", sub: "Site & Event Lighting", href: "/#equipment", image: "/images/equipment-tower-lights.jpg" },
-  { num: "06", title: "Spare Parts", sub: "Genuine OEM & Aftermarket", href: "/#equipment", image: "/images/equipment-spare-parts.jpg" },
 ];
 
 /* ---------- Services overview ---------- */
@@ -152,12 +132,3 @@ export const testimonials: Testimonial[] = [
   },
 ];
 
-/* ---------- Quote form options ---------- */
-
-export const equipmentCategories: string[] = [
-  "Generators",
-  "Forklifts",
-  "Air Compressors",
-  "Heavy Equipment",
-  "Tower Lights",
-];

@@ -11,9 +11,14 @@ import Button from "../ui/Button.astro";
 import Icon from "../ui/Icon.astro";
 import { site } from "../../config/site";
 import { contactSection } from "../../data/content";
-import { equipmentCategories } from "../../data/catalog";
+import { getCollection } from "astro:content";
 
 const mapsHref = `https://maps.google.com/?q=${site.geo.lat},${site.geo.lng}`;
+
+/* The dropdown mirrors the catalogue — same collection as /equipment. */
+const equipmentCategoryNames = (await getCollection("equipment"))
+  .sort((a, b) => a.data.sortOrder - b.data.sortOrder)
+  .map((category) => category.data.name);
 
 const methods = [
   { icon: "phone", label: "Call us", value: site.phone.display, href: site.phone.href },
@@ -82,7 +87,7 @@ const methods = [
         </div>
         <select class="q-field" name="category" required>
           <option value="">Choose equipment category</option>
-          {equipmentCategories.map((category) => <option>{category}</option>)}
+          {equipmentCategoryNames.map((category) => <option>{category}</option>)}
         </select>
         <div class="grid grid-cols-2 gap-3 max-cmp:grid-cols-1">
           <select class="q-field" name="mode">

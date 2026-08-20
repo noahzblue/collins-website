@@ -9,7 +9,7 @@ export interface NavLink {
 
 export const mainNav: NavLink[] = [
   { label: "Home", href: "/" },
-  { label: "Equipment", href: "/#equipment" },
+  { label: "Equipment", href: "/equipment" },
   { label: "Services", href: "/#services" },
   { label: "Industries", href: "/#industries" },
   { label: "About", href: "/#about" },
@@ -25,11 +25,11 @@ export const footerColumns: FooterColumn[] = [
   {
     title: "Equipment",
     links: [
-      { label: "Generators", href: "/#equipment" },
-      { label: "Forklifts", href: "/#equipment" },
-      { label: "Air Compressors", href: "/#equipment" },
-      { label: "Heavy Equipment", href: "/#equipment" },
-      { label: "Tower Lights", href: "/#equipment" },
+      { label: "Generators", href: "/equipment/generators" },
+      { label: "Forklifts", href: "/equipment/forklifts" },
+      { label: "Mobile Cranes", href: "/equipment/mobile-cranes" },
+      { label: "Excavators", href: "/equipment/excavators" },
+      { label: "All equipment", href: "/equipment" },
     ],
   },
   {

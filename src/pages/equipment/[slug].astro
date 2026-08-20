@@ -1,0 +1,242 @@
+---
+/**
+ * Category page — /equipment/<slug>.
+ *
+ * Banner, the full sizes/ratings table with per-row enquiry, what the hire
+ * rate covers, optional sizing guide and three related categories. Generated
+ * from the `equipment` content collection, so a new category is a JSON edit.
+ *
+ * Hire content only for now: the buy/hire toggle has to render both panels at
+ * build time and swap them client-side (a static build has no request-time
+ * `?mode=`), which lands with the quote links in a later pass. The pieces are
+ * already mode-aware and tagged `data-mode-panel`.
+ */
+import type { GetStaticPaths } from "astro";
+import { getCollection, getEntry, type CollectionEntry } from "astro:content";
+import Base from "../../layouts/Base.astro";
+import Footer from "../../components/Footer.astro";
+import Section from "../../components/ui/Section.astro";
+import Eyebrow from "../../components/ui/Eyebrow.astro";
+import Button from "../../components/ui/Button.astro";
+import Icon from "../../components/ui/Icon.astro";
+import RangeTable from "../../components/equipment/RangeTable.astro";
+import IncludedList from "../../components/equipment/IncludedList.astro";
+import DutyGuide from "../../components/equipment/DutyGuide.astro";
+import CategoryCard from "../../components/equipment/CategoryCard.astro";
+import { CTA_LABEL, enquireHref, singular } from "../../lib/equipment";
+import { site } from "../../config/site";
+
+export const getStaticPaths = (async () => {
+  const categories = await getCollection("equipment");
+  return categories.map((category) => ({
+    params: { slug: category.id },
+    props: { category },
+  }));
+}) satisfies GetStaticPaths;
+
+const { category } = Astro.props;
+const {
+  name,
+  family,
+  h1,
+  rangeLabel,
+  heroImage,
+  availableHire,
+  availableSale,
+  ranges,
+  dutyGuide,
+  related,
+  seoTitle,
+  seoDescription,
+} = category.data;
+
+/* References resolve here — Astro won't await inside the template. */
+const relatedEntries = (
+  await Promise.all(related.map((ref) => getEntry(ref)))
+).filter((entry): entry is CollectionEntry<"equipment"> => Boolean(entry));
+
+/* `reference()` only logs a missing slug — it does not fail the build — and an
+   unresolved entry would quietly leave a two-up grid. Make it loud instead. */
+if (relatedEntries.length !== related.length) {
+  const found = new Set(relatedEntries.map((entry) => entry.id));
+  const missing = related.map((ref) => ref.id).filter((id) => !found.has(id));
+  throw new Error(
+    `equipment/${category.id}: \`related\` points at slug(s) that don't exist — ${missing.join(", ")}`,
+  );
+}
+
+const badges = [availableHire && "For hire", availableSale && "For sale"].filter(
+  Boolean,
+) as string[];
+
+/* Keep the page off two grey sections in a row, and off a grey one directly
+   above the grey footer. */
+const relatedTone = "light" as const;
+---
+
+<Base title={seoTitle} description={seoDescription}>
+  <!-- Banner -->
+  <section
+    class="relative overflow-hidden min-h-[460px] flex items-end bg-ink max-mob:min-h-[380px]"
+  >
+    {
+      heroImage && (
+        <div
+          class="absolute inset-0 bg-cover bg-center"
+          style={`background-image:url('${heroImage}')`}
+          aria-hidden="true"
+        />
+      )
+    }
+    <div
+      class="absolute inset-0 bg-[linear-gradient(180deg,rgba(6,10,20,0.4)_0%,rgba(6,10,20,0.25)_45%,rgba(6,10,20,0.8)_100%)]"
+      aria-hidden="true"
+    >
+    </div>
+
+    <div
+      class="wrap relative z-[1] w-full pt-[180px] pb-[52px] max-mob:pt-[130px] max-mob:pb-[40px]"
+    >
+      <nav class="text-[13px] text-white/65 mb-4" aria-label="Breadcrumb">
+        <a href="/equipment" class="transition-colors hover:text-white">
+          Equipment
+        </a>
+        <span class="mx-2">/</span>
+        <span class="text-white/90">{name}</span>
+      </nav>
+
+      <h1
+        class="text-white text-[clamp(34px,4.6vw,54px)] leading-[1.05] tracking-[-0.025em] max-w-[780px]"
+      >
+        {h1}
+      </h1>
+
+      <div class="flex items-center gap-3 flex-wrap mt-5">
+        <span class="text-[16.5px] text-white/80">{rangeLabel}</span>
+        <span class="text-white/30" aria-hidden="true">·</span>
+        {
+          badges.map((badge) => (
+            <span class="inline-flex items-center rounded-full border border-white/30 px-[11px] py-[4px] text-[12.5px] font-medium text-white/85">
+              {badge}
+            </span>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Sizes and ratings -->
+  <Section>
+    <div class="wrap">
+      <div
+        class="flex justify-between items-end gap-8 flex-wrap mb-9 max-mob:gap-4"
+      >
+        <div>
+          <Eyebrow class="mb-4">{family}</Eyebrow>
+          <h2 class="text-[clamp(26px,3vw,36px)] leading-[1.1]">
+            Sizes and ratings
+          </h2>
+        </div>
+        <p class="text-[15px] leading-relaxed text-muted max-w-[400px]">
+          Enquire on any line and we'll confirm availability, rate and delivery
+          for your dates.
+        </p>
+      </div>
+
+      <RangeTable ranges={ranges} name={name} mode="hire" />
+
+      <p class="text-[13.5px] leading-relaxed text-faint mt-5 max-w-[720px]">
+        <strong class="font-semibold text-muted">In yard</strong> — on the ground
+        and ready to dispatch. <strong class="font-semibold text-muted"
+          >On request</strong
+        > — short lead, usually within the week. <strong
+          class="font-semibold text-muted">To order</strong
+        > — sourced to your spec.
+      </p>
+    </div>
+  </Section>
+
+  <!-- What the hire rate covers + enquiry -->
+  <Section tone="gray">
+    <div class="wrap">
+      <div
+        class="grid grid-cols-[1.05fr_0.95fr] gap-16 items-start max-nav:grid-cols-1 max-nav:gap-10"
+      >
+        <IncludedList mode="hire" />
+
+        <div class="card p-8 max-xs:p-6">
+          <h3 class="text-[20px] font-semibold mb-3">
+            Need a {singular(name)} on site?
+          </h3>
+          <p class="text-[15px] leading-relaxed text-muted mb-7">
+            Tell us the load, the location and the dates — we'll come back with
+            the size that fits and what it costs, usually the same day.
+          </p>
+
+          <div class="flex gap-3 flex-wrap mb-7">
+            <Button
+              variant="primary"
+              href={enquireHref(name, "hire")}
+              target="_blank"
+              rel="noopener"
+            >
+              {CTA_LABEL.hire}
+            </Button>
+            <Button variant="outline" href="/#contact">Request a quote</Button>
+          </div>
+
+          <div class="flex flex-col gap-3 pt-6 border-t border-line">
+            <a
+              href={site.phone.href}
+              class="flex items-center gap-3 text-[15px] text-body transition-colors hover:text-brand"
+            >
+              <Icon name="phone" size={17} class="text-brand shrink-0" />
+              {site.phone.display}
+            </a>
+            <span class="flex items-center gap-3 text-[15px] text-muted">
+              <Icon name="clock" size={17} class="text-brand shrink-0" />
+              {site.hours}
+            </span>
+            <span class="flex items-center gap-3 text-[15px] text-muted">
+              <Icon name="pin" size={17} class="text-brand shrink-0" />
+              {site.locations}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </Section>
+
+  <!-- Sizing guide (renders only where the copy exists) -->
+  {
+    dutyGuide.length > 0 && (
+      <Section>
+        <div class="wrap">
+          <DutyGuide scenarios={dutyGuide} name={name} />
+        </div>
+      </Section>
+    )
+  }
+
+  <!-- Related categories -->
+  <Section tone={relatedTone} class="border-t border-line">
+    <div class="wrap">
+      <div class="mb-10">
+        <Eyebrow class="mb-4">Also supplied</Eyebrow>
+        <h2 class="text-[clamp(26px,3vw,36px)] leading-[1.1]">
+          Often hired alongside
+        </h2>
+      </div>
+
+      <div class="grid grid-cols-3 gap-5 max-nav:grid-cols-2 max-cmp:grid-cols-1">
+        {
+          relatedEntries.map((entry) => (
+            <CategoryCard category={entry} showCardLine={false} />
+          ))
+        }
+      </div>
+    </div>
+  </Section>
+
+  <Footer />
+</Base>
