@@ -1,0 +1,124 @@
+---
+/**
+ * One equipment category as a full-width alternating row — the hub's primary
+ * unit, replacing the card grid.
+ *
+ * Photo on one side, the pitch on the other: number and family, the name, the
+ * spec line, four scannable capability lines, a short paragraph and the link
+ * through to the category page. `flip` swaps the sides so consecutive rows
+ * mirror each other; on mobile the row collapses and the photo always leads.
+ */
+import type { CollectionEntry } from "astro:content";
+import Icon from "../ui/Icon.astro";
+import Button from "../ui/Button.astro";
+
+interface Props {
+  category: CollectionEntry<"equipment">;
+  /** Media to the right instead of the left. Set by position in the list. */
+  flip?: boolean;
+}
+
+const { category, flip = false } = Astro.props;
+const {
+  name,
+  family,
+  rangeLabel,
+  summary,
+  highlights,
+  heroImage,
+  availableHire,
+  availableSale,
+  sortOrder,
+} = category.data;
+
+const badges = [availableHire && "Hire", availableSale && "Buy"].filter(
+  Boolean,
+) as string[];
+
+const href = `/equipment/${category.id}`;
+---
+
+<article
+  id={category.id}
+  class="group grid grid-cols-2 gap-[72px] items-center scroll-mt-[110px] max-nav:grid-cols-1 max-nav:gap-9"
+>
+  {/* Media. Sources are 4:3 landscape; the 4:5 crop is what gives the row its
+      editorial column, so the photos are centred rather than fitted. */}
+  <a
+    href={href}
+    aria-hidden="true"
+    tabindex="-1"
+    class:list={[
+      "block overflow-hidden rounded-[18px] bg-surface-2",
+      flip && "order-2 max-nav:order-none",
+    ]}
+  >
+    {
+      heroImage && (
+        <img
+          src={heroImage}
+          alt=""
+          width="1200"
+          height="1500"
+          loading="lazy"
+          decoding="async"
+          class="aspect-[4/5] w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03] max-nav:aspect-[16/10]"
+        />
+      )
+    }
+  </a>
+
+  <div class="max-w-[460px] max-nav:max-w-none">
+    <div class="flex items-center gap-[14px]">
+      <span class="font-mono text-[12.5px] tracking-[0.5px] text-brand">
+        {String(sortOrder).padStart(2, "0")}
+      </span>
+      <span class="h-px w-[22px] bg-line-strong" aria-hidden="true"></span>
+      <span class="text-[11.5px] font-semibold uppercase tracking-[1.6px] text-faint">
+        {family}
+      </span>
+    </div>
+
+    <h2 class="text-[clamp(28px,3.2vw,38px)] leading-[1.06] mt-[18px]">
+      <a href={href} class="transition-colors hover:text-brand">{name}</a>
+    </h2>
+    <p class="text-[15px] text-muted mt-[10px]">{rangeLabel}</p>
+
+    <ul class="flex flex-col gap-[9px] mt-7">
+      {
+        highlights.map((line) => (
+          <li class="flex gap-[11px] text-[14.5px] leading-[1.45] font-medium text-body">
+            <Icon
+              name="arrow-right"
+              size={15}
+              class="text-brand mt-[4px] shrink-0"
+            />
+            <span>{line}</span>
+          </li>
+        ))
+      }
+    </ul>
+
+    <p class="text-[16px] leading-relaxed text-muted mt-7">{summary}</p>
+
+    <div class="flex items-center gap-4 flex-wrap mt-8">
+      <Button variant="outline" href={href}>
+        View {name.toLowerCase()}
+        <Icon
+          name="arrow-right"
+          size={16}
+          class="transition-transform duration-200 group-hover:translate-x-[3px]"
+        />
+      </Button>
+      <div class="flex items-center gap-2">
+        {
+          badges.map((badge) => (
+            <span class="inline-flex items-center rounded-full border border-line-strong px-[11px] py-[4px] text-[12px] font-medium text-muted">
+              {badge}
+            </span>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</article>

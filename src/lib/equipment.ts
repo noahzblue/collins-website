@@ -19,22 +19,6 @@ export type Family = (typeof FAMILIES)[number];
 export type Mode = 'hire' | 'buy';
 export type Availability = 'yard' | 'on_request' | 'sourced';
 
-/** "Power & air" -> "power-air" — the anchor id for a family on the hub. */
-export const familyId = (family: Family) =>
-  family
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/(^-|-$)/g, '');
-
-/** One line on what a family is for, under its heading on the hub. */
-export const FAMILY_LINE: Record<Family, string> = {
-  'Power & air': 'Run a site with no mains supply — power, air and light.',
-  'Material handling': 'Move and place material, indoors or across the yard.',
-  Access: 'Get people and tools safely to height.',
-  Lifting: 'Road-mobile and crawler lifting, 50 to 600 ton.',
-  Earthmoving: 'Dig, load and clear, from confined sites to bulk earthworks.',
-};
-
 /** Same three states, read differently depending on whether you're hiring or buying. */
 export const AVAILABILITY_LABEL: Record<Mode, Record<Availability, string>> = {
   hire: {

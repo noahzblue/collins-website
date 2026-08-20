@@ -5,6 +5,13 @@
     "family": "Power & air",
     "rangeLabel": "10 kVA to 1,250 kVA, diesel",
     "cardLine": "Prime and standby power, site offices to full industrial load.",
+    "summary": "Power a site with no mains supply, or hold a building's essential load when the grid drops. We size on the largest starting load rather than the running total, so the set you get starts what you actually run.",
+    "highlights": [
+      "Twelve ratings, 10 kVA through 1,250 kVA",
+      "Prime and standby duty, canopied for site noise limits",
+      "Sized on starting load, not running load",
+      "Tanks, cabling and distribution supplied with the set"
+    ],
     "h1": "Generators for sale and hire in the UAE",
     "heroImage": "/images/equipment/generators-hero.jpg",
     "availableHire": true,
@@ -49,6 +56,13 @@
     "family": "Material handling",
     "rangeLabel": "1.4 to 15 ton, diesel and electric",
     "cardLine": "Indoor electric through to heavy diesel yard handling.",
+    "summary": "Warehouse racking through to heavy yard handling. Electric counterbalance where the floor is clean and the air has to stay that way, diesel where the ground is not.",
+    "highlights": [
+      "1.4 to 15 ton, electric and diesel",
+      "Electric for indoor and cold store, no exhaust",
+      "Diesel on pneumatic tyres for yard and rough ground",
+      "Side shift, fork positioners and long forks on request"
+    ],
     "h1": "Forklifts for sale and hire in the UAE",
     "heroImage": "/images/equipment/forklifts-hero.jpg",
     "availableHire": true,
@@ -77,6 +91,13 @@
     "family": "Lifting",
     "rangeLabel": "50 to 600 ton",
     "cardLine": "Road-mobile lifting from steel erection to heavy plant.",
+    "summary": "Steel erection, plant installation and precast setting. Send us the load, the radius and the ground conditions and we come back with the chart that covers it.",
+    "highlights": [
+      "50 to 600 ton, all-terrain and rough-terrain",
+      "Road-mobile — rigged and lifting the same day",
+      "Third-party certified, test certificates on delivery",
+      "Licensed operators and rigging crew supplied"
+    ],
     "h1": "Mobile cranes for sale and hire in the UAE",
     "heroImage": "/images/equipment/mobile-cranes-hero.jpg",
     "availableHire": true,
@@ -103,6 +124,13 @@
     "family": "Lifting",
     "rangeLabel": "200, 400 and 600 ton",
     "cardLine": "Sustained heavy lift on prepared ground.",
+    "summary": "For lifts that run for weeks rather than an afternoon. Crawlers pick and travel under load on prepared ground, which is what makes them the right call on a long programme.",
+    "highlights": [
+      "200, 400 and 600 ton lattice boom",
+      "Full load chart on the tracks, no outriggers",
+      "Sustained heavy duty on prepared ground",
+      "Transport, assembly and dismantle handled by us"
+    ],
     "h1": "Crawler cranes for sale and hire in the UAE",
     "heroImage": "/images/equipment/crawler-cranes-hero.jpg",
     "availableHire": true,
@@ -124,6 +152,13 @@
     "family": "Power & air",
     "rangeLabel": "135 CFM to 1,050 CFM",
     "cardLine": "Site air for breakers, blasting and drilling spreads.",
+    "summary": "Site air for breakers, rock drills and blasting spreads. Tell us the tools running at once and we size the CFM with enough margin for the hose run.",
+    "highlights": [
+      "135 to 1,050 CFM, skid and trailer mounted",
+      "Sized on total tool consumption plus hose loss",
+      "After-coolers and filtration for blasting and painting",
+      "Hoses, manifolds and breaker sets available with the unit"
+    ],
     "h1": "Air compressors for sale and hire in the UAE",
     "heroImage": "/images/equipment/air-compressors-hero.jpg",
     "availableHire": true,
@@ -150,6 +185,13 @@
     "family": "Access",
     "rangeLabel": "9 to 16 metre working height",
     "cardLine": "Stable working platforms, indoor electric and rough terrain.",
+    "summary": "A stable platform where the work is straight up and the deck needs room for two people and their material. Electric slab machines indoors, four-wheel-drive rough terrain outside.",
+    "highlights": [
+      "9 to 16 metre working height",
+      "Electric for finished floors, rough terrain for open site",
+      "Wide decks and extension platforms for two-man work",
+      "Inspected, certified and function tested before dispatch"
+    ],
     "h1": "Scissor lifts for sale and hire in the UAE",
     "heroImage": "/images/equipment/scissor-lifts-hero.jpg",
     "availableHire": true,
@@ -174,6 +216,13 @@
     "family": "Material handling",
     "rangeLabel": "All standard reaches",
     "cardLine": "Reach and place material on upper floors.",
+    "summary": "One machine that lifts, reaches and places — loading a slab on the third floor without setting up a crane. Attachments turn it into a loader or a lifting jib on the same shift.",
+    "highlights": [
+      "Standard reaches through to high-lift models",
+      "Places material on upper floors from ground level",
+      "Fork, bucket, jib and man-basket attachments",
+      "Four-wheel and crab steer for tight sites"
+    ],
     "h1": "Telehandlers for sale and hire in the UAE",
     "heroImage": "/images/equipment/telehandlers-hero.jpg",
     "availableHire": true,
@@ -196,6 +245,13 @@
     "family": "Access",
     "rangeLabel": "Articulated and telescopic",
     "cardLine": "Articulated for obstructed access, telescopic for straight reach.",
+    "summary": "Where a scissor cannot get to the work. Articulated booms reach up and over an obstruction, telescopic booms give the longest straight horizontal reach from one set-up.",
+    "highlights": [
+      "Articulated and telescopic booms",
+      "Up-and-over reach past obstructed access",
+      "Diesel four-wheel-drive and electric narrow models",
+      "Harness points, certification and operator familiarisation"
+    ],
     "h1": "Boom lifts for sale and hire in the UAE",
     "heroImage": "/images/equipment/boom-lifts-hero.jpg",
     "availableHire": true,
@@ -220,6 +276,13 @@
     "family": "Earthmoving",
     "rangeLabel": "Tracked and wheeled",
     "cardLine": "Compact trenching through to bulk earthworks.",
+    "summary": "Trenching in a confined plot through to bulk earthworks on open ground. Zero tail swing where the boundary is tight, wheeled where the machine has to travel on a finished surface.",
+    "highlights": [
+      "Compact tracked through to bulk earthmoving class",
+      "Wheeled machines for road and finished surfaces",
+      "Zero and short tail swing for confined sites",
+      "Breaker, auger and compaction attachments"
+    ],
     "h1": "Excavators for sale and hire in the UAE",
     "heroImage": "/images/equipment/excavators-hero.jpg",
     "availableHire": true,
@@ -245,6 +308,13 @@
     "family": "Power & air",
     "rangeLabel": "Diesel and solar",
     "cardLine": "Night shift lighting, diesel or solar with no fuel logistics.",
+    "summary": "Night shift lighting that does not need a fuel run every second day. Solar-hybrid masts hold a full night on battery, which matters most on sites you cannot reach after dark.",
+    "highlights": [
+      "Diesel and solar-hybrid masts",
+      "LED heads — lower draw, longer run between refuels",
+      "Solar units run with no fuel logistics at all",
+      "Manual and hydraulic mast lift, 7 to 9 metres"
+    ],
     "h1": "Tower lights for sale and hire in the UAE",
     "heroImage": "/images/equipment/tower-lights-hero.jpg",
     "availableHire": true,
@@ -267,6 +337,13 @@
     "family": "Earthmoving",
     "rangeLabel": "Standard and site spec",
     "cardLine": "Dig and load from one machine.",
+    "summary": "Dig at one end, load at the other, and drive itself between work fronts. On small civils and utilities work it does the job of two machines without the second mobilisation.",
+    "highlights": [
+      "Loader bucket and backhoe on one machine",
+      "Road-legal travel between work fronts",
+      "Extendable dipper for deeper reach",
+      "Breaker and auger attachments available"
+    ],
     "h1": "Backhoe loaders for sale and hire in the UAE",
     "heroImage": "/images/equipment/backhoe-loaders-hero.jpg",
     "availableHire": true,
@@ -287,6 +364,13 @@
     "family": "Earthmoving",
     "rangeLabel": "With attachments",
     "cardLine": "Confined-site work with a full attachment range.",
+    "summary": "Built for sites where nothing bigger will fit. The value is the coupler — one machine sweeps, breaks, augers and trenches across a single day's work.",
+    "highlights": [
+      "Turns within its own length",
+      "Full attachment range on a quick coupler",
+      "Sweeper, breaker, auger, trencher and planer",
+      "Tracked and wheeled, for soft ground or hard standing"
+    ],
     "h1": "Bobcat and skid steer loaders for sale and hire in the UAE",
     "heroImage": "/images/equipment/skid-steer-loaders-hero.jpg",
     "availableHire": true,

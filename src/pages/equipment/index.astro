@@ -2,9 +2,11 @@
 /**
  * Equipment hub — /equipment.
  *
- * Level 1 of the IA: every category, grouped by family, each card linking to
- * its own page. Pulls straight from the `equipment` collection, so adding a
- * category to categories.json puts it here, in the right group, in order.
+ * Level 1 of the IA. Every category gets a full-width row rather than a card:
+ * photo one side, pitch the other, sides alternating down the page. A sticky
+ * rail keeps the twelve navigable. Pulls straight from the `equipment`
+ * collection, so adding a category to categories.json puts it here, numbered,
+ * in the right family group in the rail.
  */
 import { getCollection } from "astro:content";
 import Base from "../../layouts/Base.astro";
@@ -12,8 +14,9 @@ import Footer from "../../components/Footer.astro";
 import Section from "../../components/ui/Section.astro";
 import Eyebrow from "../../components/ui/Eyebrow.astro";
 import Button from "../../components/ui/Button.astro";
-import CategoryCard from "../../components/equipment/CategoryCard.astro";
-import { FAMILIES, FAMILY_LINE, familyId } from "../../lib/equipment";
+import CategoryRow from "../../components/equipment/CategoryRow.astro";
+import CategoryIndex from "../../components/equipment/CategoryIndex.astro";
+import { FAMILIES } from "../../lib/equipment";
 import { equipmentHub } from "../../data/content";
 import { site } from "../../config/site";
 
@@ -21,8 +24,9 @@ const all = (await getCollection("equipment")).sort(
   (a, b) => a.data.sortOrder - b.data.sortOrder,
 );
 
-/* Families keep their canonical order rather than the order they happen to
-   appear in the JSON. An empty family renders nothing at all. */
+/* Rows run as one flat sequence so the left/right alternation is unbroken —
+   families do the grouping in the rail instead. An empty family renders
+   nothing at all. */
 const byFamily = FAMILIES.map((family) => ({
   family,
   items: all.filter((category) => category.data.family === family),
@@ -48,12 +52,18 @@ const byFamily = FAMILIES.map((family) => ({
         {equipmentHub.intro}
       </p>
 
-      <!-- Jump to a family -->
-      <nav class="flex flex-wrap gap-[10px] mt-9" aria-label="Equipment families">
+      <!-- Jump to a family. Targets the family's first category, since the rows
+           below are a flat sequence with no group headings to land on. Mobile
+           only — on desktop the sticky rail is the same affordance, and both at
+           once puts two category lists in one viewport. -->
+      <nav
+        class="flex flex-wrap gap-[10px] mt-9 nav:hidden"
+        aria-label="Equipment families"
+      >
         {
           byFamily.map(({ family, items }) => (
             <a
-              href={`#${familyId(family)}`}
+              href={`#${items[0].id}`}
               class="inline-flex items-center gap-[8px] rounded-full border border-line-strong px-[15px] py-[8px] text-[13.5px] font-medium text-body transition-colors hover:border-ink hover:text-ink"
             >
               {family}
@@ -65,41 +75,31 @@ const byFamily = FAMILIES.map((family) => ({
     </div>
   </header>
 
-  <!-- The twelve, grouped by family -->
+  <!-- The twelve -->
   <Section class="pt-0">
-    <div class="wrap flex flex-col gap-[72px] max-mob:gap-[52px]">
-      {
-        byFamily.map(({ family, items }) => (
-          <section aria-labelledby={familyId(family)}>
-            <div class="pb-5 mb-8 border-b border-line">
-              <div>
-                <h2
-                  id={familyId(family)}
-                  class="text-[clamp(22px,2.4vw,28px)] leading-[1.1] scroll-mt-[110px]"
-                >
-                  {family}
-                </h2>
-                <p class="text-[14.5px] text-muted mt-[6px]">
-                  {FAMILY_LINE[family]}
-                </p>
-              </div>
-            </div>
+    <div class="wrap">
+      <div
+        class="grid grid-cols-[180px_1fr] gap-[72px] max-nav:grid-cols-1 max-nav:gap-0"
+      >
+        <CategoryIndex groups={byFamily} />
 
-            <div class="grid grid-cols-3 gap-5 max-nav:grid-cols-2 max-cmp:grid-cols-1">
-              {items.map((category) => (
-                <CategoryCard
-                  category={category}
-                  index={category.data.sortOrder}
-                />
-              ))}
-            </div>
-          </section>
-        ))
-      }
+        <div class="flex flex-col">
+          {
+            all.map((category, i) => (
+              <>
+                {i > 0 && (
+                  <hr class="border-0 border-t border-line my-[80px] max-mob:my-[56px]" />
+                )}
+                <CategoryRow category={category} flip={i % 2 === 1} />
+              </>
+            ))
+          }
+        </div>
+      </div>
 
       <!-- Closing enquiry -->
       <div
-        class="card flex justify-between items-center gap-8 p-9 flex-wrap max-xs:p-7"
+        class="card flex justify-between items-center gap-8 p-9 flex-wrap mt-[96px] max-mob:mt-[64px] max-xs:p-7"
       >
         <div>
           <h2 class="text-[22px] font-semibold mb-2">

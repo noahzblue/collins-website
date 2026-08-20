@@ -1,0 +1,107 @@
+---
+/**
+ * Sticky index rail beside the hub's category rows.
+ *
+ * Twelve full-height rows is a long scroll, so the rail is what keeps the
+ * catalogue navigable: every category numbered and grouped by family, with the
+ * one you are level with highlighted. Desktop only — below the `nav`
+ * breakpoint the rows stack and the header's family jump links take over.
+ */
+import type { CollectionEntry } from "astro:content";
+import type { Family } from "../../lib/equipment";
+
+interface Props {
+  groups: { family: Family; items: CollectionEntry<"equipment">[] }[];
+}
+
+const { groups } = Astro.props;
+---
+
+{/* The outer div is the grid cell and stretches to the full height of the rows
+    beside it; `sticky` only has room to travel because of that. */}
+<div class="max-nav:hidden">
+<nav
+  class="sticky top-[104px] flex flex-col gap-7"
+  aria-label="Equipment categories"
+>
+  {
+    groups.map(({ family, items }) => (
+      <div>
+        <p class="text-[10.5px] font-semibold uppercase tracking-[1.6px] text-faint mb-[10px]">
+          {family}
+        </p>
+        <ul class="flex flex-col border-l border-line">
+          {items.map((item) => (
+            <li>
+              <a
+                href={`#${item.id}`}
+                data-index-link={item.id}
+                class="idx flex items-center gap-[10px] py-[6px] pl-[13px] -ml-px border-l border-transparent transition-colors duration-200"
+              >
+                <span class="idx-num font-mono text-[11px] tracking-[0.5px] text-faint transition-colors duration-200">
+                  {String(item.data.sortOrder).padStart(2, "0")}
+                </span>
+                <span class="idx-label text-[13.5px] leading-[1.3] text-muted transition-colors duration-200">
+                  {item.data.name}
+                </span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    ))
+  }
+</nav>
+</div>
+
+<style>
+  .idx:hover .idx-label,
+  .idx:hover .idx-num {
+    color: var(--color-ink);
+  }
+  .idx.is-active {
+    border-left-color: var(--color-brand);
+  }
+  .idx.is-active .idx-num {
+    color: var(--color-brand);
+  }
+  .idx.is-active .idx-label {
+    color: var(--color-ink);
+    font-weight: 600;
+  }
+</style>
+
+<script>
+  /* Highlight whichever row is crossing the middle of the viewport. The
+     rootMargin collapses the observation area to a thin band there, so only
+     one row is intersecting at a time and the rail can't flicker between two.
+     A fast scroll can leave nothing in the band — the last active link stays
+     lit rather than the rail going blank. */
+  const links = [
+    ...document.querySelectorAll<HTMLAnchorElement>("[data-index-link]"),
+  ];
+
+  if (links.length > 0) {
+    const setActive = (id: string) => {
+      for (const link of links) {
+        link.classList.toggle("is-active", link.dataset.indexLink === id);
+      }
+    };
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) setActive(entry.target.id);
+        }
+      },
+      { rootMargin: "-45% 0px -45% 0px" },
+    );
+
+    for (const link of links) {
+      const row = document.getElementById(link.dataset.indexLink!);
+      if (row) observer.observe(row);
+    }
+
+    setActive(links[0].dataset.indexLink!);
+  }
+</script>

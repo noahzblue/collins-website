@@ -49,6 +49,10 @@ const equipment = defineCollection({
     rangeLabel: z.string(),
     /** Extra sentence shown on the hub card, not on the homepage tile. */
     cardLine: z.string(),
+    /** Two or three sentences — the paragraph in the category's hub row. */
+    summary: z.string(),
+    /** Scannable capability lines above the summary in the hub row. */
+    highlights: z.array(z.string()).min(3).max(4),
     h1: z.string(),
     heroImage: z.string().optional(),
     availableHire: z.boolean().default(true),
