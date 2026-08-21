@@ -1,0 +1,214 @@
+---
+/**
+ * Numbered rows in a column, **one** image panel beside them: pointing at (or
+ * tabbing to) a row crossfades that row's photo in.
+ *
+ * This is what lets a list of six to nine things stay one screen tall and
+ * still carry photography — six thumbnails in a grid would be a wall, and six
+ * accordion rows would be a tall, dull column.
+ *
+ *   <FollowerList
+ *     items={services.map((s) => ({ label: s.title, blurb: s.lead,
+ *                                   image: s.image, href: `#${s.slug}` }))}
+ *     ariaLabel="Services" />
+ *
+ * Below the `nav` breakpoint the panel is dropped and the rows become a plain
+ * numbered list — a shared image slot needs a pointer to be worth anything.
+ */
+export interface FollowerItem {
+  label: string;
+  blurb: string;
+  image: string;
+  href: string;
+  /** Optional floating data-card over the photo — one per row. */
+  stat?: { title: string; line: string };
+}
+
+interface Props {
+  items: FollowerItem[];
+  ariaLabel: string;
+  class?: string;
+}
+
+const { items, ariaLabel, class: extra = "" } = Astro.props;
+---
+
+<div
+  class:list={[
+    "follower grid grid-cols-[1.05fr_0.95fr] items-start gap-16 max-nav:grid-cols-1 max-nav:gap-8",
+    extra,
+  ]}
+  data-follower
+>
+  <ul aria-label={ariaLabel}>
+    {
+      items.map((item, i) => (
+        <li >
+          <a
+            href={item.href}
+            data-row={i}
+            class="row press group flex items-start gap-6 border-b  border-line pt-[34px] pb-[15px] transition-colors duration-200 max-xs:gap-4 max-xs:pt-[26px]"
+          >
+            <span class="row-num mt-[3px] shrink-0 font-mono text-caption tracking-[0.5px] text-faint transition-colors duration-200">
+              {String(i + 1).padStart(2, "0")}
+            </span>
+            <span class="min-w-0 flex-1">
+              <span class="row-title block font-mono text-subhead font-medium tracking-[-0.01em] uppercase transition-colors duration-200">
+                {item.label}
+              </span>
+              <span class="mt-[6px] block text-detail leading-relaxed text-muted">
+                {item.blurb}
+              </span>
+              {/* Below `nav` there is no shared panel, so each row carries
+                  its own photo instead of losing it entirely. */}
+              <span class="mt-4 hidden overflow-clip rounded-md max-nav:block">
+                <img
+                  src={item.image}
+                  alt=""
+                  loading="lazy"
+                  decoding="async"
+                  class="aspect-[16/10] w-full object-cover"
+                />
+              </span>
+            </span>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+
+  <div
+    class="panel sticky top-header-gap aspect-[4/5] overflow-clip rounded-md bg-surface-2 max-nav:hidden"
+    aria-hidden="true"
+  >
+    {
+      /* The breathing zoom lives on a wrapper, NOT on the photos: put it on
+         `.slot.is-active` and every row change restarts the animation from its
+         first keyframe, so the picture visibly pops each time the pointer moves
+         down the list. One continuously running wrapper means the crossfade and
+         the zoom never know about each other. */
+    }
+    <span class="panel-zoom absolute inset-0">
+      {
+        items.map((item, i) => (
+          <img
+            src={item.image}
+            alt=""
+            loading={i === 0 ? "eager" : "lazy"}
+            decoding="async"
+            class:list={[
+              "slot absolute inset-0 h-full w-full object-cover",
+              i === 0 && "is-active",
+            ]}
+          />
+        ))
+      }
+    </span>
+
+    {
+      items.map((item, i) =>
+        item.stat ? (
+          <span
+            class:list={[
+              "slot card-note absolute right-5 bottom-5 left-5 rounded-md border border-white/60 bg-white/92 p-5 backdrop-blur-md",
+              i === 0 && "is-active",
+            ]}
+            data-note={i}
+          >
+            <span class="block text-base font-medium text-ink">
+              {item.stat.title}
+            </span>
+            <span class="mt-1 block text-note leading-relaxed text-muted">
+              {item.stat.line}
+            </span>
+          </span>
+        ) : null,
+      )
+    }
+  </div>
+</div>
+
+<style>
+  .row:hover .row-title,
+  .row:focus-visible .row-title {
+    color: var(--color-brand);
+  }
+  .row:hover .row-num,
+  .row:focus-visible .row-num {
+    color: var(--color-brand);
+  }
+  .row-title {
+    color: var(--color-ink);
+  }
+
+  /* A very slow, very small breath — 1.02 to 1.065 over twelve seconds, with a
+     hair of overshoot at each end so it eases rather than turns around. At this
+     amplitude you never catch it moving; you only notice the panel is alive. */
+  .panel-zoom {
+    animation: panel-breathe 12s infinite;
+  }
+  @keyframes panel-breathe {
+    0% {
+      scale: 1.02;
+      animation-timing-function: cubic-bezier(0.36, 0.02, 0.24, 1.03);
+    }
+    50% {
+      scale: 1.065;
+      animation-timing-function: cubic-bezier(0.36, 0.02, 0.24, 1.03);
+    }
+    100% {
+      scale: 1.02;
+    }
+  }
+
+  /* One shared slot: every photo (and its data-card) is stacked and only the
+     active pair is opaque. Row 0 is marked active in the markup, so a page
+     whose JS never runs still shows a photo rather than an empty grey panel. */
+  .slot {
+    opacity: 0;
+    transition: opacity 0.45s var(--ease-out-expo);
+  }
+  .slot.is-active {
+    opacity: 1;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .slot {
+      transition: none;
+    }
+    .panel-zoom {
+      animation: none;
+      scale: 1.02;
+    }
+  }
+</style>
+
+<script>
+  // Re-runs after every client-router navigation as well as on first load,
+  // so the swapped-in DOM gets wired up.
+  document.addEventListener("astro:page-load", () => {
+    for (const root of document.querySelectorAll<HTMLElement>(
+      "[data-follower]",
+    )) {
+      const panel = root.querySelector<HTMLElement>(".panel");
+      if (!panel) continue;
+
+      const imgs = [...panel.querySelectorAll<HTMLElement>("img.slot")];
+      const notes = [...panel.querySelectorAll<HTMLElement>(".card-note")];
+
+      // `focusin` as well as `pointerenter` so the list works from the
+      // keyboard, not only from a mouse.
+      for (const row of root.querySelectorAll<HTMLElement>(".row")) {
+        const activate = () => {
+          const i = Number(row.dataset.row);
+          imgs.forEach((el, j) => el.classList.toggle("is-active", j === i));
+          notes.forEach((el) =>
+            el.classList.toggle("is-active", Number(el.dataset.note) === i),
+          );
+        };
+        row.addEventListener("pointerenter", activate);
+        row.addEventListener("focusin", activate);
+      }
+    }
+  });
+</script>

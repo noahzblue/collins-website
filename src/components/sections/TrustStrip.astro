@@ -8,6 +8,12 @@
  * The card runs on the wide 1600px band rather than the 1200px text column,
  * and the four tab blocks are bottom-aligned so they sit on the base of the
  * photo whether their description is open or closed.
+ *
+ * The big counter top-right and the small number on each tab are the same
+ * value. That repetition is the point: on its own, a 40px "03" in the opposite
+ * corner from the tabs reads as decoration and nobody connects it to the third
+ * block of copy. Numbering the tabs makes the counter legible as a position in
+ * a set of four.
  */
 import Section from "@/components/ui/Section.astro";
 import Eyebrow from "@/components/ui/Eyebrow.astro";
@@ -25,21 +31,35 @@ import { trust } from "@/data/content";
 
     <div
       id="why-card"
-      class="relative mt-[56px] flex min-h-[620px] flex-col justify-between overflow-clip rounded-[18px] bg-ink max-mob:mt-[36px] max-mob:min-h-0"
+      class="relative mt-[56px] flex min-h-[620px] flex-col justify-between overflow-clip rounded-md bg-ink max-mob:mt-[36px] max-mob:min-h-0"
     >
       {
+        /* The crossfade class lives on a wrapper THIS component owns, not on
+           the <ParallaxImage> itself. Astro scopes `.tab-img` to this file's
+           cid, and a child component's root element carries its OWN cid — so
+           passed down as a prop the selector never matched, all four photos
+           stayed at opacity 1, and the last one in the DOM was the only one
+           anybody ever saw regardless of which tab was selected. */
         trustFeatures.map((f, i) => (
-          <ParallaxImage
-            src={f.image}
-            loading={i === 0 ? "eager" : "lazy"}
+          <div
             class:list={["tab-img absolute inset-0", i === 0 && "is-active"]}
-          />
+          >
+            <ParallaxImage
+              src={f.image}
+              loading={i === 0 ? "eager" : "lazy"}
+              class="absolute inset-0"
+            />
+          </div>
         ))
       }
 
-      <!-- Scrim: headline zone up top, tab rail along the base. -->
+      <!-- Scrim: headline zone up top, tab rail along the base. The lower
+           half carries an extra stop at 62% because the tab copy starts well
+           above the bottom edge — a two-stop ramp only reaches full strength
+           under the last line, and the brighter photos in this set (a lit
+           workshop, a midday site) washed the descriptions out. -->
       <div
-        class="absolute inset-0 bg-[linear-gradient(180deg,rgba(6,10,20,0.55)_0%,rgba(6,10,20,0.08)_38%,rgba(6,10,20,0.78)_100%)]"
+        class="absolute inset-0 bg-[linear-gradient(180deg,rgba(6,10,20,0.55)_0%,rgba(6,10,20,0.08)_32%,rgba(6,10,20,0.60)_62%,rgba(6,10,20,0.92)_100%)]"
         aria-hidden="true"
       >
       </div>
@@ -53,9 +73,9 @@ import { trust } from "@/data/content";
         />
         <span
           id="why-num"
-          class="pt-1 font-mono text-[clamp(28px,3vw,40px)] leading-none text-white/85"
+          class="mt-1 font-mono text-[clamp(28px,3vw,40px)] leading-none text-white/85"
         >
-          01
+          <span class="digit">01</span>
         </span>
       </div>
 
@@ -69,11 +89,14 @@ import { trust } from "@/data/content";
             <button
               type="button"
               role="tab"
-              class="why-tab group cursor-pointer text-left"
+              class="why-tab cursor-pointer text-left"
               aria-selected={i === 0 ? "true" : "false"}
               data-index={i}
             >
-              <span class="block text-lead-lg font-medium text-white/65 transition-colors duration-300 group-aria-selected:text-white">
+              <span class="tab-num block font-mono text-micro tracking-[1.6px] transition-colors duration-300">
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              <span class="tab-title mt-[10px] block text-lead-lg font-medium transition-colors duration-300">
                 {f.title}
               </span>
               <span class="desc-wrap grid transition-[grid-template-rows] duration-500 ease-out">
@@ -83,8 +106,8 @@ import { trust } from "@/data/content";
                   </span>
                 </span>
               </span>
-              <span class="bar relative mt-4 block h-px overflow-hidden bg-white/25">
-                <span class="bar-fill absolute inset-y-0 left-0 w-0 bg-brand-bright" />
+              <span class="bar relative mt-4 block h-px overflow-hidden bg-white/25 transition-colors duration-300">
+                <span class="bar-fill absolute inset-y-0 left-0 w-full origin-left bg-brand-bright" />
               </span>
             </button>
           ))
@@ -103,6 +126,34 @@ import { trust } from "@/data/content";
     opacity: 1;
   }
 
+  /* Three states, and the hover state has to beat the resting one on BOTH the
+     selected and the unselected tab — hence `:hover` after the
+     `[aria-selected]` rules rather than mixed in with them. */
+  .tab-num {
+    color: rgb(255 255 255 / 0.35);
+  }
+  .tab-title {
+    color: rgb(255 255 255 / 0.65);
+  }
+  .why-tab[aria-selected="true"] .tab-num {
+    color: rgb(255 255 255 / 0.8);
+  }
+  .why-tab[aria-selected="true"] .tab-title {
+    color: #fff;
+  }
+  .why-tab:hover .tab-num,
+  .why-tab:focus-visible .tab-num,
+  .why-tab:hover .tab-title,
+  .why-tab:focus-visible .tab-title {
+    color: var(--color-brand-bright);
+  }
+  /* The rule under the tab is the other half of the affordance: the whole
+     block lights, not just its label. */
+  .why-tab:hover .bar,
+  .why-tab:focus-visible .bar {
+    background: color-mix(in srgb, var(--color-brand-bright) 45%, transparent);
+  }
+
   .desc-wrap {
     grid-template-rows: 0fr;
   }
@@ -110,21 +161,38 @@ import { trust } from "@/data/content";
     grid-template-rows: 1fr;
   }
 
-  /* Progress line fills across the auto-advance interval — keep the 6s in
-     sync with INTERVAL in the script below. Hover pauses fill + rotation. */
-  .why-tab[aria-selected="true"] .bar-fill {
-    animation: why-progress 6s linear forwards;
+  /* The progress line is driven by the rotator's own clock (`--t`, 0→1), not
+     by a CSS animation on a duration that has to be kept in sync by hand. The
+     bar and the switch therefore cannot drift, and a hover freezes the fill
+     mid-travel instead of snapping it. */
+  .bar-fill {
+    transform: scaleX(var(--t, 0));
   }
-  #why-card:hover .bar-fill {
-    animation-play-state: paused;
+
+  /* The counter rolls like an odometer: the outgoing digit leaves upward and
+     the incoming one arrives from below, both clipped by the frame. */
+  #why-num {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    width: 2ch;
+    height: 1em;
   }
-  @keyframes why-progress {
-    from {
-      width: 0;
-    }
-    to {
-      width: 100%;
-    }
+  #why-num .digit {
+    position: absolute;
+    inset: 0;
+    transition:
+      transform 0.45s var(--ease-out-expo),
+      opacity 0.45s var(--ease-out-expo);
+  }
+  #why-num .digit.is-out {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  #why-num .digit.is-in {
+    transform: translateY(100%);
+    opacity: 0;
+    transition: none;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -132,9 +200,11 @@ import { trust } from "@/data/content";
     .desc-wrap {
       transition: none;
     }
-    .why-tab[aria-selected="true"] .bar-fill {
-      animation: none;
-      width: 100%;
+    .bar-fill {
+      transform: scaleX(1);
+    }
+    #why-num .digit {
+      transition: none;
     }
   }
 </style>
@@ -151,28 +221,45 @@ import { trust } from "@/data/content";
       const imgs = [...card.querySelectorAll<HTMLElement>(".tab-img")];
       const num = card.querySelector<HTMLElement>("#why-num")!;
 
-      // Re-trigger the CSS fill animation from zero on the active tab.
-      const restartFill = () => {
-        const fill = card.querySelector<HTMLElement>(
-          '.why-tab[aria-selected="true"] .bar-fill',
-        );
-        if (!fill) return;
-        fill.style.animation = "none";
-        void fill.offsetWidth;
-        fill.style.animation = "";
+      const fills = [...card.querySelectorAll<HTMLElement>(".bar-fill")];
+
+      /** Roll the counter: the old digit leaves upward, the new one arrives
+       *  from below. Two elements for the length of one transition. */
+      const roll = (i: number) => {
+        const next = String(i + 1).padStart(2, "0");
+        const current = num.querySelector<HTMLElement>(".digit:not(.is-out)");
+        if (!current || current.textContent === next) return;
+
+        const incoming = document.createElement("span");
+        incoming.className = "digit is-in";
+        incoming.textContent = next;
+        num.append(incoming);
+
+        current.classList.add("is-out");
+        current.addEventListener("transitionend", () => current.remove(), {
+          once: true,
+        });
+        // Next frame, so the browser paints the below-the-frame start state
+        // before the class that animates away from it lands.
+        requestAnimationFrame(() => incoming.classList.remove("is-in"));
       };
 
       const rotator = createRotator({
         root: card,
         count: tabs.length,
-        interval: 6000, // keep in sync with the why-progress duration in <style>
-        onResume: restartFill,
+        interval: 6000,
         onSelect: (i) => {
           tabs.forEach((t, j) =>
             t.setAttribute("aria-selected", String(j === i)),
           );
           imgs.forEach((im, j) => im.classList.toggle("is-active", j === i));
-          num.textContent = String(i + 1).padStart(2, "0");
+          roll(i);
+        },
+        // One clock for the switch and the bar, so they can't disagree.
+        onProgress: (i, t) => {
+          fills.forEach((fill, j) =>
+            fill.style.setProperty("--t", String(j === i ? t : 0)),
+          );
         },
       });
       tabs.forEach((t, i) =>

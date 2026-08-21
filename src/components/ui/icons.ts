@@ -59,6 +59,12 @@ export const icons = {
     mode: "stroke",
     body: `<path d="M7 17 17 7M8 7h9v9"/>`,
   },
+  /** Plus — accordion open/close. Rotate it 45° and it is a cross, which is
+   *  why it is a plus and not a chevron: one glyph, two states, no swap. */
+  plus: {
+    mode: "stroke",
+    body: `<path d="M12 5v14M5 12h14"/>`,
+  },
   /** Medal / award — top brands. */
   award: {
     mode: "stroke",
@@ -83,6 +89,21 @@ export const icons = {
   refresh: {
     mode: "stroke",
     body: `<path d="M21 12a9 9 0 0 0-9-9 9.8 9.8 0 0 0-6.7 2.7L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.8 9.8 0 0 0 6.7-2.7L21 16"/><path d="M16 16h5v5"/>`,
+  },
+  /** Hamburger — the mobile nav toggle. */
+  menu: {
+    mode: "stroke",
+    body: `<path d="M4 7h16M4 12h16M4 17h16"/>`,
+  },
+  /** Spanner — maintenance & spares. */
+  wrench: {
+    mode: "stroke",
+    body: `<path d="M14.7 6.3a4 4 0 0 0 5 5l-8.4 8.4a2.1 2.1 0 0 1-3-3Z"/><path d="M19.7 11.3a4 4 0 0 1-5-5l-2.1-2.1a4 4 0 0 0-5 5l2.1 2.1"/>`,
+  },
+  /** Sheet with a folded corner — documentation, condition reports. */
+  document: {
+    mode: "stroke",
+    body: `<path d="M14 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7Z"/><path d="M14 2v5h5"/><path d="M9 13h6M9 17h4"/>`,
   },
   /** Magnifier — sourcing. */
   search: {

@@ -1,17 +1,22 @@
 ---
-/** Site-wide footer — light surface matching the blue/white system. */
+/** Site-wide footer — light surface matching the blue/white system.
+ *
+ *  Three link columns plus the brand column make this a real sitemap. The
+ *  legal line under the bar is the local equivalent of the certification
+ *  badges a reference site would carry: a register number anyone can check. */
 import Logo from "@/components/ui/Logo.astro";
 import Icon from "@/components/ui/Icon.astro";
 import { site } from "@/config/site";
 import { footerColumns } from "@/data/navigation";
 
 const year = new Date().getFullYear();
+const { office, yard } = site.places;
 ---
 
 <footer class="border-t border-line bg-surface pt-24 text-muted max-mob:pt-16">
   <div class="wrap">
     <div
-      class="grid grid-cols-[1.4fr_0.9fr_0.9fr_1fr] gap-12 border-b border-line pb-16 max-nav:grid-cols-2 max-nav:gap-10 max-cmp:grid-cols-1"
+      class="grid grid-cols-[1.4fr_0.9fr_0.9fr_1.1fr] gap-12 border-b border-line pb-16 max-nav:grid-cols-2 max-nav:gap-10 max-cmp:grid-cols-1"
     >
       <!-- Brand -->
       <div>
@@ -19,19 +24,42 @@ const year = new Date().getFullYear();
         <p class="mt-5 mb-6 max-w-[280px] text-sm leading-relaxed text-muted">
           {site.blurb}
         </p>
+
+        <!-- Two addresses, because there are two places doing two jobs. -->
+        <ul class="mb-6 flex flex-col gap-[10px] text-sm">
+          {
+            [office, yard].map((place) => (
+              <li class="flex gap-[10px]">
+                <span class="shrink-0 font-mono text-tag tracking-[1.2px] text-faint uppercase">
+                  {place.tag}
+                </span>
+                <span>{place.address}</span>
+              </li>
+            ))
+          }
+        </ul>
+
+        {
+          /* Only the networks we actually have a URL for. Three of the four
+           entries in site.ts are still `#`, and a dead link in the footer of
+           every page is worse than one fewer icon — fill the href in and the
+           icon comes back on its own. */
+        }
         <div class="flex gap-[10px]">
           {
-            site.social.map((s) => (
-              <a
-                href={s.href}
-                target="_blank"
-                rel="noopener"
-                aria-label={s.label}
-                class="flex h-9 w-9 items-center justify-center rounded-full border border-line-strong text-muted transition-colors hover:border-brand hover:text-brand"
-              >
-                <Icon name={s.icon} size={15} />
-              </a>
-            ))
+            site.social
+              .filter((s) => s.href !== "#")
+              .map((s) => (
+                <a
+                  href={s.href}
+                  target="_blank"
+                  rel="noopener"
+                  aria-label={s.label}
+                  class="flex h-9 w-9 items-center justify-center rounded-full border border-line-strong text-muted transition-colors hover:border-brand hover:text-brand"
+                >
+                  <Icon name={s.icon} size={15} />
+                </a>
+              ))
           }
         </div>
       </div>
@@ -56,15 +84,29 @@ const year = new Date().getFullYear();
         ))
       }
 
-      <!-- Contact -->
+      <!-- Get in touch -->
       <div>
         <h5
           class="mb-5 text-meta font-medium tracking-[1.5px] text-ink uppercase"
         >
-          Contact
+          Get in touch
         </h5>
         <ul class="flex flex-col gap-[11px] text-sm">
-          <li>{site.address}</li>
+          <li>
+            <a href="/contact" class="transition-colors hover:text-ink">
+              Request a quote
+            </a>
+          </li>
+          <li>
+            <a
+              href={site.whatsapp.href}
+              target="_blank"
+              rel="noopener"
+              class="transition-colors hover:text-ink"
+            >
+              WhatsApp
+            </a>
+          </li>
           <li>
             <a href={site.phone.href} class="transition-colors hover:text-ink">
               {site.phone.display}
@@ -82,6 +124,15 @@ const year = new Date().getFullYear();
         </ul>
       </div>
     </div>
+
+    <!-- Legal line: the checkable credential, from the profile's back cover. -->
+    <p
+      class="mb-0 border-b border-line py-6 font-mono text-caption tracking-[0.4px] text-faint"
+    >
+      {site.legalName} · Register {site.register} · Licensed by the {
+        site.licensingAuthority
+      }
+    </p>
 
     <div
       class="flex flex-wrap justify-between gap-[10px] py-7 text-meta text-faint max-xs:flex-col max-xs:items-start max-xs:gap-2"

@@ -1,0 +1,178 @@
+---
+/**
+ * /services — the six capabilities, replacing the /#services anchor.
+ *
+ * This was the biggest content gap on the site: `services.ts` shipped three
+ * items, two real revenue lines (transport & haulage, maintenance & spares)
+ * appeared nowhere, and "equipment sales" — the stated core of the business —
+ * was folded into "general trading".
+ *
+ * Five beats: banner, the follower list, the six blocks, the cross-sell back
+ * to the catalogue, the shared closer.
+ */
+import Base from "@/layouts/Base.astro";
+import Section from "@/components/ui/Section.astro";
+import Button from "@/components/ui/Button.astro";
+import Icon from "@/components/ui/Icon.astro";
+import PageBanner from "@/components/ui/PageBanner.astro";
+import IndexRail from "@/components/ui/IndexRail.astro";
+import FollowerList from "@/components/ui/FollowerList.astro";
+import ParallaxImage from "@/components/ui/ParallaxImage.astro";
+import PageCTA from "@/components/sections/PageCTA.astro";
+import { services } from "@/data/services";
+import { servicesSection } from "@/data/content";
+import { site } from "@/config/site";
+
+/** Nested template literals confuse the compiler's frontmatter scan — build
+ *  the message first, then the URL. */
+const enquire = (title: string) => {
+  const text = `Hi Collins, I'd like to talk about ${title.toLowerCase()}.`;
+  return `${site.whatsapp.href}?text=${encodeURIComponent(text)}`;
+};
+---
+
+<Base
+  title={servicesSection.seoTitle}
+  description={servicesSection.seoDescription}
+>
+  <PageBanner
+    image="/images/service-logistics.jpg"
+    trail={[{ label: "Home", href: "/" }]}
+    current="Services"
+    title="Services"
+  >
+    <p class="mt-4 max-w-[620px] text-intro leading-relaxed text-white/80">
+      {servicesSection.intro}
+    </p>
+  </PageBanner>
+
+  <!-- Beat 2 — the six at a glance -->
+  <Section class="pb-[80px] max-mob:pb-[56px]">
+    <div class="wrap">
+      <FollowerList
+        items={services.map((s) => ({
+          label: s.title,
+          blurb: s.lead,
+          image: s.image,
+          href: `#${s.slug}`,
+          stat: s.stat,
+        }))}
+        ariaLabel="Services"
+      />
+    </div>
+  </Section>
+
+  <!-- Beat 3 — the six blocks, sides alternating, siblings of /equipment's rows -->
+  <Section tone="gray" class="pt-0">
+    <div class="wrap pt-[110px] max-mob:pt-[72px]">
+      <div class="grid grid-cols-[180px_1fr] gap-[72px] max-nav:block">
+        <IndexRail
+          items={services.map((s) => ({ id: s.slug, label: s.title }))}
+          ariaLabel="Services"
+        />
+
+        <div class="flex flex-col">
+          {
+            services.map((service, i) => (
+              <>
+                {i > 0 && (
+                  <hr class="my-[80px] border-0 border-t border-line-strong max-mob:my-[56px]" />
+                )}
+                <article
+                  id={service.slug}
+                  class="group grid scroll-mt-header-gap grid-cols-2 items-center gap-[72px] max-nav:grid-cols-1 max-nav:gap-9"
+                >
+                  <ParallaxImage
+                    src={service.image}
+                    alt=""
+                    shift="4%"
+                    zoom={1.1}
+                    class:list={[
+                      "aspect-[4/5] rounded-md max-nav:aspect-[16/10]",
+                      i % 2 === 1 && "order-2 max-nav:order-none",
+                    ]}
+                  />
+
+                  <div class="max-w-[460px] max-nav:max-w-none">
+                    <div class="flex items-center gap-[14px]">
+                      <span class="font-mono text-caption tracking-[0.5px] text-brand">
+                        {String(i + 1).padStart(2, "0")}
+                      </span>
+                      <span
+                        class="h-px w-[22px] bg-line-strong"
+                        aria-hidden="true"
+                      />
+                      <span class="flex h-[30px] w-[30px] items-center justify-center rounded-sm bg-brand-tint text-brand">
+                        <Icon name={service.icon} size={16} />
+                      </span>
+                    </div>
+
+                    <h2 class="mt-[18px] text-[clamp(28px,3.2vw,38px)] leading-[1.06]">
+                      {service.title}
+                    </h2>
+                    <p class="mt-5 text-lead leading-relaxed text-body">
+                      {service.body}
+                    </p>
+
+                    <ul class="mt-7 grid grid-cols-2 gap-x-6 gap-y-[9px] max-cmp:grid-cols-1">
+                      {service.points.map((point) => (
+                        <li class="flex gap-[11px] text-detail leading-[1.45] font-medium text-body">
+                          <Icon
+                            name="check"
+                            size={15}
+                            class="mt-[4px] shrink-0 text-brand"
+                          />
+                          <span>{point}</span>
+                        </li>
+                      ))}
+                    </ul>
+
+                    <div class="mt-8 flex flex-wrap items-center gap-3">
+                      <Button variant="primary" href="/contact" class="press">
+                        {service.cta}
+                      </Button>
+                      <Button
+                        variant="outline"
+                        href={enquire(service.title)}
+                        target="_blank"
+                        rel="noopener"
+                        class="press"
+                      >
+                        <Icon name="whatsapp" size={16} />
+                        WhatsApp
+                      </Button>
+                    </div>
+                  </div>
+                </article>
+              </>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+  </Section>
+
+  <!-- Beat 4 — the internal link that stops /services and /equipment
+       competing for the same intent and makes them reinforce each other. -->
+  <Section class="py-[80px] max-mob:py-[56px]">
+    <div class="wrap">
+      <div
+        class="flex flex-wrap items-center justify-between gap-8 border-y border-line py-10"
+        data-reveal
+      >
+        <p class="mb-0 max-w-[620px] text-lead-lg leading-relaxed text-body">
+          {servicesSection.crossSell.body}
+        </p>
+        <a
+          href={servicesSection.crossSell.cta.href}
+          class="press inline-flex items-center gap-2 text-base font-medium text-ink transition-colors hover:text-brand"
+        >
+          {servicesSection.crossSell.cta.label}
+          <Icon name="arrow-right" size={17} />
+        </a>
+      </div>
+    </div>
+  </Section>
+
+  <PageCTA />
+</Base>

@@ -73,7 +73,10 @@ if (relatedEntries.length !== related.length) {
 <Base title={seoTitle} description={seoDescription}>
   <PageBanner
     image={heroImage}
-    trail={[{ label: "Equipment", href: "/equipment" }]}
+    trail={[
+      { label: "Home", href: "/" },
+      { label: "Equipment", href: "/equipment" },
+    ]}
     current={name}
     title={h1}
   >
@@ -145,7 +148,7 @@ if (relatedEntries.length !== related.length) {
             >
               {CTA_LABEL.hire}
             </Button>
-            <Button variant="outline" href="/#contact">Request a quote</Button>
+            <Button variant="outline" href="/contact">Request a quote</Button>
           </div>
 
           <ContactRows

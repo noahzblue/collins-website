@@ -1,0 +1,248 @@
+---
+/**
+ * "Buy it, or hire the same machine." — the company profile's clearest
+ * statement of what the business is, which appeared nowhere on the site.
+ * Worse, the hero used to imply the opposite order.
+ *
+ * Two rows on a dark full-bleed band: the tonal anchor mid-page, and the
+ * highest-value block on the homepage.
+ *
+ * It reads as an accordion rather than as two side-by-side panels for one
+ * reason: side by side, the two modes are alternatives you compare at a
+ * glance and then leave. Opened one at a time, each one gets the entire
+ * 1200px column — a photograph at a size that means something, and copy with
+ * room around it — and the section makes its argument twice instead of
+ * halving it. It advances on its own every 8s, so the second answer arrives
+ * without being asked for.
+ *
+ * The trigger is deliberately oversized: a ~140px row of tracked uppercase
+ * mono with a number in front of it. At that scale the two words ARE the
+ * section, and everything below them is supporting material.
+ *
+ * Auto-advance, hover-pause, the progress line and the reduced-motion hold
+ * all come from `scripts/rotator.ts` — same clock for the switch and the bar,
+ * so they cannot drift.
+ */
+import Section from "@/components/ui/Section.astro";
+import Eyebrow from "@/components/ui/Eyebrow.astro";
+import Button from "@/components/ui/Button.astro";
+import Icon from "@/components/ui/Icon.astro";
+import ParallaxImage from "@/components/ui/ParallaxImage.astro";
+import { supplyModes } from "@/data/content";
+---
+
+<Section id="supply" tone="dark" class="relative overflow-clip">
+  {
+    /* Keeps the dark band from reading as flat, at an opacity low enough that
+     it never competes with the copy. */
+  }
+  <ParallaxImage
+    src="/images/hero-yard.jpg"
+    shift="6%"
+    class="absolute inset-0 opacity-[0.08]"
+  />
+
+  <div class="wrap relative">
+    <Eyebrow tone="brand-bright" class="mb-[16px]">
+      {supplyModes.eyebrow}
+    </Eyebrow>
+    <h2
+      class="max-w-[760px] text-h2 leading-[1.06] text-white"
+      data-reveal="lines"
+      set:html={supplyModes.title.join("<br>")}
+    />
+
+    <div
+      id="supply-modes"
+      class="mt-[72px] border-t border-white/14 max-mob:mt-[44px]"
+      data-reveal
+    >
+      {
+        supplyModes.modes.map((mode, i) => (
+          <div class="mode" data-open={i === 0 ? "true" : "false"}>
+            <button
+              type="button"
+              class="mode-trigger relative flex w-full cursor-pointer items-center gap-10 py-[46px] text-left max-mob:gap-6 max-mob:py-[30px]"
+              aria-expanded={i === 0 ? "true" : "false"}
+              aria-controls={`supply-panel-${i}`}
+              id={`supply-trigger-${i}`}
+            >
+              <span class="mode-num font-mono text-micro tracking-[2px] transition-colors duration-300">
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              <span class="mode-label font-mono text-[clamp(30px,4.4vw,56px)] leading-[1] tracking-[-0.03em] uppercase transition-colors duration-300">
+                {mode.label}
+              </span>
+              <span class="mode-sign ml-auto shrink-0 text-white/45 transition-all duration-500">
+                <Icon name="plus" size={26} />
+              </span>
+
+              {/* The rule under the header doubles as the timer: the fill is
+                  driven by the rotator's own clock, so a hover freezes it
+                  mid-travel instead of snapping it. */}
+              <span
+                class="mode-rule absolute inset-x-0 bottom-0 h-px bg-white/14"
+                aria-hidden="true"
+              >
+                <span class="mode-fill absolute inset-y-0 left-0 w-full origin-left bg-brand-bright" />
+              </span>
+            </button>
+
+            <div
+              class="mode-panel grid transition-[grid-template-rows] duration-[620ms]"
+              id={`supply-panel-${i}`}
+              role="region"
+              aria-labelledby={`supply-trigger-${i}`}
+            >
+              <div class="mode-clip overflow-hidden">
+                <div class="grid grid-cols-[1.08fr_0.92fr] items-center gap-[72px] pt-[56px] pb-[80px] max-nav:grid-cols-1 max-nav:gap-10 max-mob:pt-[36px] max-mob:pb-[52px]">
+                  <ParallaxImage
+                    src={mode.image}
+                    shift="5%"
+                    class="aspect-[16/10] w-full rounded-md"
+                  />
+
+                  <div class="max-w-[460px]">
+                    <span class="block font-mono text-label font-medium tracking-[2px] text-brand-bright uppercase">
+                      {mode.lead}
+                    </span>
+                    <p class="mt-6 mb-0 text-intro leading-relaxed text-[#aab2c0]">
+                      {mode.body}
+                    </p>
+                    <Button
+                      variant="outline-white"
+                      href={mode.cta.href}
+                      size="lg"
+                      class="press mt-10"
+                    >
+                      {mode.cta.label}
+                      <Icon name="arrow-right" size={16} />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))
+      }
+    </div>
+
+    <p
+      class="mt-14 mb-0 max-w-[760px] border-t border-white/14 pt-10 text-lead-lg leading-relaxed text-[#aab2c0] max-mob:mt-9 max-mob:pt-7"
+      data-reveal
+    >
+      {supplyModes.footnote}
+    </p>
+  </div>
+</Section>
+
+<style>
+  .mode-num {
+    color: rgb(255 255 255 / 0.4);
+  }
+  .mode-label {
+    color: rgb(255 255 255 / 0.55);
+  }
+  .mode[data-open="true"] .mode-num {
+    color: rgb(255 255 255 / 0.75);
+  }
+  .mode[data-open="true"] .mode-label {
+    color: #fff;
+  }
+  .mode-trigger:hover .mode-num,
+  .mode-trigger:focus-visible .mode-num,
+  .mode-trigger:hover .mode-label,
+  .mode-trigger:focus-visible .mode-label {
+    color: var(--color-brand-bright);
+  }
+  .mode-trigger:hover .mode-sign,
+  .mode-trigger:focus-visible .mode-sign {
+    color: var(--color-brand-bright);
+  }
+
+  /* One glyph, two states — see icons.ts. */
+  .mode[data-open="true"] .mode-sign {
+    color: rgb(255 255 255 / 0.75);
+    rotate: 45deg;
+  }
+
+  /* `0fr → 1fr` on a grid row is the only way to animate to a height nobody
+     has to measure. The inner element does the clipping. */
+  .mode-panel {
+    grid-template-rows: 0fr;
+    transition-timing-function: var(--ease-out-expo);
+  }
+  .mode[data-open="true"] .mode-panel {
+    grid-template-rows: 1fr;
+  }
+
+  /* A closed panel still contains a link. `0fr` + `overflow: hidden` hides it
+     from the eye but not from the tab order or the accessibility tree, so
+     keyboard focus would land on an invisible CTA. `visibility` fixes both,
+     and the delay holds it visible for exactly as long as the collapse takes
+     so the row doesn't blank out halfway through. */
+  .mode-clip {
+    visibility: hidden;
+    transition: visibility 0s linear 620ms;
+  }
+  .mode[data-open="true"] .mode-clip {
+    visibility: visible;
+    transition-delay: 0s;
+  }
+
+  .mode-fill {
+    transform: scaleX(var(--t, 0));
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mode-panel,
+    .mode-clip,
+    .mode-sign,
+    .mode-num,
+    .mode-label {
+      transition: none;
+    }
+    .mode-fill {
+      transform: scaleX(1);
+    }
+  }
+</style>
+
+<script>
+  import { createRotator } from "@/scripts/rotator";
+
+  // Re-runs after every client-router navigation as well as on first load,
+  // so the swapped-in DOM gets wired up.
+  document.addEventListener("astro:page-load", () => {
+    const root = document.getElementById("supply-modes");
+    if (!root) return;
+
+    const modes = [...root.querySelectorAll<HTMLElement>(".mode")];
+    const triggers = [
+      ...root.querySelectorAll<HTMLButtonElement>(".mode-trigger"),
+    ];
+    const fills = [...root.querySelectorAll<HTMLElement>(".mode-fill")];
+
+    const rotator = createRotator({
+      root,
+      count: modes.length,
+      interval: 8000,
+      onSelect: (i) => {
+        modes.forEach((m, j) => m.setAttribute("data-open", String(j === i)));
+        triggers.forEach((t, j) =>
+          t.setAttribute("aria-expanded", String(j === i)),
+        );
+      },
+      // One clock for the switch and the bar, so they can't disagree.
+      onProgress: (i, t) => {
+        fills.forEach((fill, j) =>
+          fill.style.setProperty("--t", String(j === i ? t : 0)),
+        );
+      },
+    });
+
+    triggers.forEach((t, i) =>
+      t.addEventListener("click", () => rotator.select(i)),
+    );
+  });
+</script>

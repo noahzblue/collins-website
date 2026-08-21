@@ -1,0 +1,402 @@
+---
+/**
+ * /about — the five-beat inner-page skeleton: banner, sticky index, the
+ * blocks, the credentials proof, the shared closer.
+ *
+ * Every fact on this page is traceable to a page of the company profile. There
+ * is no founding year, no headcount and no "over 15 years", because the
+ * profile doesn't give them and inventing them is the one thing that would
+ * undo the credentials block at the bottom.
+ */
+import Base from "@/layouts/Base.astro";
+import Section from "@/components/ui/Section.astro";
+import Eyebrow from "@/components/ui/Eyebrow.astro";
+import Button from "@/components/ui/Button.astro";
+import PageBanner from "@/components/ui/PageBanner.astro";
+import IndexRail from "@/components/ui/IndexRail.astro";
+import ParallaxImage from "@/components/ui/ParallaxImage.astro";
+import PageCTA from "@/components/sections/PageCTA.astro";
+import { site } from "@/config/site";
+import { aboutPage } from "@/data/content";
+import { founderQuote } from "@/data/proof";
+import {
+  aboutBlocks,
+  leadership,
+  leadershipIntro,
+  licensedActivities,
+  missionVision,
+  onePointOfContact,
+  whoWeAre,
+} from "@/data/about";
+
+const { office, yard } = site.places;
+
+/** The mono detail row under the banner heading — the instrument-panel
+ *  register. One line, entirely verifiable, and worth more than a paragraph. */
+const bannerDetail = [
+  "Est. Dubai",
+  office.address.replace(", U.A.E.", ""),
+  `Yard: ${yard.address.replace(", U.A.E.", "")}`,
+  `Register ${site.register}`,
+];
+
+const initials = (name: string) =>
+  name
+    .split(" ")
+    .map((part) => part[0])
+    .slice(0, 2)
+    .join("");
+---
+
+<Base title={aboutPage.seoTitle} description={aboutPage.seoDescription}>
+  <PageBanner
+    image={whoWeAre.image}
+    trail={[{ label: "Home", href: "/" }]}
+    current="About"
+    title="About us"
+  >
+    <p class="mt-4 max-w-[560px] text-intro leading-relaxed text-white/80">
+      {aboutPage.tagline}
+    </p>
+    <div
+      class="mt-7 flex flex-wrap items-center gap-x-4 gap-y-2 font-mono text-caption tracking-[1px] text-white/55 uppercase"
+    >
+      {
+        bannerDetail.map((item, i) => (
+          <>
+            {i > 0 && <span aria-hidden="true">·</span>}
+            <span>{item}</span>
+          </>
+        ))
+      }
+    </div>
+  </PageBanner>
+
+  <Section class="pt-[90px] max-mob:pt-[56px]">
+    <div class="wrap">
+      <div class="grid grid-cols-[180px_1fr] gap-[72px] max-nav:block">
+        <IndexRail items={aboutBlocks} ariaLabel="About this page" />
+
+        <div class="flex flex-col">
+          <!-- 01 — Who we are -->
+          <article id="who-we-are" class="scroll-mt-header-gap">
+            <div
+              class="grid grid-cols-[1.1fr_0.9fr] items-start gap-16 max-nav:grid-cols-1 max-nav:gap-10"
+            >
+              <div>
+                <Eyebrow class="mb-[16px]">{whoWeAre.eyebrow}</Eyebrow>
+                <h2
+                  class="text-h2 leading-[1.06]"
+                  data-reveal="lines"
+                  set:html={whoWeAre.title.join("<br>")}
+                />
+
+                <p
+                  class="mt-7 text-lead-lg leading-relaxed text-body"
+                  data-reveal
+                >
+                  {whoWeAre.paragraphs[0]}
+                </p>
+
+                <p
+                  class="my-9 border-y border-line py-7 font-mono text-h3 leading-[1.15] text-ink"
+                  data-reveal
+                >
+                  {whoWeAre.pullQuote}
+                </p>
+
+                <p class="text-lead leading-relaxed text-muted" data-reveal>
+                  {whoWeAre.paragraphs[1]}
+                </p>
+                <p
+                  class="mt-6 text-lead leading-relaxed text-muted"
+                  data-reveal
+                >
+                  {whoWeAre.paragraphs[2]}
+                </p>
+              </div>
+
+              {
+                /* Sticky media. `overflow-clip`, never `overflow-hidden` — a
+                 hidden box is a scroll container and would freeze the parallax
+                 mid-travel (see ParallaxImage's own note). */
+              }
+              <div class="sticky top-header-gap max-nav:static">
+                <ParallaxImage
+                  src={whoWeAre.image}
+                  alt={whoWeAre.imageAlt}
+                  shift="4%"
+                  zoom={1.1}
+                  class="aspect-[4/5] rounded-md max-nav:aspect-[16/10]"
+                />
+              </div>
+            </div>
+          </article>
+
+          <hr
+            class="my-[96px] border-0 border-t border-line max-mob:my-[64px]"
+          />
+
+          <!-- 02 — Mission & vision -->
+          <article id="mission-vision" class="scroll-mt-header-gap">
+            <div
+              class="grid grid-cols-2 gap-px overflow-clip rounded-md bg-line max-nav:grid-cols-1"
+              data-reveal
+              data-reveal-stagger
+            >
+              {
+                missionVision.map((item, i) => (
+                  <div class="bg-ink p-11 text-white max-xs:p-7">
+                    <span class="font-mono text-caption tracking-[0.5px] text-white/45">
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+                    <h3 class="mt-4 text-h3 leading-[1.1] text-white">
+                      {item.label}
+                    </h3>
+                    <p class="mt-5 mb-0 text-lead leading-relaxed text-[#aab2c0]">
+                      {item.body}
+                    </p>
+                    {item.closer && (
+                      <p class="mt-3 mb-0 text-lead leading-relaxed text-brand-bright">
+                        {item.closer}
+                      </p>
+                    )}
+                  </div>
+                ))
+              }
+            </div>
+          </article>
+
+          <hr
+            class="my-[96px] border-0 border-t border-line max-mob:my-[64px]"
+          />
+
+          <!-- 03 — Leadership -->
+          <article id="leadership" class="scroll-mt-header-gap">
+            <Eyebrow class="mb-[16px]">Leadership</Eyebrow>
+            <h2 class="max-w-[640px] text-h2 leading-[1.06]" data-reveal>
+              Five people, five remits.
+            </h2>
+            <p
+              class="mt-6 max-w-[620px] text-lead leading-relaxed text-muted"
+              data-reveal
+            >
+              {leadershipIntro}
+            </p>
+
+            {
+              /* A typographic table, not a photo grid. We have no portraits,
+               and a grid of stock faces is the exact tell that would undo the
+               credentials block below. */
+            }
+            <ul class="mt-11 border-t border-line">
+              {
+                leadership.map((person, i) => (
+                  <li class="lead-row grid grid-cols-[auto_auto_1fr_1.2fr] items-start gap-6 border-b border-line px-4 py-7 transition-colors duration-200 max-nav:grid-cols-[auto_auto_1fr] max-nav:gap-x-5 max-xs:px-0">
+                    <span class="mt-[14px] font-mono text-micro tracking-[0.5px] text-faint">
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+                    <span
+                      class="flex h-[44px] w-[44px] shrink-0 items-center justify-center rounded-sm bg-brand-tint font-mono text-detail font-medium text-brand"
+                      aria-hidden="true"
+                    >
+                      {initials(person.name)}
+                    </span>
+                    <span>
+                      <span class="block text-subhead font-medium text-ink">
+                        {person.name}
+                      </span>
+                      <span class="mt-1 block font-mono text-label tracking-[1px] text-faint uppercase">
+                        {person.role}
+                      </span>
+                    </span>
+                    <span class="text-base leading-relaxed text-muted max-nav:col-span-3 max-nav:col-start-3 max-nav:-mt-2">
+                      {person.remit}
+                    </span>
+                  </li>
+                ))
+              }
+            </ul>
+
+            <div
+              class="mt-12 rounded-md bg-brand-tint p-10 max-xs:p-7"
+              data-reveal
+            >
+              <h3 class="text-h3 leading-[1.1] text-brand">
+                {onePointOfContact.title}
+              </h3>
+              <p
+                class="mt-4 mb-0 max-w-[640px] text-lead leading-relaxed text-body"
+              >
+                {onePointOfContact.body}
+              </p>
+            </div>
+          </article>
+
+          <hr
+            class="my-[96px] border-0 border-t border-line max-mob:my-[64px]"
+          />
+
+          <!-- 04 — The yard -->
+          <article id="the-yard" class="scroll-mt-header-gap">
+            <div
+              class="grid grid-cols-[0.9fr_1.1fr] items-center gap-14 max-nav:grid-cols-1 max-nav:gap-9"
+            >
+              <ParallaxImage
+                src="/images/why-readiness.jpg"
+                alt="Serviced plant standing in the Sajjah yard, fuelled and ready for dispatch."
+                shift="4%"
+                zoom={1.1}
+                class="aspect-[4/3] rounded-md"
+              />
+              <div>
+                <Eyebrow class="mb-[16px]">The yard</Eyebrow>
+                <h2 class="text-h2 leading-[1.06]" data-reveal>
+                  One yard. Ready stock.
+                </h2>
+                <p
+                  class="mt-6 text-lead leading-relaxed text-muted"
+                  data-reveal
+                >
+                  Generators, forklifts, telehandlers, cranes and trailers stand
+                  in the same yard at Sajjah, so a mixed order arrives on one
+                  delivery, on one agreement — serviced, fuelled and function
+                  tested before it leaves.
+                </p>
+                <div class="mt-8" data-reveal>
+                  <Button variant="outline" href="/yard" class="press">
+                    Inside the yard
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <hr
+            class="my-[96px] border-0 border-t border-line max-mob:my-[64px]"
+          />
+
+          <!-- 05 — Credentials -->
+          <article id="credentials" class="scroll-mt-header-gap">
+            <Eyebrow class="mb-[16px]">Credentials</Eyebrow>
+            <h2 class="max-w-[640px] text-h2 leading-[1.06]" data-reveal>
+              Licensed, registered, checkable.
+            </h2>
+
+            {
+              /* No card, no shadow, no icons. This section's credibility comes
+               from looking like a document. */
+            }
+            <div
+              class="mt-10 grid grid-cols-3 border-y border-line max-cmp:grid-cols-1"
+            >
+              {
+                [
+                  { label: "Licensed name", value: site.legalName },
+                  { label: "Head office", value: office.address },
+                  { label: "Yard", value: yard.address },
+                ].map((cell, i) => (
+                  <div
+                    class:list={[
+                      "px-7 py-8 max-cmp:px-0 max-cmp:py-6",
+                      i > 0 &&
+                        "border-l border-line max-cmp:border-t max-cmp:border-l-0",
+                    ]}
+                  >
+                    <span class="block font-mono text-micro tracking-[1.4px] text-faint uppercase">
+                      {String(i + 1).padStart(2, "0")} {cell.label}
+                    </span>
+                    <span class="mt-3 block text-cell text-ink">
+                      {cell.value}
+                    </span>
+                  </div>
+                ))
+              }
+            </div>
+
+            <h3
+              class="mt-14 font-mono text-micro tracking-[1.4px] text-faint uppercase"
+            >
+              Licensed activities
+            </h3>
+            <table class="mt-4 w-full border-collapse text-left">
+              <thead>
+                <tr class="border-y border-line">
+                  <th
+                    scope="col"
+                    class="w-1/2 py-[10px] pr-6 font-mono text-tag font-medium tracking-[1.4px] text-faint uppercase"
+                  >
+                    Sale
+                  </th>
+                  <th
+                    scope="col"
+                    class="w-1/2 border-l border-line py-[10px] pr-6 pl-6 font-mono text-tag font-medium tracking-[1.4px] text-faint uppercase max-xs:pl-4"
+                  >
+                    Rental
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {
+                  licensedActivities.map((row) => (
+                    <tr class="border-b border-line">
+                      <td class="py-[14px] pr-6 align-top text-cell leading-[1.4] text-body">
+                        {row.sale}
+                      </td>
+                      <td class="border-l border-line py-[14px] pr-6 pl-6 align-top text-cell leading-[1.4] text-body max-xs:pl-4">
+                        {row.rental}
+                      </td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+
+            <p
+              class="mt-6 mb-0 font-mono text-caption tracking-[1.2px] text-faint uppercase"
+            >
+              Register {site.register} · Licensed by the {
+                site.licensingAuthority
+              }
+            </p>
+          </article>
+        </div>
+      </div>
+    </div>
+  </Section>
+
+  <!-- The founder's words. Real, named, and the best copy in the profile. -->
+  <Section tone="dark" class="relative overflow-clip">
+    <ParallaxImage
+      src="/images/hero-industrial.jpg"
+      shift="6%"
+      class="absolute inset-0 opacity-[0.14]"
+    />
+    <div class="wrap relative">
+      <figure class="mx-auto max-w-[860px] text-center">
+        <blockquote
+          class="font-mono text-[clamp(21px,2.5vw,31px)] leading-[1.35] text-white"
+          data-reveal
+        >
+          <span aria-hidden="true">“</span>{founderQuote.lead}<span
+            class="text-brand-bright">{founderQuote.emphasis}</span
+          >{founderQuote.tail}<span aria-hidden="true">”</span>
+        </blockquote>
+        <figcaption
+          class="mt-9 font-mono text-label tracking-[1.6px] text-white/55 uppercase"
+          data-reveal
+        >
+          {founderQuote.name} — {founderQuote.role}
+        </figcaption>
+      </figure>
+    </div>
+  </Section>
+
+  <PageCTA />
+</Base>
+
+<style>
+  .lead-row:hover {
+    background: var(--color-surface);
+  }
+</style>

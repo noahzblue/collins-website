@@ -1,0 +1,171 @@
+---
+/**
+ * The page transition: a pale glass lens that rises from the bottom, covers
+ * the screen while the router swaps the page behind it, then keeps travelling
+ * upward and off the top.
+ *
+ * The panel never reverses. It enters bottom→top and exits bottom→top, so a
+ * navigation reads as one object passing over the screen rather than a curtain
+ * opening and closing. That single direction is the thing to protect if
+ * anything else about this gets cut.
+ *
+ * Three things make it read as glass rather than as a coloured wipe, and all
+ * three are load-bearing:
+ *
+ * a) **It is translucent.** 65% of a near-white brand tint, over a blurred
+ *    backdrop. You can still see the shape of the page underneath, which is
+ *    what stops a 1.2s cover from feeling like a stall — something is clearly
+ *    happening back there.
+ *
+ * b) **Both edges are parabolic.** The element overhangs the viewport by
+ *    `--veil-dome` at the top AND the bottom, and both overhangs are shaped by
+ *    an elliptical `border-radius` whose vertical radius is exactly that
+ *    overhang. The result is a lens: a curved leading edge sweeps up the
+ *    screen, and the curved trailing edge follows it out. At full cover both
+ *    curves sit outside the viewport, so the screen is genuinely covered — the
+ *    curvature costs nothing in coverage. The radius is never animated, only
+ *    the transform, so the whole thing stays on the compositor.
+ *
+ * c) **The velocity varies.** Each phase is a keyframe animation with a
+ *    per-keyframe easing rather than one bezier: the entrance surges, then
+ *    settles parabolically over its last tenth; the exit creeps, then whips
+ *    away. A single curve on a panel this large reads as mechanical.
+ *
+ * ≈1.2s door to door. This runs on every link click, so the budget is tight on
+ * purpose — `prefetchAll` (astro.config) is what keeps the veil from ever
+ * waiting on a network round trip. Treat 1.4s as the hard ceiling and tune
+ * downward.
+ *
+ * At rest it sits below the fold, so a script that never runs means plain
+ * instant navigations — never a covered screen.
+ */
+---
+
+<div id="veil" transition:persist aria-hidden="true"></div>
+
+<style is:global>
+  #veil {
+    /* The overhang at each end, and the vertical radius that curves it. One
+       number: they have to agree or the lens stops covering the viewport. */
+    --veil-dome: 16vh;
+
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: calc(var(--veil-dome) * -1);
+    height: calc(100vh + var(--veil-dome) * 2);
+    z-index: 90; /* over the header and the floating buttons */
+
+    /* Elliptical corners: 50% of the width horizontally, the full overhang
+       vertically. The two arcs on each end meet in the middle as one dome. */
+    border-radius: 50% / var(--veil-dome);
+
+    background: color-mix(in srgb, var(--color-brand-tint) 65%, transparent);
+    /* Reads as a pane with a thickness rather than a flat fill. */
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.55),
+      0 0 80px rgba(10, 14, 23, 0.12);
+
+    transform: translateY(100%);
+    pointer-events: none;
+  }
+
+  /* The blur and the layer promotion are scoped to the two moving states. A
+     permanently promoted 132vh backdrop-filter layer would tax every scroll on
+     the site for a panel that is off-screen 99% of the time. */
+  #veil[data-state="in"],
+  #veil[data-state="out"] {
+    backdrop-filter: blur(22px) saturate(150%);
+    -webkit-backdrop-filter: blur(22px) saturate(150%);
+    will-change: transform;
+  }
+
+  #veil[data-state="in"] {
+    animation: veil-in var(--duration-veil-in) forwards;
+    /* Eat clicks while covered, so a second link can't start a second
+       navigation into a page nobody can see. */
+    pointer-events: auto;
+  }
+  #veil[data-state="out"] {
+    animation: veil-out var(--duration-veil-out) forwards;
+  }
+
+  /* Fast off the mark, then a long parabolic settle onto the last few percent
+     — the lens arrives rather than stopping. */
+  @keyframes veil-in {
+    0% {
+      transform: translateY(100%);
+      animation-timing-function: cubic-bezier(0.34, 0, 0.28, 1);
+    }
+    62% {
+      transform: translateY(11%);
+      animation-timing-function: cubic-bezier(0.22, 0.86, 0.2, 1);
+    }
+    100% {
+      transform: translateY(0);
+    }
+  }
+
+  /* The mirror image: it hesitates, then accelerates out of frame. Easing IN
+     on an exit is not the "never ease-in for UI" violation it looks like —
+     that rule is about elements the user is waiting on. The veil on its way
+     out is leaving, and leaving should accelerate. The thing the user is
+     waiting on is the content behind it, which uses ease-out-expo. */
+  @keyframes veil-out {
+    0% {
+      transform: translateY(0);
+      animation-timing-function: cubic-bezier(0.7, 0, 0.84, 0.2);
+    }
+    28% {
+      transform: translateY(-8%);
+      animation-timing-function: cubic-bezier(0.4, 0, 0.1, 1);
+    }
+    100% {
+      transform: translateY(-100%);
+    }
+  }
+</style>
+
+<script>
+  const veil = document.getElementById("veil");
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+  const settled = (el: Element) =>
+    new Promise<void>((resolve) =>
+      el.addEventListener("animationend", () => resolve(), { once: true }),
+    );
+
+  if (veil) {
+    // Wrapping the loader makes the swap wait for the cover to finish, so the
+    // page never changes in front of the reader.
+    document.addEventListener("astro:before-preparation", (event) => {
+      if (reduce.matches) return;
+      const load = event.loader;
+      event.loader = async () => {
+        veil.dataset.state = "in";
+        try {
+          // Cover AND fetch, whichever is slower.
+          await Promise.all([settled(veil), load()]);
+        } finally {
+          /* A reader who clicks a second link mid-transition aborts the first
+             navigation, and its `astro:page-load` never fires — so the exit
+             would never run and the veil would stay up. Only the surviving
+             navigation gets to leave the cover in place. */
+          if (event.signal.aborted) veil.dataset.state = "";
+        }
+      };
+    });
+
+    document.addEventListener("astro:page-load", () => {
+      if (veil.dataset.state !== "in") return;
+      veil.dataset.state = "out";
+      settled(veil).then(() => {
+        /* Clearing the attribute drops the animation, and the base rule puts
+           the lens back below the fold for free. (The transition-based version
+           of this needed a forced reflow here; keyframes with `forwards` do
+           not, because the resting transform is the off-screen one.) */
+        veil.dataset.state = "";
+      });
+    });
+  }
+</script>

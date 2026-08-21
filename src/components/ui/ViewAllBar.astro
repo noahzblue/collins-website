@@ -1,0 +1,55 @@
+---
+/**
+ * The "view all N …" link that closes a teaser section.
+ *
+ * It used to be a small centred text link three times over (equipment,
+ * services, industries) — a 140px target at the bottom of a 1200px section,
+ * which is the one place on the page where the reader has just decided they
+ * want more. This is the same link as a full-width rule: it spans the block it
+ * belongs to, it has real height, and it tints on hover so the whole bar
+ * acknowledges the pointer rather than four words in the middle of it.
+ *
+ *   <ViewAllBar href="/equipment" label="View all 12 categories" />
+ */
+import Icon from "@/components/ui/Icon.astro";
+
+interface Props {
+  href: string;
+  label: string;
+  class?: string;
+}
+
+const { href, label, class: extra = "" } = Astro.props;
+---
+
+<a
+  href={href}
+  class:list={[
+    "view-all press group flex w-full items-center justify-center gap-3 border-y border-line px-6 py-[30px] font-mono text-sm font-medium tracking-[1.6px] text-ink uppercase transition-colors duration-300 max-mob:py-[22px]",
+    extra,
+  ]}
+>
+  {label}
+  <Icon
+    name="arrow-right"
+    size={17}
+    class="transition-transform duration-300 ease-out group-hover:translate-x-[6px]"
+  />
+</a>
+
+<style>
+  /* The quietest surface the palette has that still reads as "on". */
+  .view-all:hover,
+  .view-all:focus-visible {
+    background: var(--color-brand-tint);
+    border-color: var(--color-brand-tint);
+    color: var(--color-brand);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .view-all,
+    .view-all :global(svg) {
+      transition: none;
+    }
+  }
+</style>

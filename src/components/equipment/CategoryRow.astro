@@ -42,7 +42,7 @@ const href = `/equipment/${category.id}`;
     aria-hidden="true"
     tabindex="-1"
     class:list={[
-      "block overflow-hidden rounded-[18px] bg-surface-2",
+      "block overflow-hidden rounded-md bg-surface-2",
       flip && "order-2 max-nav:order-none",
     ]}
   >
@@ -95,7 +95,7 @@ const href = `/equipment/${category.id}`;
     <p class="mt-7 text-lead leading-relaxed text-muted">{summary}</p>
 
     <div class="mt-8 flex flex-wrap items-center gap-4">
-      <Button variant="outline" href={href}>
+      <Button variant="outline" href={href} class="press">
         View {name.toLowerCase()}
         <Icon
           name="arrow-right"

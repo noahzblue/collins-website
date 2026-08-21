@@ -46,6 +46,12 @@ export const trustFeatures: Feature[] = [
 
 /* ---------- Manufacturer wordmarks (hero base strip) ---------- */
 
+/**
+ * UNVERIFIED. The company profile names no manufacturer at all, so these six
+ * are not sourced from it. They run in the hero as a "trusted by" signal —
+ * confirm Collins is an authorised or regular channel for each before they
+ * stay (docs/site-expansion/03 §Part A).
+ */
 export const partners: string[] = [
   "PERKINS",
   "KALMAR",
@@ -55,7 +61,7 @@ export const partners: string[] = [
   "TADANO",
 ];
 
-/* ---------- Stats + testimonials (placeholder — confirm figures) ---------- */
+/* ---------- Headline numbers (profile p.8 — real and checkable) ---------- */
 
 export interface Stat {
   value: string;
@@ -63,11 +69,49 @@ export interface Stat {
 }
 
 export const stats: Stat[] = [
-  { value: "15+", label: "Years of expertise in the UAE" },
-  { value: "500+", label: "Machines available to buy or rent" },
-  { value: "24h", label: "Typical quote turnaround" },
+  { value: "1", label: "Yard \u2014 Sajjah, Sharjah" },
+  { value: "12", label: "Equipment categories" },
+  { value: "7", label: "Emirates served" },
+  { value: "1250 kVA", label: "Max generator output" },
 ];
 
+/* ---------- The proof quote ---------- */
+
+/**
+ * One real, named quote (profile p.3) standing where three placeholder client
+ * testimonials used to. The placeholders read as customer testimony and were
+ * not — see docs/site-expansion/03 §A5.
+ *
+ * `emphasis` is the clause the profile itself bolds; keep that weight.
+ * When real client quotes exist, they go in an array beside this one and this
+ * quote moves to /about (docs/site-expansion/10).
+ */
+export interface Quote {
+  lead: string;
+  emphasis: string;
+  tail: string;
+  name: string;
+  role: string;
+}
+
+export const founderQuote: Quote = {
+  lead: "We would rather turn down a job than send out a machine we have not checked ourselves. ",
+  emphasis: "That is the whole business in one sentence.",
+  tail: " The rest is logistics.",
+  name: "Rohan Robert",
+  role: "Managing Director",
+};
+
+/**
+ * Real client quotes. Empty until there are some.
+ *
+ * Three placeholders used to live here, attributed to "Site Manager ·
+ * Construction · Dubai" and similar. `Testimonials.astro` renders nothing
+ * while this array is empty, so the rotation logic survives for the day real
+ * quotes land — put them here, add the section back to the homepage, and move
+ * `founderQuote` to /about. A quote qualifies when it has a named person, a
+ * role and a company (docs/site-expansion/10 §The gate).
+ */
 export interface Testimonial {
   quote: string;
   name: string;
@@ -75,26 +119,4 @@ export interface Testimonial {
   rating: number;
 }
 
-export const testimonials: Testimonial[] = [
-  {
-    quote:
-      "Collins had a 250 KVA generator on our site within hours — exactly the spec we asked for, with zero downtime.",
-    name: "Site Manager",
-    role: "Construction · Dubai",
-    rating: 5,
-  },
-  {
-    quote:
-      "We rent forklifts across two projects. Reliable machines, flexible terms, and a team that actually picks up the phone.",
-    name: "Operations Lead",
-    role: "Logistics · Sharjah",
-    rating: 5,
-  },
-  {
-    quote:
-      "From sourcing to delivery they handled everything — the easiest equipment partner we've worked with in the region.",
-    name: "Procurement Head",
-    role: "Facilities · Abu Dhabi",
-    rating: 5,
-  },
-];
+export const testimonials: Testimonial[] = [];

@@ -1,14 +1,25 @@
 ---
 /**
- * Per-industry page — banner photo, how we help, commonly supplied
- * equipment and a quote CTA. Pages are generated from data/industries.ts.
+ * Per-industry page — banner, how we help, the duty block that makes the page
+ * specific to its reader, the commonly supplied categories, sibling
+ * navigation and the shared closer. Generated from data/industries.ts.
+ *
+ * Three things this page used to get wrong: its breadcrumb pointed backwards
+ * at a homepage anchor, every "commonly supplied" item linked to `/#equipment`
+ * regardless of what it was, and there was no way to reach any of the other
+ * seven sectors without going home first.
  */
+import { getCollection } from "astro:content";
 import Base from "@/layouts/Base.astro";
 import Section from "@/components/ui/Section.astro";
+import Eyebrow from "@/components/ui/Eyebrow.astro";
 import Button from "@/components/ui/Button.astro";
 import Icon from "@/components/ui/Icon.astro";
 import PageBanner from "@/components/ui/PageBanner.astro";
+import BgImage from "@/components/ui/BgImage.astro";
+import PageCTA from "@/components/sections/PageCTA.astro";
 import { industries } from "@/data/industries";
+import { resolveCategories } from "@/lib/equipment";
 import { site } from "@/config/site";
 
 export function getStaticPaths() {
@@ -19,15 +30,30 @@ export function getStaticPaths() {
 }
 
 const { industry } = Astro.props;
+
+const all = (await getCollection("equipment")).sort(
+  (a, b) => a.data.sortOrder - b.data.sortOrder,
+);
+const categories = resolveCategories(industry.categories, all);
+
+const siblings = industries.filter((other) => other.slug !== industry.slug);
+
+/** Nested template literals confuse the compiler's frontmatter scan — build
+ *  the message first, then the URL. */
+const enquiryText = `Hi Collins, I'm enquiring about equipment for a ${industry.name.toLowerCase()} project.`;
+const enquiryHref = `${site.whatsapp.href}?text=${encodeURIComponent(enquiryText)}`;
 ---
 
 <Base
-  title={`${industry.name} | ${site.name}`}
-  description={`${industry.tagline} Equipment sales & rental for ${industry.name.toLowerCase()} across the UAE.`}
+  title={`${industry.name} Equipment Sales & Rental | ${site.name}`}
+  description={`${industry.tagline} Equipment supplied outright or on hire for ${industry.name.toLowerCase()} across the UAE.`}
 >
   <PageBanner
     image={industry.image}
-    trail={[{ label: "Industries", href: "/#industries" }]}
+    trail={[
+      { label: "Home", href: "/" },
+      { label: "Industries", href: "/industries" },
+    ]}
     current={industry.name}
     title={industry.name}
   >
@@ -42,34 +68,66 @@ const { industry } = Astro.props;
         class="grid grid-cols-[1.15fr_0.85fr] items-start gap-16 max-nav:grid-cols-1 max-nav:gap-10"
       >
         <div>
-          <h2 class="mb-6 text-h3 leading-[1.12]">
+          <h2 class="mb-6 text-h3 leading-[1.12]" data-reveal>
             How we support {industry.name.toLowerCase()} teams
           </h2>
-          <p class="max-w-[600px] text-lead-lg leading-relaxed text-body">
+          <p
+            class="max-w-[600px] text-lead-lg leading-relaxed text-body"
+            data-reveal
+          >
             {industry.body}
           </p>
+
+          <!-- The duty block: the one requirement this sector has that the
+               others don't. It is what stops eight pages reading as one page
+               with the nouns swapped. -->
+          <div
+            class="mt-11 border-l-2 border-brand pl-8 max-xs:pl-6"
+            data-reveal
+          >
+            <Eyebrow bar={false} class="mb-3">Duty note</Eyebrow>
+            <h3 class="text-h3 leading-[1.12]">{industry.duty.title}</h3>
+            <p
+              class="mt-4 mb-0 max-w-[560px] text-lead leading-relaxed text-muted"
+            >
+              {industry.duty.body}
+            </p>
+          </div>
         </div>
 
-        <div class="card p-8 max-xs:p-6">
+        <div class="card sticky top-header-gap p-8 max-nav:static max-xs:p-6">
           <h3 class="mb-5 text-[19px]">Commonly supplied</h3>
           <ul class="mb-8 flex flex-col gap-[12px]">
             {
-              industry.equipment.map((item) => (
+              categories.map((category) => (
                 <li>
                   <a
-                    href="/#equipment"
-                    class="flex items-center gap-3 text-base text-body transition-colors hover:text-brand"
+                    href={category.href}
+                    class="group flex items-center gap-3 text-base text-body transition-colors hover:text-brand"
                   >
                     <Icon name="check" size={16} class="shrink-0 text-brand" />
-                    {item}
+                    <span class="flex-1">{category.name}</span>
+                    <Icon
+                      name="arrow-right"
+                      size={15}
+                      class="text-faint transition-transform duration-200 group-hover:translate-x-[3px] group-hover:text-brand"
+                    />
                   </a>
                 </li>
               ))
             }
           </ul>
           <div class="flex flex-wrap gap-3">
-            <Button variant="primary" href="/#contact">Request a quote</Button>
-            <Button variant="outline" href={site.whatsapp.href}>
+            <Button variant="primary" href="/contact" class="press">
+              Request a quote
+            </Button>
+            <Button
+              variant="outline"
+              href={enquiryHref}
+              target="_blank"
+              rel="noopener"
+              class="press"
+            >
               WhatsApp us
             </Button>
           </div>
@@ -77,4 +135,49 @@ const { industry } = Astro.props;
       </div>
     </div>
   </Section>
+
+  <!-- Siblings: what turns eight orphans into a section. -->
+  <Section tone="gray" class="py-[80px] max-mob:py-[56px]">
+    <div class="wrap">
+      <div class="mb-8 flex flex-wrap items-end justify-between gap-4">
+        <h2 class="text-h3 leading-[1.12]">Other industries</h2>
+        <a
+          href="/industries"
+          class="press inline-flex items-center gap-2 text-base font-medium text-ink transition-colors hover:text-brand"
+        >
+          View all eight
+          <Icon name="arrow-right" size={16} />
+        </a>
+      </div>
+
+      <div
+        class="grid grid-cols-4 gap-4 max-nav:grid-cols-2 max-xs:grid-cols-1"
+        data-reveal
+        data-reveal-stagger
+      >
+        {
+          siblings.map((other) => (
+            <a
+              href={`/industries/${other.slug}`}
+              class="group relative aspect-[4/3] overflow-hidden rounded-md"
+            >
+              <BgImage
+                src={other.image}
+                class="transition-transform duration-500 ease-out group-hover:scale-[1.05]"
+              />
+              <span
+                class="absolute inset-0 bg-[linear-gradient(180deg,rgba(6,10,20,0.05)_40%,rgba(6,10,20,0.75)_100%)]"
+                aria-hidden="true"
+              />
+              <span class="absolute right-4 bottom-4 left-4 text-detail leading-snug font-medium text-white">
+                {other.name}
+              </span>
+            </a>
+          ))
+        }
+      </div>
+    </div>
+  </Section>
+
+  <PageCTA />
 </Base>

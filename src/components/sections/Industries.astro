@@ -1,33 +1,54 @@
 ---
-/** Industries — 8 portrait photo tiles, each linking to its own page. */
+/** Industries — 8 portrait photo tiles, each linking to its own page, plus a
+ *  way through to the hub that now exists. */
 import Section from "@/components/ui/Section.astro";
 import SectionHeading from "@/components/ui/SectionHeading.astro";
 import Icon from "@/components/ui/Icon.astro";
-import BgImage from "@/components/ui/BgImage.astro";
+import ViewAllBar from "@/components/ui/ViewAllBar.astro";
+import ParallaxImage from "@/components/ui/ParallaxImage.astro";
 import { industries } from "@/data/industries";
 import { industriesSection } from "@/data/content";
 ---
 
 <Section id="industries" tone="gray">
-  <div class="wrap">
+  <div class="wrap wrap-wide">
     <SectionHeading
       eyebrow={industriesSection.eyebrow}
       title={industriesSection.title}
       intro={industriesSection.intro}
+      align="center"
     />
 
+    {
+      /* The wave travels by COLUMN, not by index, so it moves left to right
+       across the grid rather than wrapping down the rows. The delay is set
+       inline because `reveal.ts` leaves an already-set `--reveal-delay` alone
+       — that is how a component overrides the default stagger. */
+    }
     <div class="grid grid-cols-4 gap-5 max-nav:grid-cols-2 max-xs:grid-cols-1">
       {
-        industries.map((ind) => (
+        industries.map((ind, i) => (
           <a
             href={`/industries/${ind.slug}`}
-            class="group relative aspect-[3/4] overflow-hidden rounded-[16px] max-xs:aspect-[4/3]"
+            class="press group relative aspect-[3/4] overflow-clip rounded-md max-xs:aspect-[4/3]"
+            style={`--reveal-delay:${(i % 4) * 70}ms`}
+            data-reveal
           >
-            <BgImage
+            {/* Eight drifting photos at the default 8%/1.12 would read as
+               noise — this is the one place on the page that needs restraint
+               more than it needs travel.
+
+               And no hover scale. Eight tiles that each swell under the pointer
+               is the single most-used interaction on the web; on a wide band of
+               real photography it adds nothing the parallax drift is not
+               already doing, and it costs the grid its stillness. */}
+            <ParallaxImage
               src={ind.image}
-              class="transition-transform duration-500 ease-out group-hover:scale-[1.05]"
+              shift="2%"
+              zoom={1.06}
+              class="absolute inset-0"
             />
-            <div
+            <span
               class="absolute inset-0 bg-[linear-gradient(180deg,rgba(6,10,20,0.05)_40%,rgba(6,10,20,0.72)_100%)]"
               aria-hidden="true"
             />
@@ -41,5 +62,11 @@ import { industriesSection } from "@/data/content";
         ))
       }
     </div>
+
+    <ViewAllBar
+      href={industriesSection.viewAll.href}
+      label={industriesSection.viewAll.label}
+      class="mt-[64px] max-mob:mt-[40px]"
+    />
   </div>
 </Section>

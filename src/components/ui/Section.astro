@@ -5,14 +5,20 @@
  * are intentionally full-bleed.
  *
  * Padding is deliberately roomy — the airy rhythm is what sells "premium".
+ *
+ * `theme` is what the floating header should look like while this section is
+ * under it (see scripts/themeFlip.ts). It defaults from `tone`, so a dark band
+ * inverts the header for free and only a deliberate exception needs the prop.
  */
 interface Props {
   id?: string;
   tone?: "light" | "dark" | "gray";
+  /** Header appearance over this section. Defaults from `tone`. */
+  theme?: "light" | "dark" | "glass";
   class?: string;
 }
 
-const { id, tone = "light", class: extra = "" } = Astro.props;
+const { id, tone = "light", theme, class: extra = "" } = Astro.props;
 
 const toneClass =
   tone === "dark" ? "bg-ink text-white" : tone === "gray" ? "bg-surface" : "";
@@ -20,6 +26,7 @@ const toneClass =
 
 <section
   id={id}
+  data-next-theme={theme ?? (tone === "dark" ? "dark" : "light")}
   class:list={["py-[110px] max-mob:py-[72px]", toneClass, extra]}
 >
   <slot />

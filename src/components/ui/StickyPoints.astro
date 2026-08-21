@@ -1,0 +1,137 @@
+---
+/**
+ * A pinned photograph beside a column of numbered points: the photo holds
+ * still while the points scroll past it, crossfading to a different frame as
+ * each point becomes the active one.
+ *
+ * Five images, one slot — the same idea as `FollowerList`, driven by scroll
+ * position instead of by the pointer, because on this page the reader is
+ * travelling rather than choosing.
+ *
+ * Reduced motion: the pin still holds (it's `position: sticky`, not an
+ * animation) and the crossfade becomes an instant swap.
+ */
+export interface StickyPoint {
+  title: string;
+  body: string;
+  image: string;
+  /** Real alt text — these photos carry the page's argument. */
+  alt: string;
+}
+
+interface Props {
+  points: StickyPoint[];
+  class?: string;
+}
+
+const { points, class: extra = "" } = Astro.props;
+---
+
+<div
+  class:list={[
+    "sticky-points grid grid-cols-[0.95fr_1.05fr] items-start gap-[72px] max-nav:grid-cols-1 max-nav:gap-10",
+    extra,
+  ]}
+  data-sticky-points
+>
+  <div
+    class="media sticky top-header-gap aspect-[4/5] overflow-clip rounded-md bg-surface-2 max-nav:static max-nav:aspect-[16/10]"
+  >
+    {
+      points.map((point, i) => (
+        <img
+          src={point.image}
+          alt={i === 0 ? point.alt : ""}
+          aria-hidden={i === 0 ? undefined : "true"}
+          loading={i === 0 ? "eager" : "lazy"}
+          decoding="async"
+          class:list={[
+            "frame absolute inset-0 h-full w-full object-cover",
+            i === 0 && "is-active",
+          ]}
+        />
+      ))
+    }
+  </div>
+
+  <ol class="flex flex-col">
+    {
+      points.map((point, i) => (
+        <li
+          class="point flex min-h-[62svh] flex-col justify-center border-b border-line py-12 last:border-0 max-nav:min-h-0 max-nav:py-9"
+          data-point={i}
+        >
+          <span class="flex items-center gap-[14px]">
+            <span class="point-num font-mono text-caption tracking-[0.5px] text-faint transition-colors duration-300">
+              {String(i + 1).padStart(2, "0")}
+            </span>
+            <span class="h-px w-[22px] bg-line-strong" aria-hidden="true" />
+          </span>
+          <h3 class="mt-[18px] text-h3 leading-[1.1]">{point.title}</h3>
+          <p class="mt-4 max-w-[460px] text-lead leading-relaxed text-muted">
+            {point.body}
+          </p>
+        </li>
+      ))
+    }
+  </ol>
+</div>
+
+<style>
+  .frame {
+    opacity: 0;
+    transition: opacity 0.6s var(--ease-out-expo);
+  }
+  .frame.is-active {
+    opacity: 1;
+  }
+
+  .point.is-active .point-num {
+    color: var(--color-brand);
+  }
+
+  /* Below the nav breakpoint the pin is dropped, so the shared slot would
+     leave four photos invisible — each point gets its own inline photo
+     instead. Handled by the parent page's layout, not here: the media column
+     simply stops being sticky and holds the first frame. */
+  @media (prefers-reduced-motion: reduce) {
+    .frame {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  import { untilPageSwap } from "@/scripts/untilPageSwap";
+
+  // Re-runs after every client-router navigation as well as on first load,
+  // so the swapped-in DOM gets wired up.
+  document.addEventListener("astro:page-load", () => {
+    const root = document.querySelector<HTMLElement>("[data-sticky-points]");
+    if (!root) return;
+
+    const frames = [...root.querySelectorAll<HTMLElement>(".frame")];
+    const points = [...root.querySelectorAll<HTMLElement>(".point")];
+    if (frames.length === 0) return;
+
+    /* Same thin observation band as the index rail: only one point is inside
+       it at a time, so the photo can't flicker between two. A fast scroll can
+       leave the band empty — the last frame holds rather than going blank. */
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          const i = Number((entry.target as HTMLElement).dataset.point);
+          frames.forEach((f, j) => f.classList.toggle("is-active", j === i));
+          points.forEach((p, j) => p.classList.toggle("is-active", j === i));
+        }
+      },
+      { rootMargin: "-45% 0px -45% 0px" },
+    );
+    for (const point of points) observer.observe(point);
+
+    untilPageSwap().addEventListener("abort", () => observer.disconnect(), {
+      once: true,
+    });
+  });
+</script>

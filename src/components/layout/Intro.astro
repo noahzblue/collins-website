@@ -1,0 +1,424 @@
+---
+/**
+ * The onboarding sequence — the logo intro, decoded from the Figma storyboard
+ * (docs/site-expansion/12).
+ *
+ * Read it as one travelling dot that becomes the whole screen, then becomes
+ * the logo, then gets out of the way: the dot arrives low, scouts to the top,
+ * settles at centre, stretches into a bar, floods the screen blue; on the blue
+ * it re-forms at the wordmark's baseline, runs the wipe left to right and
+ * parks as the period after "COLLINS"; then a white disc opens from the
+ * wordmark's own centre and the page is underneath.
+ *
+ * ≈2.6s to the page appearing, ≈3.2s to settled. Long by UI standards and
+ * correct by intro standards — it plays once per session, on the homepage
+ * only, and any key or click skips it.
+ *
+ * Two things that are easy to get wrong:
+ *
+ * a) **The colour flip is the disc's doing, not the wordmark's.** At 2560ms the
+ *    wordmark switches to brand blue while the field behind it is still brand
+ *    blue, so it renders as nothing. The white disc sits *behind* the letters
+ *    and *above* the field, so as it opens they fill in from the middle
+ *    outwards. A colour tween would read as a dissolve and lose the effect.
+ *
+ * b) **Transform only.** Every phase is a transform on an element that is
+ *    already the right size, so the sequence stays off the main thread — which
+ *    matters more here than anywhere else on the site, because it is competing
+ *    with the first page load for CPU.
+ *
+ * The Core Web Vitals trade is deliberate and documented in `12 §The Core Web
+ * Vitals cost`: a solid-colour div is not an LCP candidate, so a cold session
+ * measures LCP at whatever paints when the disc opens. Field data is mostly
+ * unaffected (most visitors never see the intro); the lab score takes the hit.
+ */
+import wordmark from "@/assets/collins-logo.svg?raw";
+---
+
+<div id="intro" hidden aria-hidden="true">
+  <span class="intro-dot"></span>
+  <span class="intro-disc"></span>
+
+  <div class="intro-stage">
+    <span class="intro-mark"></span>
+    {
+      /* Two clipped bands over two copies of the same asset: the wordmark wipes
+       across, the subline wipes down, and each needs its own clip. */
+    }
+    <div class="intro-logo">
+      <span class="band band-wm"><Fragment set:html={wordmark} /></span>
+      <span class="band band-sub"><Fragment set:html={wordmark} /></span>
+    </div>
+  </div>
+</div>
+
+{
+  /* Ships `hidden`, and this runs immediately AFTER it — before first paint,
+   and after the element exists, which is the whole reason it sits below the
+   markup rather than above it. It un-hides only when the session flag is
+   absent, so a returning visitor never sees a flash of blue and a reader with
+   JS off never sees the overlay at all. This is the one place on the site
+   where a blocking inline script is the right answer. */
+}
+<script is:inline>
+  try {
+    var introEl = document.getElementById("intro");
+    if (
+      introEl &&
+      !sessionStorage.getItem("collins:intro") &&
+      !matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      introEl.removeAttribute("hidden");
+      /* Holds the hero's entrance back until the disc opens (see Hero.astro).
+         Set only in the branch that actually un-hid the overlay — stranding
+         this attribute would leave the hero invisible. */
+      document.documentElement.dataset.intro = "playing";
+    }
+    sessionStorage.setItem("collins:intro", "1");
+  } catch {
+    /* Storage blocked (private mode, embedded webview). Skip the intro rather
+       than risk playing it on every single navigation. */
+  }
+</script>
+
+<style>
+  #intro {
+    position: fixed;
+    inset: 0;
+    z-index: 100; /* over the veil, which is 90 */
+    background: #fff;
+    overflow: clip;
+  }
+  #intro[hidden] {
+    display: none;
+  }
+
+  /* The dot is 12px for its whole life. The bar and the flood are transforms
+     on that same 12px — never a width/height animation. */
+  .intro-dot {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    width: 12px;
+    height: 12px;
+    margin: -6px 0 0 -6px;
+    border-radius: 999px;
+    background: var(--color-brand);
+    opacity: 0;
+    will-change: transform;
+  }
+
+  /* Starts at a visible seed, not at zero — nothing in the real world appears
+     from nothing. `scale(1.5)` on a 100vmax circle clears the viewport
+     diagonal at every aspect ratio. */
+  .intro-disc {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 100vmax;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: #fff;
+    transform: translate(-50%, -50%) scale(0.02);
+    opacity: 0;
+    will-change: transform;
+  }
+
+  .intro-stage {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+  }
+
+  .intro-logo {
+    --wm-w: clamp(200px, 16vw, 277px);
+    position: relative;
+    width: var(--wm-w);
+    /* The asset's own aspect: 277 × 92. */
+    height: calc(var(--wm-w) * 92 / 277);
+    color: #fff;
+  }
+
+  .band {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    overflow: clip;
+  }
+  .band :global(svg) {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  /* "COLLINS" occupies y 0–58 of the 92-unit box … */
+  .band-wm {
+    top: 0;
+    height: calc(var(--wm-w) * 58 / 277);
+    clip-path: inset(0 100% 0 0);
+  }
+  .band-wm :global(svg) {
+    top: 0;
+  }
+  /* … and "EQUIPMENTS LLC" occupies y 75–92. */
+  .band-sub {
+    top: calc(var(--wm-w) * 75 / 277);
+    height: calc(var(--wm-w) * 17 / 277);
+    clip-path: inset(0 0 100% 0);
+  }
+  .band-sub :global(svg) {
+    top: calc(var(--wm-w) * -75 / 277);
+  }
+
+  /* The mark: a white sliver that grows into a dot, rides the leading edge of
+     the wipe, and parks as the period after the final S. Positioned against
+     the wordmark box so it scales with it. */
+  .intro-mark {
+    position: absolute;
+    left: 50%;
+    /* The period sits at 86% of the 58-unit wordmark band — 54% of the
+       92-unit box, not the box's own middle. */
+    top: 54%;
+    width: 12px;
+    height: 12px;
+    margin: -6px 0 0 -6px;
+    border-radius: 999px;
+    background: #fff;
+    opacity: 0;
+    will-change: transform;
+  }
+</style>
+
+<script>
+  const intro = document.getElementById("intro");
+
+  if (intro && !intro.hasAttribute("hidden")) {
+    const q = (sel: string) => intro.querySelector<HTMLElement>(sel)!;
+    const dot = q(".intro-dot");
+    const disc = q(".intro-disc");
+    const mark = q(".intro-mark");
+    const logo = q(".intro-logo");
+    const bandWm = q(".band-wm");
+    const bandSub = q(".band-sub");
+
+    const EXPO = "cubic-bezier(0.16, 1, 0.3, 1)";
+    const STRONG = "cubic-bezier(0.77, 0, 0.175, 1)";
+    /* Keyframe values are parsed without the element's custom-property
+       context, so `var(--color-brand)` would not resolve here. Read the token
+       once instead of hardcoding the hex in a second place. */
+    const BRAND = getComputedStyle(document.documentElement)
+      .getPropertyValue("--color-brand")
+      .trim();
+
+    const running: Animation[] = [];
+    const abort = new AbortController();
+
+    /**
+     * One phase. `delay` is its start on the master clock, so overlapping
+     * phases (H+I, J+K) are separate calls rather than nested callbacks.
+     *
+     * `fill` defaults to `forwards`, and that default is load-bearing: with
+     * `both`, an animation applies its FIRST keyframe during its delay — so a
+     * later phase would override an earlier one on the same element from t=0.
+     * Only the first phase on a given element gets `both`.
+     */
+    const at = (
+      el: Element,
+      frames: Keyframe[],
+      delay: number,
+      duration: number,
+      easing: string,
+      fill: FillMode = "forwards",
+    ) => {
+      const animation = el.animate(frames, { delay, duration, easing, fill });
+      running.push(animation);
+      return animation;
+    };
+
+    /* The dot sits at `top: 0`, so every y is an absolute travel from there. */
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    const y = (pct: number) => `translateY(${h * pct}px)`;
+    /** The wordmark's rendered width — every mark position is a share of it. */
+    const W = logo.getBoundingClientRect().width;
+
+    // A — the dot arrives low, scaling in from .4 (never from 0).
+    at(
+      dot,
+      [
+        { opacity: 0, transform: `${y(0.833)} scale(0.4)` },
+        { opacity: 1, transform: `${y(0.833)} scale(1)` },
+      ],
+      0,
+      160,
+      EXPO,
+      "both",
+    );
+    // B — it scouts to near the top. This is the memorable move.
+    at(
+      dot,
+      [{ transform: `${y(0.833)}` }, { transform: `${y(0.225)}` }],
+      160,
+      480,
+      STRONG,
+    );
+    // C — and settles back to dead centre.
+    at(
+      dot,
+      [{ transform: `${y(0.225)}` }, { transform: `${y(0.5)}` }],
+      640,
+      260,
+      EXPO,
+    );
+    // D — 12px becomes a full-width, 32px-tall bar.
+    at(
+      dot,
+      [
+        { transform: `${y(0.5)} scale(1)`, borderRadius: "999px" },
+        {
+          transform: `${y(0.5)} scale(${w / 12}, ${32 / 12})`,
+          borderRadius: "0px",
+        },
+      ],
+      900,
+      240,
+      EXPO,
+    );
+    // E — the bar floods to full height. The rounding is already gone by here,
+    // or the corners would read as a lozenge on the way up.
+    at(
+      dot,
+      [
+        { transform: `${y(0.5)} scale(${w / 12}, ${32 / 12})` },
+        { transform: `${y(0.5)} scale(${w / 12}, ${h / 12})` },
+      ],
+      1140,
+      300,
+      STRONG,
+    );
+
+    /* F — on the blue, a white sliver re-forms at the wordmark's baseline and
+       grows back into a 12px dot. It is a second element only because the
+       first one *is* the blue field by now; the handoff happens on flat blue
+       where nothing is distinguishable, so it still reads as one object. */
+    at(
+      mark,
+      [
+        { opacity: 1, transform: "translateX(0) scaleY(0.08)" },
+        { opacity: 1, transform: "translateX(0) scaleY(1)" },
+      ],
+      1500,
+      100,
+      EXPO,
+    );
+    // G — it slides to the wordmark's left edge …
+    at(
+      mark,
+      [
+        { opacity: 1, transform: "translateX(0)" },
+        { opacity: 1, transform: `translateX(${-W / 2}px)` },
+      ],
+      1600,
+      200,
+      STRONG,
+    );
+    // H — … then rides the leading edge of the wipe and shrinks into the
+    // period after the final S (x = 101.1% of the wordmark width, 12px → 6px).
+    at(
+      mark,
+      [
+        { opacity: 1, transform: `translateX(${-W / 2}px) scale(1)` },
+        { opacity: 1, transform: `translateX(${W * 0.511}px) scale(0.5)` },
+      ],
+      1800,
+      400,
+      STRONG,
+    );
+    at(
+      bandWm,
+      [{ clipPath: "inset(0 100% 0 0)" }, { clipPath: "inset(0 0 0 0)" }],
+      1800,
+      400,
+      STRONG,
+    );
+    // I — the subline wipes down under it.
+    at(
+      bandSub,
+      [{ clipPath: "inset(0 0 100% 0)" }, { clipPath: "inset(0 0 0 0)" }],
+      2180,
+      200,
+      EXPO,
+    );
+
+    /* J — the wordmark flips to brand blue INSTANTLY at 2560 (see the header
+       comment: the disc does the reveal, a colour tween would dissolve it),
+       and the disc opens from the wordmark's own centre. One animation with a
+       hairline offset step is the flip; 0.0003 of 3160ms is under a frame. */
+    at(
+      logo,
+      [
+        { color: "#ffffff", offset: 0 },
+        { color: "#ffffff", offset: 0.8101 },
+        { color: BRAND, offset: 0.8104 },
+        { color: BRAND, offset: 1 },
+      ],
+      0,
+      3160,
+      "linear",
+      "both",
+    );
+    at(mark, [{ opacity: 1 }, { opacity: 0 }], 2500, 60, "linear");
+    at(
+      disc,
+      [
+        { opacity: 1, transform: "translate(-50%, -50%) scale(0.02)" },
+        { opacity: 1, transform: "translate(-50%, -50%) scale(1.5)" },
+      ],
+      2560,
+      600,
+      STRONG,
+    );
+
+    // The logo dissolves into the page as the disc finishes covering it.
+    const last = at(
+      intro,
+      [{ opacity: 1 }, { opacity: 0 }],
+      2860,
+      300,
+      "linear",
+    );
+
+    const finish = () => {
+      abort.abort();
+      intro.setAttribute("hidden", "");
+      // Releases the hero's load choreography (see Hero.astro), so it plays
+      // into the page rather than behind the overlay.
+      delete document.documentElement.dataset.intro;
+      for (const animation of running) animation.cancel();
+    };
+
+    last.finished.then(finish, finish);
+
+    /* Skippable. Any input jumps to the end in 250ms — never trap someone in
+       an intro. Fading the whole overlay is one animation against the five it
+       would take to fast-forward every phase. */
+    const skip = () => {
+      for (const animation of running) animation.cancel();
+      intro
+        .animate([{ opacity: 1 }, { opacity: 0 }], {
+          duration: 250,
+          easing: "linear",
+        })
+        .finished.then(finish, finish);
+    };
+    for (const type of ["pointerdown", "keydown", "wheel"] as const) {
+      window.addEventListener(type, skip, {
+        once: true,
+        passive: true,
+        signal: abort.signal,
+      });
+    }
+  }
+</script>

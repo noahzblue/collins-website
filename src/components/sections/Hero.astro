@@ -8,6 +8,7 @@ import { site } from "@/config/site";
 ---
 
 <section
+  data-next-theme="dark"
   class="hero relative flex h-[100svh] min-h-[640px] items-end overflow-hidden max-mob:h-auto max-mob:min-h-0"
 >
   <!-- Ambient yard footage. The still underneath is the same frame, so
@@ -79,6 +80,7 @@ import { site } from "@/config/site";
             variant={cta.variant === "outline" ? "outline-white" : cta.variant}
             href={cta.href}
             size="lg"
+            class="press"
           >
             {cta.label}
           </Button>
@@ -88,7 +90,7 @@ import { site } from "@/config/site";
 
     <!-- Base panel — survey-tag coordinates + the drifting wordmarks. -->
     <div
-      class="reveal reveal-5 mt-14 flex items-center gap-6 rounded-[14px] border border-white/12 bg-white/[0.06] px-6 py-4 backdrop-blur-sm max-mob:mt-10 max-cmp:flex-col max-cmp:items-start max-cmp:gap-3 max-cmp:px-5"
+      class="reveal reveal-5 mt-14 flex items-center gap-6 rounded-md border border-white/12 bg-white/[0.06] px-6 py-4 backdrop-blur-sm max-mob:mt-10 max-cmp:flex-col max-cmp:items-start max-cmp:gap-3 max-cmp:px-5"
     >
       <span
         class="shrink-0 font-mono text-label tracking-[0.5px] text-white/55"
@@ -165,22 +167,37 @@ import { site } from "@/config/site";
     animation-duration: 0.8s;
     animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
     animation-fill-mode: backwards;
+    animation-delay: calc(var(--intro-hold, 0s) + var(--reveal-step, 0s));
   }
   .reveal-1 {
-    animation-delay: 0s;
+    --reveal-step: 0s;
   }
   .reveal-2 {
-    animation-delay: 0.09s;
+    --reveal-step: 0.09s;
   }
   .reveal-3 {
-    animation-delay: 0.17s;
+    --reveal-step: 0.17s;
   }
   .reveal-4 {
-    animation-delay: 0.25s;
+    --reveal-step: 0.25s;
   }
   .reveal-5 {
-    animation-delay: 0.34s;
+    --reveal-step: 0.34s;
   }
+
+  /* The logo intro (layout/Intro.astro) covers the page for ~2.6s. Hold the
+     hero back so it rises INTO the opening disc rather than finishing behind
+     the overlay where nobody sees it.
+
+     This is a delay and not `animation-play-state: paused` on purpose: a delay
+     expires by itself. If the intro's own script never runs — a bundle error,
+     a blocked module — the hero arrives 2.4s late instead of never arriving,
+     and the page is still readable. `finish()` clears the attribute on a skip,
+     which drops the delay and plays the entrance immediately. */
+  :global(html[data-intro="playing"]) .reveal {
+    --intro-hold: 2.4s;
+  }
+
   @keyframes hero-rise-in {
     from {
       opacity: 0;

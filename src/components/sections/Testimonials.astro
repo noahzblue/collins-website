@@ -8,72 +8,76 @@ import Section from "@/components/ui/Section.astro";
 import Eyebrow from "@/components/ui/Eyebrow.astro";
 import Icon from "@/components/ui/Icon.astro";
 import { testimonials } from "@/data/proof";
-import { testimonialsSection } from "@/data/content";
+import { quoteSection } from "@/data/content";
+
+/* Empty until real client quotes exist — see data/proof.ts. The homepage
+   carries the founder's quote (sections/FounderQuote.astro) in the meantime.
+   Rendering nothing beats rendering an empty slider. */
+const hasQuotes = testimonials.length > 0;
 ---
 
-<Section>
-  <div class="wrap">
-    <div
-      id="quote-split"
-      class="grid grid-cols-[0.85fr_1.15fr] items-stretch gap-16 max-nav:grid-cols-1 max-nav:gap-8"
-    >
-      <div
-        class="min-h-[480px] rounded-[18px] bg-cover bg-center max-nav:aspect-[16/10] max-nav:min-h-0"
-        style="background-image:url('/images/testimonial-site.jpg')"
-        role="img"
-        aria-label={testimonialsSection.imageAlt}
-      >
-      </div>
-
-      <div class="flex flex-col justify-center py-4">
-        <Eyebrow class="mb-7">{testimonialsSection.eyebrow}</Eyebrow>
-
-        <div class="grid">
-          {
-            testimonials.map((t, i) => (
-              <figure
-                class:list={[
-                  "quote-slide col-start-1 row-start-1",
-                  i === 0 && "is-active",
-                ]}
-              >
-                <div class="flex gap-[3px] text-brand">
-                  {Array.from({ length: t.rating }).map(() => (
-                    <Icon name="star" size={15} />
-                  ))}
-                </div>
-                <blockquote class="mt-5 font-display text-[clamp(22px,2.5vw,31px)] leading-[1.32] font-medium tracking-[-0.015em] text-ink">
-                  “{t.quote}”
-                </blockquote>
-                <figcaption class="mt-7">
-                  <div class="text-base font-medium text-ink">{t.name}</div>
-                  <div class="mt-0.5 text-note text-faint">{t.role}</div>
-                </figcaption>
-              </figure>
-            ))
-          }
-        </div>
-
+{
+  hasQuotes && (
+    <Section>
+      <div class="wrap">
         <div
-          class="mt-10 flex items-center gap-[7px]"
-          aria-label="Choose testimonial"
+          id="quote-split"
+          class="grid grid-cols-[0.85fr_1.15fr] items-stretch gap-16 max-nav:grid-cols-1 max-nav:gap-8"
         >
-          {
-            testimonials.map((_, i) => (
-              <button
-                type="button"
-                class="quote-dot h-[7px] cursor-pointer rounded-full transition-all duration-300"
-                aria-label={`Testimonial ${i + 1}`}
-                aria-current={i === 0 ? "true" : "false"}
-                data-index={i}
-              />
-            ))
-          }
+          <div
+            class="min-h-[480px] rounded-md bg-cover bg-center max-nav:aspect-[16/10] max-nav:min-h-0"
+            style="background-image:url('/images/testimonial-site.jpg')"
+            role="img"
+            aria-label={quoteSection.imageAlt}
+          />
+
+          <div class="flex flex-col justify-center py-4">
+            <Eyebrow class="mb-7">{quoteSection.eyebrow}</Eyebrow>
+
+            <div class="grid">
+              {testimonials.map((t, i) => (
+                <figure
+                  class:list={[
+                    "quote-slide col-start-1 row-start-1",
+                    i === 0 && "is-active",
+                  ]}
+                >
+                  <div class="flex gap-[3px] text-brand">
+                    {Array.from({ length: t.rating }).map(() => (
+                      <Icon name="star" size={15} />
+                    ))}
+                  </div>
+                  <blockquote class="mt-5 font-display text-[clamp(22px,2.5vw,31px)] leading-[1.32] font-medium tracking-[-0.015em] text-ink">
+                    “{t.quote}”
+                  </blockquote>
+                  <figcaption class="mt-7">
+                    <div class="text-base font-medium text-ink">{t.name}</div>
+                    <div class="mt-0.5 text-note text-faint">{t.role}</div>
+                  </figcaption>
+                </figure>
+              ))}
+            </div>
+
+            <div
+              class="mt-10 flex items-center gap-[7px]"
+              aria-label="Choose testimonial"
+            >
+              {testimonials.map((_, i) => (
+                <button
+                  type="button"
+                  class="quote-dot h-[7px] cursor-pointer rounded-full transition-all duration-300"
+                  aria-label={`Testimonial ${i + 1}`}
+                  aria-current={i === 0 ? "true" : "false"}
+                  data-index={i}
+                />
+              ))}
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-  </div>
-</Section>
+    </Section>
+  )
+}
 
 <style>
   .quote-slide {

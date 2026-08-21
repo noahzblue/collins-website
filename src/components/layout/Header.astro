@@ -1,29 +1,38 @@
 ---
 /**
  * Floating glass header — a pill bar inset from the viewport edges.
- * Smoked glass over the hero (the video reads through it), switching to
- * frosted white once scrolled past the hero. Tone lives on `data-tone`.
+ * Smoked glass over dark bands and photo banners, frosted white over light
+ * ones. Tone lives on `data-tone` and is driven by whichever section is under
+ * the bar (scripts/themeFlip.ts), not by any one page's hero height.
  */
 import Logo from "@/components/ui/Logo.astro";
 import Button from "@/components/ui/Button.astro";
+import Icon from "@/components/ui/Icon.astro";
 import { mainNav } from "@/data/navigation";
+
+/* "Current" matches by prefix so /equipment/generators lights Equipment.
+   "/" is exact — otherwise it would light on every page. */
+const path = Astro.url.pathname.replace(/\/+$/, "") || "/";
+const isCurrent = (href: string) =>
+  href === "/" ? path === "/" : path === href || path.startsWith(`${href}/`);
 ---
 
 <header
   id="site-header"
   data-tone="glass"
-  class="fixed inset-x-4 top-4 z-50 mx-auto max-w-[1200px] rounded-2xl border max-mob:inset-x-3 max-mob:top-3"
+  class="fixed inset-x-4 top-4 z-50 mx-auto max-w-[1200px] rounded-md border max-mob:inset-x-3 max-mob:top-3"
 >
   <div
     class="flex h-[64px] items-center justify-between px-7 max-mob:h-[56px] max-mob:px-4"
   >
     <Logo />
 
-    <nav class="flex items-center gap-[36px] max-nav:hidden">
+    <nav class="flex items-center gap-[30px] max-nav:hidden">
       {
         mainNav.map((link) => (
           <a
             href={link.href}
+            aria-current={isCurrent(link.href) ? "page" : undefined}
             class="nav-link font-mono text-detail font-medium transition-colors duration-150"
           >
             {link.label}
@@ -32,10 +41,47 @@ import { mainNav } from "@/data/navigation";
       }
     </nav>
 
-    <div class="flex items-center gap-3">
-      <Button variant="primary" href="/#contact" class="max-xs:px-4">
+    <div class="flex items-center gap-2">
+      <Button variant="primary" href="/contact" class="press max-xs:px-4">
         Get a quote
       </Button>
+      <button
+        type="button"
+        id="nav-toggle"
+        class="hidden h-[38px] w-[38px] cursor-pointer items-center justify-center rounded-full border transition-colors max-nav:flex"
+        aria-expanded="false"
+        aria-controls="nav-panel"
+        aria-label="Open menu"
+      >
+        <Icon name="menu" size={18} />
+      </button>
+    </div>
+  </div>
+
+  {
+    /* Below the nav breakpoint the six links live here. It shares the header's
+     glass so it reads as the bar growing rather than a second surface. */
+  }
+  <div
+    id="nav-panel"
+    class="nav-panel grid max-nav:border-t nav:hidden"
+    data-lenis-prevent
+    inert
+  >
+    <div class="overflow-hidden">
+      <nav class="flex flex-col px-7 py-4 max-mob:px-4" aria-label="Main">
+        {
+          mainNav.map((link) => (
+            <a
+              href={link.href}
+              aria-current={isCurrent(link.href) ? "page" : undefined}
+              class="nav-link border-b py-[13px] font-mono text-base font-medium transition-colors last:border-0"
+            >
+              {link.label}
+            </a>
+          ))
+        }
+      </nav>
     </div>
   </div>
 </header>
@@ -68,18 +114,51 @@ import { mainNav } from "@/data/navigation";
 
   #site-header[data-tone="glass"] .nav-link {
     color: rgba(255, 255, 255, 0.82);
+    border-color: rgba(255, 255, 255, 0.12);
   }
-  #site-header[data-tone="glass"] .nav-link:hover {
+  #site-header[data-tone="glass"] .nav-link:hover,
+  #site-header[data-tone="glass"] .nav-link[aria-current="page"] {
     color: #fff;
   }
   #site-header[data-tone="solid"] .nav-link {
     color: var(--color-muted);
+    border-color: var(--color-line);
   }
   #site-header[data-tone="solid"] .nav-link:hover {
     color: var(--color-ink);
   }
+  #site-header[data-tone="solid"] .nav-link[aria-current="page"] {
+    color: var(--color-brand);
+  }
 
-  /* The wordmark inherits currentColor — flip it white while over the video. */
+  #nav-toggle {
+    border-color: currentColor;
+  }
+  #site-header[data-tone="glass"] #nav-toggle {
+    color: rgba(255, 255, 255, 0.75);
+  }
+  #site-header[data-tone="solid"] #nav-toggle {
+    color: var(--color-muted);
+  }
+
+  /* 0fr -> 1fr: the panel opens to its own height with no measuring and no
+     inline styles — the same idiom the services accordion uses. */
+  .nav-panel {
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.35s var(--ease-out-expo);
+    border-color: inherit;
+  }
+  .nav-panel[data-open] {
+    grid-template-rows: 1fr;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .nav-panel {
+      transition: none;
+    }
+  }
+
+  /* The wordmark inherits currentColor — flip it white while over a photo. */
   #site-header :global(.text-brand) {
     transition: color 0.35s ease;
   }
@@ -90,32 +169,48 @@ import { mainNav } from "@/data/navigation";
 
 <script>
   import { untilPageSwap } from "@/scripts/untilPageSwap";
+  import { initThemeFlip } from "@/scripts/themeFlip";
+  import { initReveal } from "@/scripts/reveal";
 
   // Re-runs after every client-router navigation as well as on first load,
   // so the swapped-in DOM gets wired up.
   document.addEventListener("astro:page-load", () => {
     const gone = untilPageSwap();
     const header = document.getElementById("site-header")!;
-    const hero = document.querySelector<HTMLElement>(".hero");
-    let ticking = false;
 
-    // Pages without a hero have light backgrounds — frosted white from the start.
-    const apply = () => {
-      const limit = hero ? hero.offsetHeight - 84 : -1;
-      header.dataset.tone = window.scrollY > limit ? "solid" : "glass";
-      ticking = false;
+    initThemeFlip(header, gone);
+    // The header is on every page, so it is the one script guaranteed to run —
+    // which makes it the right place to arm the page's reveals.
+    initReveal();
+
+    const toggle = document.getElementById("nav-toggle");
+    const panel = document.getElementById("nav-panel");
+    if (!toggle || !panel) return;
+
+    const setOpen = (open: boolean) => {
+      toggle.setAttribute("aria-expanded", String(open));
+      toggle.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+      panel.toggleAttribute("data-open", open);
+      // Collapsed to 0fr the links are invisible but still tabbable — `inert`
+      // is what actually takes them out of the tab order and the a11y tree.
+      panel.toggleAttribute("inert", !open);
+      // `autoToggle` on Lenis reads this and stands down while the menu is up.
+      document.body.style.overflow = open ? "hidden" : "";
     };
-    const onScroll = () => {
-      if (!ticking) {
-        ticking = true;
-        requestAnimationFrame(apply);
-      }
-    };
-    apply();
-    window.addEventListener("scroll", onScroll, {
-      passive: true,
-      signal: gone,
+
+    toggle.addEventListener("click", () =>
+      setOpen(toggle.getAttribute("aria-expanded") !== "true"),
+    );
+    // The router swaps the page under an open menu — close it on the way out.
+    document.addEventListener("astro:before-swap", () => setOpen(false), {
+      once: true,
     });
-    window.addEventListener("resize", onScroll, { signal: gone });
+    document.addEventListener(
+      "keydown",
+      (e) => {
+        if (e.key === "Escape") setOpen(false);
+      },
+      { signal: gone },
+    );
   });
 </script>

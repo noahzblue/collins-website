@@ -21,7 +21,8 @@ const { image, trail, current, title } = Astro.props;
 ---
 
 <section
-  class="relative flex min-h-[460px] items-end overflow-hidden bg-ink max-mob:min-h-[380px]"
+  data-next-theme="glass"
+  class="relative flex min-h-[460px] items-end overflow-clip bg-ink max-mob:min-h-[380px]"
 >
   {image && <BgImage src={image} />}
   <div class="scrim-banner absolute inset-0" aria-hidden="true"></div>

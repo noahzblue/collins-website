@@ -11,6 +11,12 @@ import "@/styles/global.css";
 import Header from "@/components/layout/Header.astro";
 import Footer from "@/components/layout/Footer.astro";
 import FloatingButtons from "@/components/layout/FloatingButtons.astro";
+import PageVeil from "@/components/layout/PageVeil.astro";
+// PAUSED — the logo onboarding sequence is switched off for now. Restore by
+// un-commenting this import, the `isHome` const and the <Intro /> below;
+// nothing else depends on it (Hero's hold is keyed off `html[data-intro]`,
+// which simply never appears while this is off).
+// import Intro from "@/components/layout/Intro.astro";
 import { site } from "@/config/site";
 
 interface Props {
@@ -20,6 +26,60 @@ interface Props {
 
 const { title = site.seo.title, description = site.seo.description } =
   Astro.props;
+
+const canonical = new URL(Astro.url.pathname, Astro.site ?? site.url).href;
+
+/* The logo intro is a title card, not a signpost — a visitor who landed on
+   /equipment/generators from a search wants the generators. Homepage only. */
+// const isHome = Astro.url.pathname === "/";
+
+/**
+ * LocalBusiness JSON-LD, built entirely from config/site.ts. This is what puts
+ * the hours, the phone numbers and both locations into Google's local panel —
+ * everything it needs is already the single source of truth, so it can't drift
+ * from what the pages say.
+ */
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  "@id": `${site.url}/#business`,
+  name: site.name,
+  legalName: site.legalName,
+  description: site.seo.description,
+  url: site.url,
+  email: site.email,
+  telephone: site.phones.map((p) => p.display),
+  address: {
+    "@type": "PostalAddress",
+    streetAddress: "Ras Al Khor 2",
+    addressLocality: "Dubai",
+    addressCountry: "AE",
+  },
+  geo: {
+    "@type": "GeoCoordinates",
+    latitude: site.places.office.geo.lat,
+    longitude: site.places.office.geo.lng,
+  },
+  openingHours: site.hoursSchema,
+  areaServed: "United Arab Emirates",
+  identifier: {
+    "@type": "PropertyValue",
+    name: `Trade licence register — ${site.licensingAuthority}`,
+    value: site.register,
+  },
+  // The yard is a second real place doing a different job, not a duplicate.
+  location: {
+    "@type": "Place",
+    name: `${site.name} — yard`,
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: "Sajjah",
+      addressLocality: "Sharjah",
+      addressCountry: "AE",
+    },
+  },
+  sameAs: site.social.filter((s) => s.href !== "#").map((s) => s.href),
+};
 ---
 
 <!doctype html>
@@ -31,14 +91,21 @@ const { title = site.seo.title, description = site.seo.description } =
     <link rel="icon" href="/favicon.ico" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonical} />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500&family=Geist+Mono:wght@400;500&display=swap"
       rel="stylesheet"
+    />
+    <script
+      type="application/ld+json"
+      is:inline
+      set:html={JSON.stringify(jsonLd)}
     />
     <!-- Client-side routing: the next page swaps in without a reload, so the
          header, hero video and marquee never flash or restart on navigation.
@@ -81,6 +148,8 @@ const { title = site.seo.title, description = site.seo.description } =
     </script>
   </head>
   <body>
+    {/* {isHome && <Intro />} */}
+    <PageVeil />
     <Header />
     <main>
       <slot />

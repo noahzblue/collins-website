@@ -1,12 +1,26 @@
 ---
-/** Homepage — composes the marketing sections in order. Nothing else. */
+/**
+ * Homepage — composes the marketing sections in order. Nothing else.
+ *
+ * The job of this page changed with the site expansion: it used to BE the
+ * site, six sections trying to be six pages. Now every section makes one
+ * claim, shows one proof and hands off to the page that goes deep — which is
+ * what lets each of them be short.
+ *
+ * The dark/light rhythm is declared by each section's `tone` (Section.astro
+ * writes `data-next-theme` from it) and the header inverts across every
+ * boundary on its own: hero dark, sales-or-hire dark mid-page, the founder
+ * quote dark near the end. Two dark bands in the body, evenly spaced, each
+ * carrying one big statement.
+ */
 import Base from "@/layouts/Base.astro";
 import Hero from "@/components/sections/Hero.astro";
 import TrustStrip from "@/components/sections/TrustStrip.astro";
+import SalesOrHire from "@/components/sections/SalesOrHire.astro";
 import ProductGrid from "@/components/sections/ProductGrid.astro";
 import Services from "@/components/sections/Services.astro";
 import Industries from "@/components/sections/Industries.astro";
-import Testimonials from "@/components/sections/Testimonials.astro";
+import FounderQuote from "@/components/sections/FounderQuote.astro";
 import AboutTeaser from "@/components/sections/AboutTeaser.astro";
 import ContactCTA from "@/components/sections/ContactCTA.astro";
 ---
@@ -14,10 +28,11 @@ import ContactCTA from "@/components/sections/ContactCTA.astro";
 <Base>
   <Hero />
   <TrustStrip />
+  <SalesOrHire />
   <ProductGrid />
   <Services />
   <Industries />
-  <Testimonials />
+  <FounderQuote />
   <AboutTeaser />
   <ContactCTA />
 </Base>

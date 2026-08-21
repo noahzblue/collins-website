@@ -9,38 +9,35 @@ import Section from "@/components/ui/Section.astro";
 import Eyebrow from "@/components/ui/Eyebrow.astro";
 import Button from "@/components/ui/Button.astro";
 import Icon from "@/components/ui/Icon.astro";
-import { site } from "@/config/site";
+import { site, directionsHref } from "@/config/site";
 import { contactSection } from "@/data/content";
 import { getCollection } from "astro:content";
-
-const mapsHref = `https://maps.google.com/?q=${site.geo.lat},${site.geo.lng}`;
 
 /* The dropdown mirrors the catalogue — same collection as /equipment. */
 const equipmentCategoryNames = (await getCollection("equipment"))
   .sort((a, b) => a.data.sortOrder - b.data.sortOrder)
   .map((category) => category.data.name);
 
+const { office, yard } = site.places;
+
+/* Three numbers, not one. "Visit" offers both pins, because there are two
+   places doing two different jobs. */
 const methods = [
   {
-    icon: "phone",
-    label: "Call us",
-    value: site.phone.display,
-    href: site.phone.href,
-  },
-  {
-    icon: "whatsapp",
+    icon: "whatsapp" as const,
     label: "WhatsApp",
     value: "Chat with our team",
     href: site.whatsapp.href,
   },
   {
-    icon: "mail",
+    icon: "mail" as const,
     label: "Email",
     value: site.email,
     href: `mailto:${site.email}`,
   },
-  { icon: "pin", label: "Visit", value: site.address, href: mapsHref },
-] as const;
+];
+
+const places = [office, yard];
 ---
 
 <Section id="contact" tone="gray">
@@ -60,15 +57,41 @@ const methods = [
         </p>
 
         <div class="flex flex-col gap-3">
+          <!-- Three separate tel: rows. One number was three-thirds wrong. -->
+          <div class="rounded-md border border-line bg-white p-4">
+            <span class="flex items-center gap-4">
+              <span
+                class="flex h-[44px] w-[44px] shrink-0 items-center justify-center rounded-sm bg-brand-tint text-brand"
+              >
+                <Icon name="phone" size={20} />
+              </span>
+              <span class="text-caption text-faint">Call us</span>
+            </span>
+            <ul class="mt-3 flex flex-col">
+              {
+                site.phones.map((phone) => (
+                  <li>
+                    <a
+                      href={phone.href}
+                      class="block border-t border-line py-[9px] font-mono text-cell text-ink transition-colors hover:text-brand"
+                    >
+                      {phone.display}
+                    </a>
+                  </li>
+                ))
+              }
+            </ul>
+          </div>
+
           {
             methods.map((m) => (
               <a
                 href={m.href}
                 target={m.href.startsWith("http") ? "_blank" : undefined}
                 rel={m.href.startsWith("http") ? "noopener" : undefined}
-                class="group flex items-center gap-4 rounded-[14px] border border-line bg-white p-4 transition-all duration-200 hover:border-line-strong hover:shadow-[0_12px_30px_-20px_rgba(10,14,23,0.3)]"
+                class="group flex items-center gap-4 rounded-md border border-line bg-white p-4 transition-all duration-200 hover:border-line-strong hover:shadow-[0_12px_30px_-20px_rgba(10,14,23,0.3)]"
               >
-                <span class="flex h-[44px] w-[44px] shrink-0 items-center justify-center rounded-[12px] bg-brand-tint text-brand">
+                <span class="flex h-[44px] w-[44px] shrink-0 items-center justify-center rounded-sm bg-brand-tint text-brand">
                   <Icon name={m.icon} size={20} />
                 </span>
                 <span>
@@ -80,6 +103,44 @@ const methods = [
               </a>
             ))
           }
+
+          <!-- Visit: both pins. -->
+          <div class="rounded-md border border-line bg-white p-4">
+            <span class="flex items-center gap-4">
+              <span
+                class="flex h-[44px] w-[44px] shrink-0 items-center justify-center rounded-sm bg-brand-tint text-brand"
+              >
+                <Icon name="pin" size={20} />
+              </span>
+              <span class="text-caption text-faint">Visit</span>
+            </span>
+            <ul class="mt-3 flex flex-col">
+              {
+                places.map((place) => (
+                  <li>
+                    <a
+                      href={directionsHref(place)}
+                      target="_blank"
+                      rel="noopener"
+                      class="block border-t border-line py-[9px] transition-colors hover:text-brand"
+                    >
+                      <span class="font-mono text-micro tracking-[1.4px] text-faint uppercase">
+                        {place.tag}
+                      </span>
+                      <span class="mt-0.5 block text-base font-medium text-ink">
+                        {place.address}
+                      </span>
+                    </a>
+                  </li>
+                ))
+              }
+            </ul>
+          </div>
+
+          <p class="mt-1 mb-0 flex items-center gap-3 text-note text-muted">
+            <Icon name="clock" size={16} class="shrink-0 text-brand" />
+            {site.hoursLong}
+          </p>
         </div>
       </div>
 
@@ -89,9 +150,10 @@ const methods = [
         data-wa={site.whatsapp.href}
         class="card p-9 shadow-[0_24px_60px_-36px_rgba(10,14,23,0.4)] max-xs:p-6"
       >
-        <label class="mb-5 block text-meta font-medium text-ink">
-          Request a quote — we reply within one business day.
-        </label>
+        <p class="mb-5 text-meta font-medium text-ink">
+          Send us the machine, the duty and the dates — or just describe the job
+          and we'll specify it for you.
+        </p>
         <div class="grid grid-cols-2 gap-3 max-cmp:grid-cols-1">
           <input
             class="q-field"
@@ -153,15 +215,19 @@ const methods = [
           name="message"
           rows="3"
           placeholder="Tell us what you need"></textarea>
-        <Button variant="primary" type="submit" class="mt-2 w-full">
+        <Button variant="primary" type="submit" class="press mt-2 w-full">
           Submit request
         </Button>
-        <p class="mt-4 mb-0 text-center text-caption text-faint">
-          Submitting opens WhatsApp with your request pre-filled — or email us
-          at
-          {" "}<a href={`mailto:${site.email}`} class="underline hover:text-ink"
-            >{site.email}</a
-          >.
+        <!-- A real commitment from the profile, and the single best thing
+             that could sit next to a submit button. -->
+        <p class="mt-4 mb-0 text-center text-base font-medium text-ink">
+          {site.quotePromise}
+        </p>
+        <p class="mt-2 mb-0 text-center text-caption text-faint">
+          Submitting opens WhatsApp with your request pre-filled. Need more
+          fields? <a href="/contact" class="underline hover:text-ink">
+            Use the full enquiry form
+          </a>.
         </p>
       </form>
     </div>
@@ -173,7 +239,7 @@ const methods = [
     width: 100%;
     background: #fff;
     border: 1px solid var(--color-line-strong);
-    border-radius: 10px;
+    border-radius: var(--radius-sm);
     color: var(--color-ink);
     padding: 12px 14px;
     font-size: 14px;

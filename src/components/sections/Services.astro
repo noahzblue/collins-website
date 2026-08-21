@@ -1,192 +1,55 @@
 ---
 /**
- * Services — icon accordion on the left, photo on the right with a floating
- * mini data-card (siteassist "Platform" pattern). Selecting a row swaps the
- * photo and the data-card; the first row starts open.
+ * Services teaser — the six capabilities as a numbered follower list.
+ *
+ * It used to be a three-row accordion, which had two problems: the data only
+ * held three services (two real revenue lines were invisible site-wide), and
+ * six accordion rows would be a tall, dull column. The follower list keeps six
+ * rows in roughly the height the three-row accordion took and still carries
+ * photography.
+ *
+ * Every row deep-links into its block on /services. Reads from the same
+ * services.ts as the hub, so the homepage can't drift from it.
  */
 import Section from "@/components/ui/Section.astro";
 import Eyebrow from "@/components/ui/Eyebrow.astro";
-import Icon from "@/components/ui/Icon.astro";
-import BgImage from "@/components/ui/BgImage.astro";
+import FollowerList from "@/components/ui/FollowerList.astro";
+import ViewAllBar from "@/components/ui/ViewAllBar.astro";
 import { services } from "@/data/services";
 import { servicesSection } from "@/data/content";
 ---
 
 <Section id="services">
   <div class="wrap">
-    <div
-      id="services-split"
-      class="grid grid-cols-[0.9fr_1.1fr] items-center gap-16 max-nav:grid-cols-1 max-nav:gap-10"
-      data-stats={JSON.stringify(services.map((s) => s.stat))}
-    >
-      <!-- Left: heading + accordion -->
+    <div class="mb-[56px] flex flex-wrap items-end justify-between gap-8">
       <div>
-        <Eyebrow class="mb-4">{servicesSection.eyebrow}</Eyebrow>
+        <Eyebrow class="mb-[16px]">{servicesSection.eyebrow}</Eyebrow>
         <h2
-          class="mb-4 text-h2 leading-[1.06]"
+          class="text-h2 leading-[1.06] tracking-[-0.015em] uppercase"
+          data-reveal="lines"
           set:html={servicesSection.title.join("<br>")}
         />
-        <p class="mb-10 max-w-[440px] text-lead leading-relaxed text-muted">
-          {servicesSection.intro}
-        </p>
-
-        <div class="border-t border-line">
-          {
-            services.map((s, i) => (
-              <button
-                type="button"
-                class="svc-row group block w-full cursor-pointer border-b border-line py-6 text-left"
-                aria-expanded={i === 0 ? "true" : "false"}
-                data-index={i}
-              >
-                <span class="flex items-center gap-4">
-                  <span class="svc-icon flex h-[44px] w-[44px] shrink-0 items-center justify-center rounded-[13px] transition-colors duration-300">
-                    <Icon name={s.icon} size={21} />
-                  </span>
-                  <span class="svc-title text-subhead font-medium transition-colors duration-300">
-                    {s.title}
-                  </span>
-                </span>
-                <span class="svc-body grid transition-[grid-template-rows] duration-500 ease-out">
-                  <span class="block overflow-hidden">
-                    <span class="block pt-3 pl-[60px] text-base leading-relaxed text-muted max-xs:pl-0">
-                      {s.body}
-                    </span>
-                  </span>
-                </span>
-              </button>
-            ))
-          }
-        </div>
       </div>
-
-      <!-- Right: photo panel + floating data-card -->
-      <div
-        class="relative aspect-[4/3] overflow-hidden rounded-[18px] max-nav:aspect-[16/10]"
-      >
-        {
-          services.map((s, i) => (
-            <BgImage
-              src={s.image}
-              class:list={["svc-img", i === 0 && "is-active"]}
-            />
-          ))
-        }
-        <div
-          class="absolute bottom-5 left-5 max-w-[290px] rounded-[14px] border border-white/60 bg-white/92 p-5 shadow-[0_18px_44px_-22px_rgba(10,14,23,0.45)] backdrop-blur-md max-xs:bottom-4 max-xs:left-4 max-xs:p-4"
-        >
-          <div class="flex items-center gap-3">
-            <span
-              id="svc-card-icon"
-              class="flex h-[38px] w-[38px] shrink-0 items-center justify-center rounded-[11px] bg-brand-tint text-brand"
-            >
-              {
-                services.map((s, i) => (
-                  <span
-                    class:list={["svc-card-glyph", i !== 0 && "hidden"]}
-                    data-index={i}
-                  >
-                    <Icon name={s.icon} size={18} />
-                  </span>
-                ))
-              }
-            </span>
-            <span id="svc-card-title" class="text-base font-medium text-ink">
-              {services[0].stat.title}
-            </span>
-          </div>
-          <p
-            id="svc-card-line"
-            class="mt-2 mb-0 text-note leading-relaxed text-muted"
-          >
-            {services[0].stat.line}
-          </p>
-        </div>
-      </div>
+      <p class="max-w-[430px] text-lead leading-relaxed text-muted">
+        {servicesSection.intro}
+      </p>
     </div>
+
+    <FollowerList
+      items={services.map((service) => ({
+        label: service.title,
+        blurb: service.lead,
+        image: service.image,
+        href: `/services#${service.slug}`,
+        stat: service.stat,
+      }))}
+      ariaLabel={servicesSection.eyebrow}
+    />
+
+    <ViewAllBar
+      href={servicesSection.viewAll.href}
+      label={servicesSection.viewAll.label}
+      class="mt-[64px] max-mob:mt-[40px]"
+    />
   </div>
 </Section>
-
-<style>
-  .svc-icon {
-    background: var(--color-surface-2);
-    color: var(--color-muted);
-  }
-  .svc-row[aria-expanded="true"] .svc-icon {
-    background: var(--color-brand-tint);
-    color: var(--color-brand);
-  }
-  .svc-title {
-    color: var(--color-muted);
-  }
-  .svc-row:hover .svc-title,
-  .svc-row[aria-expanded="true"] .svc-title {
-    color: var(--color-ink);
-  }
-
-  .svc-body {
-    grid-template-rows: 0fr;
-  }
-  .svc-row[aria-expanded="true"] .svc-body {
-    grid-template-rows: 1fr;
-  }
-
-  .svc-img {
-    opacity: 0;
-    transition: opacity 0.6s ease;
-  }
-  .svc-img.is-active {
-    opacity: 1;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .svc-img,
-    .svc-body {
-      transition: none;
-    }
-  }
-</style>
-
-<script>
-  import { createRotator } from "@/scripts/rotator";
-
-  // Re-runs after every client-router navigation as well as on first load,
-  // so the swapped-in DOM gets wired up.
-  document.addEventListener("astro:page-load", () => {
-    const split = document.getElementById("services-split");
-    if (split) {
-      const rows = [...split.querySelectorAll<HTMLButtonElement>(".svc-row")];
-      const imgs = [...split.querySelectorAll<HTMLElement>(".svc-img")];
-      const glyphs = [
-        ...split.querySelectorAll<HTMLElement>(".svc-card-glyph"),
-      ];
-      const cardTitle = split.querySelector<HTMLElement>("#svc-card-title")!;
-      const cardLine = split.querySelector<HTMLElement>("#svc-card-line")!;
-      // Data-card copy mirrors the `stat` field per service in data/services.ts.
-      const stats = JSON.parse(split.dataset.stats ?? "[]") as {
-        title: string;
-        line: string;
-      }[];
-
-      // No `interval` — the accordion only ever moves on a click.
-      const rotator = createRotator({
-        root: split,
-        count: rows.length,
-        onSelect: (i) => {
-          rows.forEach((r, j) =>
-            r.setAttribute("aria-expanded", String(j === i)),
-          );
-          imgs.forEach((im, j) => im.classList.toggle("is-active", j === i));
-          glyphs.forEach((g, j) => g.classList.toggle("hidden", j !== i));
-          if (stats[i]) {
-            cardTitle.textContent = stats[i].title;
-            cardLine.textContent = stats[i].line;
-          }
-        },
-      });
-      rows.forEach((r, i) =>
-        r.addEventListener("click", () => rotator.select(i)),
-      );
-    }
-  });
-</script>

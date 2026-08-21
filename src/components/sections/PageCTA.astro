@@ -1,0 +1,71 @@
+---
+/**
+ * The site-wide closer — identical on /about, /services, /industries and
+ * /yard. Copy is verbatim from the company profile's contact spread (p.9).
+ *
+ * The consistency is doing real work: one CTA, the same shape everywhere,
+ * means you always know where a page ends and what it wants. Don't give a
+ * page its own bespoke ending.
+ */
+import Section from "@/components/ui/Section.astro";
+import Button from "@/components/ui/Button.astro";
+import Icon from "@/components/ui/Icon.astro";
+import { site } from "@/config/site";
+import { pageCta } from "@/data/content";
+---
+
+<Section tone="dark">
+  <div class="wrap">
+    <div class="mx-auto max-w-[720px] text-center">
+      <h2
+        class="text-h2 leading-[1.06] text-balance text-white"
+        data-reveal="lines"
+      >
+        {pageCta.title}
+      </h2>
+      <p
+        class="mx-auto mt-6 max-w-[560px] text-lead-lg leading-relaxed text-[#aab2c0]"
+        data-reveal
+      >
+        {pageCta.body}
+      </p>
+
+      <div
+        class="mt-9 flex flex-wrap justify-center gap-3 max-xs:flex-col"
+        data-reveal
+      >
+        <Button variant="primary" href="/contact" size="lg" class="press">
+          Request a quote
+        </Button>
+        <Button
+          variant="outline-white"
+          href={site.whatsapp.href}
+          target="_blank"
+          rel="noopener"
+          size="lg"
+          class="press"
+        >
+          <Icon name="whatsapp" size={17} />
+          WhatsApp us
+        </Button>
+      </div>
+
+      <div
+        class="mt-8 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 font-mono text-caption tracking-[0.5px] text-white/50"
+        data-reveal
+      >
+        <a
+          href={site.phone.href}
+          class="transition-colors hover:text-white"
+          set:text={site.phone.display}
+        />
+        <span aria-hidden="true">·</span>
+        <span>{site.hours}</span>
+      </div>
+
+      <p class="mt-6 mb-0 text-note text-white/45" data-reveal>
+        {site.quotePromise}
+      </p>
+    </div>
+  </div>
+</Section>

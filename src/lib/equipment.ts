@@ -94,3 +94,28 @@ export const enquireHref = (name: string, mode: Mode, rangeLabel?: string) => {
   const text = `Hi Collins, I'm interested in ${verb} ${item}.`;
   return `${site.whatsapp.href}?text=${encodeURIComponent(text)}`;
 };
+
+/**
+ * Resolve equipment category ids to `{ id, name, href }`, throwing on an id
+ * that isn't in the collection.
+ *
+ * `industries.ts` stores category ids rather than display names so an
+ * industry's "commonly supplied" list links to the real category page. The
+ * throw is the point: a typo fails `bun run build` the same way a bad
+ * `related` slug does, instead of shipping a dead link nobody notices.
+ */
+export const resolveCategories = (
+  ids: string[],
+  all: { id: string; data: { name: string } }[],
+) =>
+  ids.map((id) => {
+    const match = all.find((category) => category.id === id);
+    if (!match) {
+      throw new Error(
+        `Unknown equipment category id "${id}". Valid ids: ${all
+          .map((c) => c.id)
+          .join(", ")}`,
+      );
+    }
+    return { id, name: match.data.name, href: `/equipment/${id}` };
+  });

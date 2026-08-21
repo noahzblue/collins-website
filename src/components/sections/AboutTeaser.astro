@@ -1,132 +1,67 @@
 ---
-/** About teaser — mission + borderless stat band (count-up) + head-office strip. */
+/**
+ * About teaser — one statement, and the door to /about. Nothing else.
+ *
+ * It used to be a stat band plus a two-column locations card: eleven pieces of
+ * information in a section whose whole job is to make you want to read the
+ * about page. Both of those things survive where they belong — the two places
+ * are in the footer AND in the contact band directly below this one, so the
+ * card was the third telling on a single scroll, and the four numbers are the
+ * spine of /about itself.
+ *
+ * What is left is the composition from the brief: eyebrow, then the claim at a
+ * size that makes it the only thing in the section, then a long diagonal of
+ * white space down to the supporting line and the link. The first line is
+ * indented, which is the detail that stops a big uppercase block from reading
+ * as a banner and makes it read as prose.
+ *
+ * Mono here is not a slip against "h2 is Geist". This is a statement, not a
+ * section heading — the same structural voice the numbers, the eyebrows and
+ * the accordion triggers already speak in, at the one size on the page where
+ * it gets to be the subject rather than the label.
+ */
 import Section from "@/components/ui/Section.astro";
-import SectionHeading from "@/components/ui/SectionHeading.astro";
+import Eyebrow from "@/components/ui/Eyebrow.astro";
 import Button from "@/components/ui/Button.astro";
-import Pill from "@/components/ui/Pill.astro";
-import ContactRows from "@/components/ui/ContactRows.astro";
-import { stats } from "@/data/proof";
 import { aboutSection } from "@/data/content";
-import { site } from "@/config/site";
-
-const office = aboutSection.office;
-
-/** Split "500+" / "24h" into the animatable number and its suffix. */
-const parseStat = (value: string) => {
-  const match = value.match(/^(\d+)(.*)$/);
-  return match
-    ? { target: Number(match[1]), suffix: match[2] }
-    : { target: 0, suffix: value };
-};
 ---
 
 <Section id="about">
   <div class="wrap">
-    <SectionHeading
-      eyebrow={aboutSection.eyebrow}
-      title={aboutSection.title}
-      intro={aboutSection.body}
-    />
-
-    <!-- Stat band — borderless, hairline-divided, numbers count up on scroll. -->
-    <div
-      id="stat-band"
-      class="grid grid-cols-3 divide-x divide-line border-y border-line max-cmp:grid-cols-1 max-cmp:divide-x-0 max-cmp:divide-y max-cmp:divide-line"
+    <Eyebrow class="mb-[72px] max-mob:mb-[44px]">{aboutSection.eyebrow}</Eyebrow
     >
-      {
-        stats.map((s) => {
-          const { target, suffix } = parseStat(s.value);
-          return (
-            <div class="px-10 py-10 first:pl-0 max-cmp:px-0 max-cmp:py-7">
-              <div class="font-display text-[clamp(40px,4.8vw,60px)] leading-none font-medium text-ink">
-                <span class="stat-num" data-target={target}>
-                  {target}
-                </span>
-                {suffix}
-              </div>
-              <div class="mt-3 text-detail text-muted">{s.label}</div>
-            </div>
-          );
-        })
-      }
-    </div>
 
-    <!-- Head-office strip -->
-    <div
-      class="card mt-14 grid grid-cols-[1fr_1.1fr] overflow-hidden max-nav:grid-cols-1 max-mob:mt-10"
+    <h2
+      class="statement max-w-[1080px] font-mono text-[clamp(26px,3.9vw,50px)] leading-[1.26] tracking-[-0.035em] text-ink uppercase"
+      data-reveal
     >
-      <div
-        class="office-photo min-h-[320px] max-nav:min-h-[240px]"
-        style="background-image:linear-gradient(180deg,rgba(10,14,23,0) 45%,rgba(10,14,23,0.5) 100%),url('/images/about-office.jpg')"
+      {aboutSection.title.join(" ")}
+    </h2>
+
+    <div
+      class="mt-[140px] flex items-end justify-between gap-12 max-nav:mt-[80px] max-nav:flex-col max-nav:items-start max-nav:gap-9"
+      data-reveal
+    >
+      <p class="mb-0 max-w-[520px] text-intro leading-relaxed text-muted">
+        {aboutSection.body}
+      </p>
+      <Button
+        variant="outline"
+        size="lg"
+        href={aboutSection.cta.href}
+        class="press shrink-0"
       >
-      </div>
-      <div class="flex flex-col justify-center p-10 max-xs:p-7">
-        <Pill tone="tint" size="lg" class="self-start">{office.tag}</Pill>
-        <h3 class="mt-4 mb-5 text-[clamp(28px,3vw,38px)]">{office.city}</h3>
-        <ContactRows
-          rows={[
-            { icon: "pin", text: office.address },
-            { icon: "clock", text: office.hours },
-            { icon: "phone", text: site.phone.display },
-          ]}
-        />
-        <div class="mt-6 flex flex-wrap gap-3">
-          <Button variant="primary" href={site.phone.href}>
-            Call the branch
-          </Button>
-          <Button variant="outline" href={aboutSection.cta.href}>
-            {aboutSection.cta.label}
-          </Button>
-        </div>
-      </div>
+        {aboutSection.cta.label}
+      </Button>
     </div>
   </div>
 </Section>
 
 <style>
-  .office-photo {
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
+  /* Four characters of indent on the first line only — a typesetting move, not
+     a layout one, so it stays proportional to the fluid type size. */
+  .statement {
+    text-indent: 4ch;
+    text-wrap: pretty;
   }
 </style>
-
-<script>
-  // Re-runs after every client-router navigation as well as on first load,
-  // so the swapped-in DOM gets wired up.
-  document.addEventListener("astro:page-load", () => {
-    const band = document.getElementById("stat-band");
-    const reduced = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    ).matches;
-    if (band && !reduced) {
-      const nums = [...band.querySelectorAll<HTMLElement>(".stat-num")];
-      const DURATION = 1200;
-
-      const run = (el: HTMLElement) => {
-        const target = Number(el.dataset.target ?? "0");
-        const start = performance.now();
-        const tick = (now: number) => {
-          const t = Math.min((now - start) / DURATION, 1);
-          const eased = 1 - Math.pow(1 - t, 3);
-          el.textContent = String(Math.round(target * eased));
-          if (t < 1) requestAnimationFrame(tick);
-        };
-        requestAnimationFrame(tick);
-      };
-
-      const io = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              nums.forEach(run);
-              io.disconnect();
-            }
-          });
-        },
-        { threshold: 0.4 },
-      );
-      io.observe(band);
-    }
-  });
-</script>

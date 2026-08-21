@@ -1,19 +1,27 @@
 /** Navigation links for the header nav and footer link columns.
- *  Anchors are written as "/#id" so they also work from subpages
- *  (e.g. /industries/construction). */
+ *
+ *  Every item points at a real page. Four of these used to be homepage
+ *  anchors, which meant four nav items shared one URL, nothing could ever be
+ *  "current", and no single one of them could rank for its own search intent.
+ *  The anchors still work — the homepage sections kept their ids — they just
+ *  stopped being the destination. */
 
 export interface NavLink {
   label: string;
   href: string;
 }
 
+/** Six items: the most the pill header can carry at the `nav` breakpoint.
+ *  "Home" comes out — the logo is the home link, and it is the one item the
+ *  header can afford to lose. Equipment leads because it is the
+ *  highest-intent destination. */
 export const mainNav: NavLink[] = [
-  { label: "Home", href: "/" },
   { label: "Equipment", href: "/equipment" },
-  { label: "Services", href: "/#services" },
-  { label: "Industries", href: "/#industries" },
-  { label: "About", href: "/#about" },
-  { label: "Contact", href: "/#contact" },
+  { label: "Services", href: "/services" },
+  { label: "Industries", href: "/industries" },
+  { label: "The yard", href: "/yard" },
+  { label: "About", href: "/about" },
+  { label: "Contact", href: "/contact" },
 ];
 
 export interface FooterColumn {
@@ -21,24 +29,27 @@ export interface FooterColumn {
   links: NavLink[];
 }
 
+/** Three columns, so the footer is a real sitemap rather than a second nav.
+ *  `/projects` joins the Company column when it is unblocked — see
+ *  docs/site-expansion/10. */
 export const footerColumns: FooterColumn[] = [
   {
     title: "Equipment",
     links: [
       { label: "Generators", href: "/equipment/generators" },
       { label: "Forklifts", href: "/equipment/forklifts" },
-      { label: "Mobile Cranes", href: "/equipment/mobile-cranes" },
+      { label: "Mobile cranes", href: "/equipment/mobile-cranes" },
       { label: "Excavators", href: "/equipment/excavators" },
-      { label: "All equipment", href: "/equipment" },
+      { label: "All 12 categories", href: "/equipment" },
     ],
   },
   {
     title: "Company",
     links: [
-      { label: "Services", href: "/#services" },
-      { label: "Industries", href: "/#industries" },
-      { label: "About Us", href: "/#about" },
-      { label: "Get a Quote", href: "/#contact" },
+      { label: "About us", href: "/about" },
+      { label: "Services", href: "/services" },
+      { label: "Industries", href: "/industries" },
+      { label: "The yard", href: "/yard" },
     ],
   },
 ];
