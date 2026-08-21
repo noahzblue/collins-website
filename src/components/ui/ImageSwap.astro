@@ -1,0 +1,233 @@
+---
+/**
+ * A photo frame that changes its picture by pushing it off the edge.
+ *
+ * The next image is parked flush against one of the four sides, out of frame.
+ * When the swap fires, both photos travel together in that direction as one
+ * strip — the one on screen is carried out and drags the next one in behind
+ * it. The direction is picked at random each time, and so is the wait before
+ * it, rerolled every cycle — a grid of these never settles into a pattern and
+ * never fires in unison.
+ *
+ *   <ImageSwap images={[a, b]} class="absolute inset-0" />
+ *
+ * The frame does not size itself — give it a size and a position, the same
+ * contract `ParallaxImage` uses. Its children are absolute, so
+ * whatever you pass has to establish a containing block (`absolute inset-0`
+ * on a `relative` parent is the usual answer).
+ *
+ * Only two layers are ever in the DOM regardless of how many images you pass:
+ * the one on screen and the one waiting. After each push the layer that left
+ * is reset behind the new one and reloaded with the image after next, which
+ * is invisible because it is covered at the moment it changes.
+ *
+ * The frame holds still while it is off screen — but its clock does not stop.
+ * It is seeded at a random point inside a cycle and keeps running unwatched,
+ * so a frame that scrolls into view is caught part-way through one: it reads
+ * as something that was already going rather than something that starts the
+ * moment you look at it.
+ *
+ * Nothing runs at all for a reader who has asked for reduced motion — they get
+ * the first photograph, still. Decorative by definition, so the whole thing is
+ * `aria-hidden`.
+ */
+interface Props {
+  /** Two or more photos. One is allowed; it simply never swaps. */
+  images: string[];
+  /** Rough ms between pushes. Every cycle rolls its own wait, ±35% of this. */
+  interval?: number;
+  class?: string;
+}
+
+const { images, interval = 6500, class: extra = "" } = Astro.props;
+
+/* Two layers, whatever the list length: the front shows the first image, the
+   back is loaded with the second and waits off-frame. */
+const layers = [images[0], images[1] ?? images[0]];
+---
+
+<div
+  class:list={["swap", extra]}
+  data-swap
+  data-images={JSON.stringify(images)}
+  data-interval={interval}
+  aria-hidden="true"
+>
+  {
+    layers.map((src, i) => (
+      <img
+        src={src}
+        alt=""
+        loading="lazy"
+        decoding="async"
+        class:list={["swap-img", i === 0 && "is-front"]}
+      />
+    ))
+  }
+</div>
+
+<style>
+  .swap {
+    overflow: clip;
+    /* Keeps `.is-front`'s z-index a private matter. Without this the layer on
+       top stacks against whatever the caller put over the frame — a scrim, a
+       caption — and covers it. */
+    isolation: isolate;
+    /* The script waits exactly this long before it tidies up after a push —
+       the two numbers have to agree. */
+    --swap-duration: 1900ms;
+  }
+
+  .swap-img {
+    position: absolute;
+    inset: 0;
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+    /* A hair of overscan. The two photos travel edge to edge, and without it
+       a sub-pixel rounding error between them shows as a bright seam. */
+    scale: 1.03;
+    translate: var(--x, 0) var(--y, 0);
+  }
+
+  /* Which layer is on top only matters at the two instants either side of a
+     push, when the layer that has just left is reset to the resting position
+     to be reloaded. It has to be underneath for that to go unseen. */
+  .swap-img.is-front {
+    z-index: 1;
+  }
+
+  .swap[data-moving] .swap-img {
+    transition: translate var(--swap-duration) var(--ease-in-out-strong);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .swap[data-moving] .swap-img {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  import { untilPageSwap } from "@/scripts/untilPageSwap";
+
+  /** Must match `--swap-duration` in the stylesheet above. */
+  const DURATION = 1900;
+
+  /** Grace before the first push, so a frame that is in view on arrival is not
+      already swapping while the page is still painting itself in. */
+  const SETTLE = 900;
+
+  /** Travel directions, as [x, y] shares of the frame. */
+  const DIRECTIONS = [
+    [1, 0],
+    [-1, 0],
+    [0, 1],
+    [0, -1],
+  ] as const;
+
+  const place = (el: HTMLElement, x: number, y: number) => {
+    el.style.setProperty("--x", `${x * 100}%`);
+    el.style.setProperty("--y", `${y * 100}%`);
+  };
+
+  function wire(root: HTMLElement, gone: AbortSignal) {
+    const images: string[] = JSON.parse(root.dataset.images ?? "[]");
+    if (images.length < 2) return;
+
+    const interval = Number(root.dataset.interval) || 6500;
+    const layers = [...root.querySelectorAll<HTMLImageElement>(".swap-img")];
+    if (layers.length < 2) return;
+
+    /** Index of the image currently on screen. */
+    let shown = 0;
+    let front = layers[0];
+    let back = layers[1];
+    let timer = 0;
+    let visible = false;
+    let moving = false;
+
+    /* A fresh wait, rolled again every cycle rather than once per frame. Two
+       frames that happen to land together are pulled back apart by the next
+       roll instead of keeping the offset they fell into. */
+    const wait = () => interval * (0.65 + Math.random() * 0.7);
+
+    /* When the next push falls due, on a clock that runs whether or not anyone
+       is watching. Seeded somewhere inside a cycle, not at the start of one,
+       so the frame is already part-way through by the time it is first seen. */
+    let due = performance.now() + SETTLE + wait() * Math.random();
+
+    /* Off screen it holds still, and a push already under way is allowed to
+       land rather than freezing halfway — it simply doesn't book another. */
+    const schedule = () => {
+      clearTimeout(timer);
+      timer = 0;
+      if (!visible || moving) return;
+      const now = performance.now();
+      // The clock kept ticking while nobody was looking: settle up the missed
+      // cycles a whole one at a time. What is left over is a random slice of a
+      // cycle, which is what makes a frame scrolled into view feel caught
+      // mid-stride instead of started from zero.
+      while (due <= now) due += wait();
+      timer = window.setTimeout(push, due - now);
+    };
+
+    function push() {
+      moving = true;
+      const [dx, dy] = DIRECTIONS[Math.floor(Math.random() * 4)];
+
+      // Park the incoming photo against the opposite edge, with no transition
+      // — then force the browser to take that position as the starting point
+      // before the transition is switched on.
+      place(back, -dx, -dy);
+      void back.offsetWidth;
+
+      root.setAttribute("data-moving", "");
+      place(front, dx, dy);
+      place(back, 0, 0);
+
+      window.setTimeout(() => {
+        if (gone.aborted) return;
+        root.removeAttribute("data-moving");
+
+        // The layer that left goes underneath, returns to the resting
+        // position and picks up the image after next. All three happen behind
+        // the layer that has just arrived, so none of them is seen.
+        front.classList.remove("is-front");
+        back.classList.add("is-front");
+        place(front, 0, 0);
+
+        shown = (shown + 1) % images.length;
+        front.src = images[(shown + 1) % images.length];
+
+        [front, back] = [back, front];
+        moving = false;
+        due = performance.now() + wait();
+        schedule();
+      }, DURATION);
+    }
+
+    const watcher = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        visible = entry.isIntersecting;
+        schedule();
+      }
+    });
+    watcher.observe(root);
+
+    gone.addEventListener("abort", () => {
+      clearTimeout(timer);
+      watcher.disconnect();
+    });
+  }
+
+  // Re-runs after every client-router navigation as well as on first load,
+  // so the swapped-in DOM gets wired up.
+  document.addEventListener("astro:page-load", () => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const gone = untilPageSwap();
+    for (const root of document.querySelectorAll<HTMLElement>("[data-swap]")) {
+      wire(root, gone);
+    }
+  });
+</script>

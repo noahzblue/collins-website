@@ -169,7 +169,7 @@ duplicated:
 | `SectionHeading` | eyebrow + heading + optional intro                                       |
 | `Breadcrumb`     | the trail above any subpage heading                                      |
 | `PageBanner`     | the full-bleed photo banner opening a subpage                            |
-| `BgImage`        | a decorative full-cover background layer                                 |
+| `ParallaxImage`  | every photo — it drifts as the page scrolls; no still variant exists     |
 | `ContactRows`    | icon + line lists of contact details                                     |
 | `Logo`           | the wordmark                                                             |
 

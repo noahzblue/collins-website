@@ -21,19 +21,19 @@ const { office, yard } = site.places;
       <!-- Brand -->
       <div>
         <Logo />
-        <p class="mt-5 mb-6 max-w-[280px] text-sm leading-relaxed text-muted">
+        <p class="mt-5 mb-6 max-w-[280px] text-label leading-relaxed text-muted">
           {site.blurb}
         </p>
 
         <!-- Two addresses, because there are two places doing two jobs. -->
-        <ul class="mb-6 flex flex-col gap-[10px] text-sm">
+        <ul class="mb-6 flex flex-col gap-[10px] text-label">
           {
             [office, yard].map((place) => (
-              <li class="flex gap-[10px]">
-                <span class="shrink-0 font-mono text-tag tracking-[1.2px] text-faint uppercase">
+              <li class="flex items-center gap-[14px]">
+                <span class="shrink-0 font-medium text-tag text-faint ">
                   {place.tag}
                 </span>
-                <span>{place.address}</span>
+                <span class="text-tag">{place.address}</span>
               </li>
             ))
           }
@@ -73,7 +73,7 @@ const { office, yard } = site.places;
             </h5>
             <ul class="flex flex-col gap-[11px]">
               {col.links.map((link) => (
-                <li class="text-sm">
+                <li class="text-label">
                   <a href={link.href} class="transition-colors hover:text-ink">
                     {link.label}
                   </a>
@@ -91,7 +91,7 @@ const { office, yard } = site.places;
         >
           Get in touch
         </h5>
-        <ul class="flex flex-col gap-[11px] text-sm">
+        <ul class="flex flex-col gap-[11px] text-label">
           <li>
             <a href="/contact" class="transition-colors hover:text-ink">
               Request a quote
@@ -127,7 +127,7 @@ const { office, yard } = site.places;
 
     <!-- Legal line: the checkable credential, from the profile's back cover. -->
     <p
-      class="mb-0 border-b border-line py-6 font-mono text-caption tracking-[0.4px] text-faint"
+      class="mb-0 border-b border-line py-6 text-center font-mono text-micro tracking-[0.4px] text-faint"
     >
       {site.legalName} · Register {site.register} · Licensed by the {
         site.licensingAuthority
@@ -135,7 +135,7 @@ const { office, yard } = site.places;
     </p>
 
     <div
-      class="flex flex-wrap justify-between gap-[10px] py-7 text-meta text-faint max-xs:flex-col max-xs:items-start max-xs:gap-2"
+      class="flex flex-wrap justify-between gap-[10px] py-7 text-micro text-faint max-xs:flex-col max-xs:items-start max-xs:gap-2"
     >
       <span>© {year} {site.legalName}. All rights reserved.</span>
       <span>{site.credit}</span>

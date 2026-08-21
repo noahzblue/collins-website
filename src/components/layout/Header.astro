@@ -42,13 +42,18 @@ const isCurrent = (href: string) =>
     </nav>
 
     <div class="flex items-center gap-2">
-      <Button variant="primary" href="/contact" class="press max-xs:px-4">
+      <Button
+        size="xs"
+        variant="primary"
+        href="/contact"
+        class="press max-xs:px-4"
+      >
         Get a quote
       </Button>
       <button
         type="button"
         id="nav-toggle"
-        class="hidden h-[38px] w-[38px] cursor-pointer items-center justify-center rounded-full border transition-colors max-nav:flex"
+        class="hidden h-[38px] w-[38px] cursor-pointer items-center justify-center rounded-md border transition-colors max-nav:flex"
         aria-expanded="false"
         aria-controls="nav-panel"
         aria-label="Open menu"

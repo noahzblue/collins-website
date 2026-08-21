@@ -10,37 +10,31 @@
  * photography divided by hairlines — the machines are the content, and the
  * only chrome is the line between them.
  *
- * Two mechanics carry it:
+ * **The hairlines are the gap.** `gap: 1px` over a `--color-line` background
+ * paints every divider, interior and exterior, at exactly one device pixel
+ * with no double-borders to collapse and nothing to get out of step when a
+ * column count changes.
  *
- * a) **The hairlines are the gap.** `gap: 1px` over a `--color-line`
- *    background paints every divider, interior and exterior, at exactly one
- *    device pixel with no double-borders to collapse and nothing to get out of
- *    step when a column count changes.
- *
- * b) **Hovering re-proportions the whole grid, not the tile.** The container
- *    animates `grid-template-columns` / `-rows`, so the pointed-at cell takes
- *    space FROM its neighbours instead of scaling on top of them. Nothing
- *    overlaps, nothing lifts, the outer block never changes size, and the
- *    photos re-crop as the cells breathe. `aspect-ratio` on the container is
- *    what makes the row half of that work: `fr` rows need a definite height,
- *    or growing one row would grow the section and shove the page down.
- *
- * Below the nav breakpoint the re-proportioning is dropped entirely — it is a
- * pointer effect, and a touch device would only ever see the resting state.
+ * The grid does not react to the pointer. It used to re-proportion itself on
+ * hover — the pointed-at cell taking space from its neighbours — which was
+ * pretty and was also the block moving under the reader's cursor while they
+ * were still reading it. Six photographs holding perfectly still is the
+ * stronger version, and it is the same block on touch as on a mouse. Each
+ * tile carries its "View" affordance permanently instead of revealing one:
+ * a link that has to be hovered before it admits it is a link is a worse
+ * link, not a subtler one.
  */
 import { getCollection } from "astro:content";
 import Section from "@/components/ui/Section.astro";
 import SectionHeading from "@/components/ui/SectionHeading.astro";
 import Icon from "@/components/ui/Icon.astro";
-import BgImage from "@/components/ui/BgImage.astro";
+import ParallaxImage from "@/components/ui/ParallaxImage.astro";
 import ViewAllBar from "@/components/ui/ViewAllBar.astro";
 import { fleet } from "@/data/content";
 
 const featured = (await getCollection("equipment"))
   .filter((category) => category.data.featured)
   .sort((a, b) => a.data.sortOrder - b.data.sortOrder);
-
-const COLUMNS = 3;
 ---
 
 <Section id="equipment" tone="gray">
@@ -53,17 +47,18 @@ const COLUMNS = 3;
 
     <div class="cat-grid" data-reveal>
       {
-        featured.map((category, i) => (
+        featured.map((category) => (
           <a
             href={`/equipment/${category.id}`}
             class="tile group relative overflow-clip"
-            data-col={i % COLUMNS}
-            data-row={Math.floor(i / COLUMNS)}
           >
             {/* A category still waiting on a hero image gets the quiet
                 neutral tile behind it rather than `url('undefined')`. */}
             {category.data.heroImage && (
-              <BgImage src={category.data.heroImage} class="tile-photo" />
+              <ParallaxImage
+                src={category.data.heroImage}
+                class="absolute inset-0"
+              />
             )}
 
             {/* Dark at the base only — the name has to hold at any crop the
@@ -78,9 +73,9 @@ const COLUMNS = 3;
               <span class="font-mono text-subhead leading-[1.15] tracking-[-0.01em] text-white uppercase">
                 {category.data.name}
               </span>
-              <span class="tile-view flex shrink-0 items-center gap-[7px] font-mono text-tag tracking-[1.4px] text-white uppercase">
+              <span class="flex shrink-0 items-center gap-[7px] font-mono text-tag tracking-[1.4px] text-white/80 uppercase transition-all duration-200 ease-in-out group-hover:text-label group-hover:font-bold group-hover:text-brand-bright">
                 View
-                <Icon name="arrow-up-right" size={14} />
+                <Icon name="arrow-up-right" size={14} class="" />
               </span>
             </span>
           </a>
@@ -101,7 +96,7 @@ const COLUMNS = 3;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: repeat(2, 1fr);
-    /* Six 4:3 cells in a 3 × 2 block. Definite height — see (b) above. */
+    /* Six 4:3 cells in a 3 × 2 block. */
     aspect-ratio: 2 / 1;
 
     /* The dividers. One background, one gap; no per-tile borders. */
@@ -110,64 +105,10 @@ const COLUMNS = 3;
     border: 1px solid var(--color-line);
     border-radius: var(--radius-md);
     overflow: clip;
-
-    transition:
-      grid-template-columns 680ms var(--ease-out-expo),
-      grid-template-rows 680ms var(--ease-out-expo);
   }
 
   .tile {
     background: var(--color-surface-2);
-  }
-  /* `.tile-photo` is on <BgImage>'s root, which carries BgImage's OWN Astro
-     scope id, not this file's — a bare `.tile-photo {}` here would compile to
-     a selector that can never match. `:global()` nested under `.tile` (which
-     this file does own) is the fix, and keeps the rule from leaking past this
-     component. Same trap as the crossfade in TrustStrip. */
-  .tile :global(.tile-photo) {
-    transition: filter 520ms var(--ease-out-expo);
-    filter: saturate(0.92);
-  }
-  .tile:hover :global(.tile-photo),
-  .tile:focus-visible :global(.tile-photo) {
-    filter: saturate(1.06);
-  }
-
-  .tile-view {
-    opacity: 0;
-    translate: -6px 0;
-    transition:
-      opacity 320ms var(--ease-out-expo),
-      translate 320ms var(--ease-out-expo);
-  }
-  .tile:hover .tile-view,
-  .tile:focus-visible .tile-view {
-    opacity: 1;
-    translate: 0 0;
-  }
-
-  /* The re-proportioning. Pointer devices on the full three-column layout
-     only — the column/row maps below are written for that grid shape. */
-  @media (min-width: 981px) and (hover: hover) and (pointer: fine) {
-    .cat-grid {
-      --grow: 1.26fr;
-      --shrink: 0.87fr;
-    }
-    .cat-grid:has(.tile[data-col="0"]:hover) {
-      grid-template-columns: var(--grow) var(--shrink) var(--shrink);
-    }
-    .cat-grid:has(.tile[data-col="1"]:hover) {
-      grid-template-columns: var(--shrink) var(--grow) var(--shrink);
-    }
-    .cat-grid:has(.tile[data-col="2"]:hover) {
-      grid-template-columns: var(--shrink) var(--shrink) var(--grow);
-    }
-    .cat-grid:has(.tile[data-row="0"]:hover) {
-      grid-template-rows: var(--grow) var(--shrink);
-    }
-    .cat-grid:has(.tile[data-row="1"]:hover) {
-      grid-template-rows: var(--shrink) var(--grow);
-    }
   }
 
   @media (max-width: 980px) {
@@ -176,7 +117,6 @@ const COLUMNS = 3;
       grid-template-rows: none;
       grid-auto-rows: auto;
       aspect-ratio: auto;
-      transition: none;
     }
     .tile {
       aspect-ratio: 4 / 3;
@@ -185,14 +125,6 @@ const COLUMNS = 3;
   @media (max-width: 600px) {
     .cat-grid {
       grid-template-columns: 1fr;
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .cat-grid,
-    .tile-view,
-    .tile :global(.tile-photo) {
-      transition: none;
     }
   }
 </style>

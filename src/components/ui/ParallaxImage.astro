@@ -19,20 +19,54 @@
  * Reduced-motion readers, and browsers without scroll-driven animation, get
  * the same still frame — the zoom holds, only the drift is dropped.
  *
+ * `shift` and `zoom` are not independent, and the component — not the caller —
+ * is what keeps them honest. The zoom is what puts photo outside the frame for
+ * the drift to spend, and it splits evenly top and bottom, so the overscan on
+ * the side being travelled toward is only half of it: the photo stays covered
+ * only while `shift` fits inside `(zoom - 1) / 2`. Ask for more travel than
+ * that and the zoom rises to pay for it, rather than the frame sliding off the
+ * picture and showing a band of whatever sits behind it. `zoom` is therefore a
+ * floor, not a setting — it decides how tight the crop looks at rest, and the
+ * travel decides how tight it has to be at minimum.
+ *
+ * That also means travel is never free: doubling `shift` roughly doubles how
+ * far the source image is upscaled, so keep it small (the house style is 3-6%)
+ * unless the photo can afford the crop.
+ *
+ * (Keep `<` and `<=` out of this comment. Astro's frontmatter scanner reads a
+ * bare `<` as the start of markup even inside a block comment, which quietly
+ * severs `Props` from `Astro.props` — the component still builds, and every
+ * prop silently becomes `any`.)
+ *
  * One constraint worth knowing: the frame clips with `overflow: clip`, not
  * `overflow: hidden`, because a hidden box IS a scroll container — the photo
  * would then measure itself against a box that never scrolls and sit frozen
  * mid-travel. Any ancestor that clips this component has to use `clip` too
  * (Tailwind: `overflow-clip`).
+ *
+ * `axis="inline"` is the escape hatch for a photo living inside a horizontal
+ * strip (the yard's fleet carousel). That strip is a scroll container, so the
+ * default block-axis timeline resolves against IT rather than the page and
+ * freezes — and there is no way out of that: `overflow-y: clip` computes to
+ * `hidden` the moment `overflow-x` is `auto`, so the strip is a block-axis
+ * scroller whether you want it or not. Driving the drift off the strip's own
+ * axis turns the dead effect into the right one: the photos slide against
+ * their cards as you swipe. Where such a photo has no horizontal scroller
+ * over it (the same strip below `nav`, where it becomes a plain grid) the
+ * timeline is inert and the picture simply holds still — and because the zoom
+ * always covers the travel, a frozen parking spot can never pull the frame off
+ * the edge of the photo either.
  */
 interface Props {
   src: string;
   /** Empty alt = decorative (the default). Pass real text if it carries meaning. */
   alt?: string;
-  /** Travel, as a share of the photo's height. Mild on purpose — keep it small. */
-  shift?: string;
-  /** Overscan that hides the travel. Must exceed twice `shift`. */
+  /** Travel, as a share of the frame. Mild on purpose — keep it small. */
+  shift?: `${number}%`;
+  /** Overscan at rest. A floor — `shift` raises it when it needs more room. */
   zoom?: number;
+  /** Which scroll axis drives the drift. `inline` only for horizontal strips. */
+  axis?: "block" | "inline";
   loading?: "lazy" | "eager";
   class?: string;
 }
@@ -40,16 +74,29 @@ interface Props {
 const {
   src,
   alt = "",
-  shift = "8%",
+  shift = "15%",
   zoom = 1.12,
+  axis = "block",
   loading = "lazy",
   class: extra = "",
 } = Astro.props;
+
+/* The travel is spent against half the overscan, so the frame stays on the
+   picture only while `shift` fits inside `(zoom - 1) / 2`. Solve that for the
+   zoom and take whichever is bigger: an over-asked shift now costs a tighter
+   crop instead of exposing the background. The 0.004 is the rounding margin —
+   at exactly the boundary a subpixel layout can still leave a hairline. */
+const travel = Math.abs(Number.parseFloat(shift)) / 100;
+const cover = Math.max(zoom, 1 + 2 * travel + 0.004);
 ---
 
 <div
-  class:list={["parallax overflow-clip", extra]}
-  style={`--px-shift:${shift};--px-zoom:${zoom}`}
+  class:list={[
+    "parallax overflow-clip",
+    axis === "inline" && "px-inline",
+    extra,
+  ]}
+  style={`--px-shift:${shift};--px-zoom:${cover}`}
 >
   <img
     src={src}
@@ -72,12 +119,27 @@ const {
     animation-timeline: view();
   }
 
+  /* Same trip, measured sideways — see the note on `axis` above. */
+  .parallax.px-inline > img {
+    animation-name: px-drift-inline;
+    animation-timeline: view(inline);
+  }
+
   @keyframes px-drift {
     from {
       translate: 0 calc(var(--px-shift) * -1);
     }
     to {
       translate: 0 var(--px-shift);
+    }
+  }
+
+  @keyframes px-drift-inline {
+    from {
+      translate: calc(var(--px-shift) * -1) 0;
+    }
+    to {
+      translate: var(--px-shift) 0;
     }
   }
 

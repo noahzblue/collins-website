@@ -16,7 +16,7 @@ import Eyebrow from "@/components/ui/Eyebrow.astro";
 import Button from "@/components/ui/Button.astro";
 import Icon from "@/components/ui/Icon.astro";
 import PageBanner from "@/components/ui/PageBanner.astro";
-import BgImage from "@/components/ui/BgImage.astro";
+import ParallaxImage from "@/components/ui/ParallaxImage.astro";
 import PageCTA from "@/components/sections/PageCTA.astro";
 import { industries } from "@/data/industries";
 import { resolveCategories } from "@/lib/equipment";
@@ -159,11 +159,11 @@ const enquiryHref = `${site.whatsapp.href}?text=${encodeURIComponent(enquiryText
           siblings.map((other) => (
             <a
               href={`/industries/${other.slug}`}
-              class="group relative aspect-[4/3] overflow-hidden rounded-md"
+              class="group relative aspect-[4/3] overflow-clip rounded-md"
             >
-              <BgImage
+              <ParallaxImage
                 src={other.image}
-                class="transition-transform duration-500 ease-out group-hover:scale-[1.05]"
+                class="absolute inset-0 transition-transform duration-500 ease-out group-hover:scale-[1.05]"
               />
               <span
                 class="absolute inset-0 bg-[linear-gradient(180deg,rgba(6,10,20,0.05)_40%,rgba(6,10,20,0.75)_100%)]"

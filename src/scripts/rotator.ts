@@ -33,10 +33,22 @@ export interface RotatorOptions {
   onProgress?: (index: number, t: number) => void;
   /** Runs when the pointer leaves, before the timer re-arms. */
   onResume?: () => void;
+  /**
+   * Aborts the hover-pause listeners. Only needed where a rotator is torn
+   * down before its page is — a layout that runs one below a breakpoint and
+   * none above it, say. Pair it with `stop()`; without a signal, repeatedly
+   * re-creating a rotator on the same root stacks dead listeners on it.
+   */
+  signal?: AbortSignal;
 }
 
 export interface Rotator {
   select: (index: number) => void;
+  /**
+   * Cancel the timer. Panels stay exactly as they are — this stops the clock,
+   * it does not reset the selection. A later `select()` re-arms it.
+   */
+  stop: () => void;
 }
 
 export function createRotator({
@@ -46,6 +58,7 @@ export function createRotator({
   interval,
   onProgress,
   onResume,
+  signal,
 }: RotatorOptions): Rotator {
   const auto =
     interval !== undefined &&
@@ -95,24 +108,33 @@ export function createRotator({
   };
 
   if (auto) {
-    root.addEventListener("mouseenter", () => {
-      paused = true;
-    });
-    root.addEventListener("mouseleave", () => {
-      paused = false;
-      onResume?.();
-    });
+    root.addEventListener(
+      "mouseenter",
+      () => {
+        paused = true;
+      },
+      { signal },
+    );
+    root.addEventListener(
+      "mouseleave",
+      () => {
+        paused = false;
+        onResume?.();
+      },
+      { signal },
+    );
   }
 
   /* Start when the block is on screen. Reduced-motion and click-only rotators
      have no timer to gate, so they paint their first panel immediately. */
+  let gate: IntersectionObserver | null = null;
   if (auto) {
     onSelect(0);
     onProgress?.(0, 0);
-    const gate = new IntersectionObserver(
+    gate = new IntersectionObserver(
       (entries) => {
         if (!entries.some((e) => e.isIntersecting)) return;
-        gate.disconnect();
+        gate!.disconnect();
         arm();
       },
       { threshold: 0.35 },
@@ -122,5 +144,13 @@ export function createRotator({
     select(0);
   }
 
-  return { select };
+  return {
+    select,
+    // The scroll gate has to go too: a rotator stopped before it ever came
+    // into view would otherwise arm itself the moment it did.
+    stop: () => {
+      stop();
+      gate?.disconnect();
+    },
+  };
 }

@@ -52,14 +52,12 @@ export const supplyModes = {
       label: "Sales",
       lead: "Our main business",
       body: "Supplied outright, sourced direct from manufacturers and authorised distributors, handed over commissioned, documented and ready to work.",
-      image: "/images/why-brands.jpg",
       cta: { label: "Buy outright", href: "/services#equipment-sales" },
     },
     {
       label: "Rental",
       lead: "The same fleet",
       body: "Day, week, month or project duration — delivery and collection included in the rate, supported by the same engineers and held to the same standard.",
-      image: "/images/why-rental.jpg",
       cta: { label: "Hire terms", href: "/services#equipment-rental" },
     },
   ],
@@ -140,7 +138,15 @@ export const quoteSection = {
 /** About teaser — mission line, stats and the two locations. */
 export const aboutSection = {
   eyebrow: "About Collins",
-  title: ["A partner built for", "uptime and scale."],
+  /* Rendered as one paragraph (`.join(" ")`), not as fixed lines — the array
+     is only here because the rest of this file uses one. It is written long
+     on purpose: at the statement size in AboutTeaser it has to run to a third
+     line, or the block reads as a banner rather than as prose. */
+  title: [
+    "A partner built for uptime,",
+    "sized for scale,",
+    "and measured by the machines still running.",
+  ],
   body: "We deliver high-performance power solutions and heavy machinery engineered to exceed industrial standards — and we keep them running long after the invoice is settled.",
   cta: { label: "Read our story", href: "/about" },
   office: {

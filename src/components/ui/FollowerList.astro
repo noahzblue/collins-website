@@ -12,6 +12,14 @@
  *                                   image: s.image, href: `#${s.slug}` }))}
  *     ariaLabel="Services" />
  *
+ * The panel is sticky: it pins under the header and holds still while the rest
+ * of the rows scroll past it. That only works while the panel is meaningfully
+ * SHORTER than the list beside it — a sticky item can only travel inside its
+ * own grid area, so its run is exactly `list height - panel height`. The square
+ * panel and the roomy row padding below are what buy that run (~280px at
+ * 1440px with six rows); make the panel portrait again, or tighten the rows,
+ * and the pin silently degrades to nothing while still *saying* `sticky`.
+ *
  * Below the `nav` breakpoint the panel is dropped and the rows become a plain
  * numbered list — a shared image slot needs a pointer to be worth anything.
  */
@@ -43,11 +51,11 @@ const { items, ariaLabel, class: extra = "" } = Astro.props;
   <ul aria-label={ariaLabel}>
     {
       items.map((item, i) => (
-        <li >
+        <li>
           <a
             href={item.href}
             data-row={i}
-            class="row press group flex items-start gap-6 border-b  border-line pt-[34px] pb-[15px] transition-colors duration-200 max-xs:gap-4 max-xs:pt-[26px]"
+            class="row press group flex items-start gap-6 border-b border-line pt-[46px] pb-[26px] transition-colors duration-200 max-xs:gap-4 max-xs:pt-[26px] max-xs:pb-[18px]"
           >
             <span class="row-num mt-[3px] shrink-0 font-mono text-caption tracking-[0.5px] text-faint transition-colors duration-200">
               {String(i + 1).padStart(2, "0")}
@@ -78,7 +86,7 @@ const { items, ariaLabel, class: extra = "" } = Astro.props;
   </ul>
 
   <div
-    class="panel sticky top-header-gap aspect-[4/5] overflow-clip rounded-md bg-surface-2 max-nav:hidden"
+    class="panel sticky top-header-gap aspect-square overflow-clip rounded-md bg-surface-2 max-nav:hidden"
     aria-hidden="true"
   >
     {

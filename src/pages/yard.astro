@@ -17,6 +17,7 @@ import Icon from "@/components/ui/Icon.astro";
 import PageBanner from "@/components/ui/PageBanner.astro";
 import IndexRail from "@/components/ui/IndexRail.astro";
 import StickyPoints from "@/components/ui/StickyPoints.astro";
+import ParallaxImage from "@/components/ui/ParallaxImage.astro";
 import PageCTA from "@/components/sections/PageCTA.astro";
 import { stats } from "@/data/proof";
 import {
@@ -133,18 +134,21 @@ import {
                     href={group.href}
                     class="group press w-[380px] shrink-0 snap-start max-nav:w-auto"
                   >
-                    <span class="relative block overflow-hidden rounded-md bg-surface-2">
-                      <img
+                    <div class="relative overflow-clip rounded-md bg-surface-2">
+                      {/* The strip scrolls sideways, so the drift rides its
+                          axis rather than the page's — see ParallaxImage's
+                          note on `axis`. */}
+                      <ParallaxImage
                         src={group.image}
                         alt={`${group.label} standing in the Collins yard at Sajjah, ${group.range}.`}
                         loading={i === 0 ? "eager" : "lazy"}
-                        decoding="async"
-                        class="aspect-[4/3] w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
+                        axis="inline"
+                        class="aspect-[4/3] w-full transition-transform duration-500 ease-out group-hover:scale-[1.04]"
                       />
                       <span class="absolute top-4 left-4 font-mono text-caption tracking-[0.5px] text-white/85">
                         {String(i + 1).padStart(2, "0")}
                       </span>
-                    </span>
+                    </div>
                     <span class="mt-4 flex items-baseline justify-between gap-4">
                       <span class="text-subhead font-medium text-ink transition-colors group-hover:text-brand">
                         {group.label}

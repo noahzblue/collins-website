@@ -32,7 +32,7 @@
   --color-ink-soft: #141a26; /* slightly lifted near-black — dark cards */
   --color-body: #33383f; /* default body text on white */
   --color-muted: #5b6472; /* slate — secondary / supporting text */
-  --color-faint: #8a919c; /* tertiary — captions, meta, disabled */
+  --color-faint: #5e615d; /* tertiary — captions, meta, disabled */
   --color-line: #e7e9ee; /* hairline borders / dividers */
   --color-line-strong: #d6dae2; /* slightly stronger hairline */
   --color-surface: #f7f8fa; /* off-white section background */
@@ -53,7 +53,7 @@
   /* Body & UI. Pick by role, not by number.
      NB: a size token may not share a name with a colour token — both
      generate `text-<name>` and the colour wins silently. */
-  --text-micro: 11px; /* tracked caps: index-rail numbers */
+  --text-micro: 10px; /* tracked caps: index-rail numbers */
   --text-tag: 11.5px; /* table heads, family label, tile number */
   --text-label: 12px; /* eyebrow caps, pills, badges */
   --text-caption: 12.5px; /* form hints, contact-method labels */
@@ -99,23 +99,26 @@
 
   /* ---- Radius -------------------------------------------------
      Near-square corners, everywhere. Two rungs and no more:
-       rounded-sm  chips, icon tiles, inputs, small badges
-       rounded-md  cards, panels, photo frames, the whole page
-     `rounded-full` is untouched — pills and dots still round off
-     completely. Never write `rounded-[Npx]`. */
+       rounded-sm  icon tiles, inputs, small badges
+       rounded-md  cards, panels, photo frames, the header bar,
+                   every button (ui/Button.astro), the whole page
+     `rounded-full` survives only where the shape IS the component —
+     pills, chips, dots and the status light. A button is not one of
+     them: it belongs to the same 5px system as the card it sits in.
+     Never write `rounded-[Npx]`. */
   --radius-sm: 3px;
   --radius-md: 5px;
 
   /* ---- Motion -------------------------------------------------
      Three curves, one per job. The built-in CSS easings are too weak
-     for any of them — `ease-out` on a 520ms veil reads as mushy.
+     for any of them — `ease-out` on a 220ms page swap reads as mushy.
      No component gets a raw duration or a raw cubic-bezier. */
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1); /* entrances */
   --ease-in-out-strong: cubic-bezier(0.77, 0, 0.175, 1); /* on-screen travel */
-  --ease-in-veil: cubic-bezier(0.55, 0, 1, 0.45); /* exits — accelerate away */
+  --ease-in-quick: cubic-bezier(0.4, 0, 1, 1); /* exits — accelerate away */
 
-  --duration-veil-in: 580ms;
-  --duration-veil-out: 680ms;
+  --duration-page-out: 110ms;
+  --duration-page-in: 230ms;
   --duration-reveal: 700ms;
 }
 
@@ -172,12 +175,79 @@
     outline-offset: 2px;
   }
 
-  /* The blue veil (layout/PageVeil.astro) is the site's page transition, so
-     the router's own root cross-fade has to go — otherwise you get a fade AND
-     a veil, half a beat apart. */
+  /* ---- The page transition -----------------------------------
+     Every route is prerendered and every link is prefetched (astro.config),
+     so by the time a link is clicked the next page is already in memory.
+     There is no wait to cover — a cover would be inventing one. This is the
+     shortest move that still says "that is a different page": the old content
+     drops out fast and slightly upward, the new content arrives from just
+     below. ~290ms door to door, and the reader is reading through most of it.
+
+     Only the content moves. The header and the floating buttons are pulled
+     out into their own transition groups below and held perfectly still,
+     because fixed chrome that slides is what makes a page swap read as a
+     lurch rather than as a change of content. */
+  ::view-transition-old(root) {
+    animation: page-out var(--duration-page-out) var(--ease-in-quick) both;
+  }
+  ::view-transition-new(root) {
+    animation: page-in var(--duration-page-in) var(--ease-out-expo) 60ms both;
+  }
+  /* The UA blends the root pair with `plus-lighter`, which is right for a
+     pure crossfade and wrong the moment either half also moves — the overlap
+     blows out to white. */
   ::view-transition-old(root),
   ::view-transition-new(root) {
+    mix-blend-mode: normal;
+  }
+  @keyframes page-out {
+    to {
+      opacity: 0;
+      translate: 0 -10px;
+    }
+  }
+  @keyframes page-in {
+    from {
+      opacity: 0;
+      translate: 0 14px;
+    }
+  }
+
+  /* Chrome that is identical on both pages. `animation: none` leaves the old
+     and the new snapshot stacked at full opacity for the duration; they look
+     the same, so the bar simply never moves. */
+  #site-header {
+    view-transition-name: site-header;
+  }
+  #floating-buttons {
+    view-transition-name: floating-buttons;
+  }
+  ::view-transition-old(site-header),
+  ::view-transition-new(site-header),
+  ::view-transition-old(floating-buttons),
+  ::view-transition-new(floating-buttons) {
     animation: none;
+    mix-blend-mode: normal;
+  }
+
+  /* Reduced motion: the swap still has to be legible, so the fade stays and
+     only the travel goes. */
+  @media (prefers-reduced-motion: reduce) {
+    ::view-transition-old(root),
+    ::view-transition-new(root) {
+      animation-duration: 90ms;
+      animation-delay: 0s;
+    }
+    @keyframes page-out {
+      to {
+        opacity: 0;
+      }
+    }
+    @keyframes page-in {
+      from {
+        opacity: 0;
+      }
+    }
   }
 }
 
@@ -226,8 +296,10 @@
        <h2 data-reveal="lines">             line-mask (each line clipped)
        <ul data-reveal data-reveal-stagger> children 60ms apart
 
-     Distance is 14px on scroll and 16px on arrival (13 §The arrival reveal) —
-     the veil is still moving on arrival, so it needs slightly more to read. */
+     Distance is 14px on scroll and 16px on arrival (13 §The arrival reveal).
+     On a client-router navigation the arrival pass is skipped entirely — the
+     page transition above has already faded the same pixels in, and playing
+     both would animate the content twice. See scripts/reveal.ts. */
   [data-reveal].reveal-armed {
     opacity: 0;
     translate: 0 var(--reveal-distance, 14px);
@@ -290,8 +362,8 @@
     }
   }
 
-  /* Press feedback. A link that starts a 1.2s veil has to acknowledge the
-     click immediately, or there's a ~50ms void where the UI looks asleep. */
+  /* Press feedback — the click is acknowledged on the button itself, before
+     the navigation has anything to show for it. */
   @media (hover: hover) and (pointer: fine) {
     .press:active {
       transform: scale(0.97);

@@ -43,7 +43,7 @@ export const services: Service[] = [
       "Operator handover on site",
       "Documentation for finance or insurance",
     ],
-    image: "/images/why-brands.jpg",
+    image: "/images/service-sales.jpg",
     stat: {
       title: "Commissioned on handover",
       line: "Operator handover plus documentation for finance or insurance.",

@@ -7,7 +7,7 @@
 import type { CollectionEntry } from "astro:content";
 import Icon from "@/components/ui/Icon.astro";
 import Pill from "@/components/ui/Pill.astro";
-import BgImage from "@/components/ui/BgImage.astro";
+import ParallaxImage from "@/components/ui/ParallaxImage.astro";
 import { availabilityBadges } from "@/lib/equipment";
 
 interface Props {
@@ -25,18 +25,18 @@ const badges = availabilityBadges(category.data);
 
 <a
   href={`/equipment/${category.id}`}
-  class="group card relative flex flex-col overflow-hidden transition-all duration-200 hover:-translate-y-[3px] hover:border-line-strong hover:shadow-[0_20px_50px_-28px_rgba(10,14,23,0.32)]"
+  class="group card relative flex flex-col overflow-clip transition-all duration-200 hover:-translate-y-[3px] hover:border-line-strong hover:shadow-[0_20px_50px_-28px_rgba(10,14,23,0.32)]"
 >
   {
     /* Light neutral behind the photo: the six categories still waiting on a
       hero image read as a quiet empty tile rather than a black hole. */
   }
-  <div class="relative aspect-[4/3] overflow-hidden bg-surface-2">
+  <div class="relative aspect-[4/3] overflow-clip bg-surface-2">
     {
       heroImage && (
-        <BgImage
+        <ParallaxImage
           src={heroImage}
-          class="transition-transform duration-500 ease-out group-hover:scale-[1.05]"
+          class="absolute inset-0 transition-transform duration-500 ease-out group-hover:scale-[1.05]"
         />
       )
     }

@@ -12,6 +12,7 @@ import type { CollectionEntry } from "astro:content";
 import Icon from "@/components/ui/Icon.astro";
 import Button from "@/components/ui/Button.astro";
 import Pill from "@/components/ui/Pill.astro";
+import ParallaxImage from "@/components/ui/ParallaxImage.astro";
 import { availabilityBadges } from "@/lib/equipment";
 
 interface Props {
@@ -42,20 +43,15 @@ const href = `/equipment/${category.id}`;
     aria-hidden="true"
     tabindex="-1"
     class:list={[
-      "block overflow-hidden rounded-md bg-surface-2",
+      "block overflow-clip rounded-md bg-surface-2",
       flip && "order-2 max-nav:order-none",
     ]}
   >
     {
       heroImage && (
-        <img
+        <ParallaxImage
           src={heroImage}
-          alt=""
-          width="1200"
-          height="1500"
-          loading="lazy"
-          decoding="async"
-          class="aspect-[4/5] w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03] max-nav:aspect-[16/10]"
+          class="aspect-[4/5] w-full transition-transform duration-500 ease-out group-hover:scale-[1.03] max-nav:aspect-[16/10]"
         />
       )
     }

@@ -1,11 +1,20 @@
 ---
-/** Industries — 8 portrait photo tiles, each linking to its own page, plus a
- *  way through to the hub that now exists. */
+/**
+ * Industries — 8 portrait photo tiles, each linking to its own page, plus a
+ * way through to the hub.
+ *
+ * Each tile carries two photographs of its sector and takes turns between
+ * them: the one on screen is pushed off one of the four edges and drags the
+ * other in behind it (`ui/ImageSwap.astro`). Direction and timing are random
+ * per tile, so the grid is never doing one thing — at any moment one or two
+ * of the eight are moving and the rest are still, which is what keeps a band
+ * of eight animated tiles from reading as a slideshow.
+ */
 import Section from "@/components/ui/Section.astro";
 import SectionHeading from "@/components/ui/SectionHeading.astro";
 import Icon from "@/components/ui/Icon.astro";
 import ViewAllBar from "@/components/ui/ViewAllBar.astro";
-import ParallaxImage from "@/components/ui/ParallaxImage.astro";
+import ImageSwap from "@/components/ui/ImageSwap.astro";
 import { industries } from "@/data/industries";
 import { industriesSection } from "@/data/content";
 ---
@@ -34,18 +43,19 @@ import { industriesSection } from "@/data/content";
             style={`--reveal-delay:${(i % 4) * 70}ms`}
             data-reveal
           >
-            {/* Eight drifting photos at the default 8%/1.12 would read as
-               noise — this is the one place on the page that needs restraint
-               more than it needs travel.
+            {/* No hover scale. Eight tiles that each swell under the pointer
+               is the single most-used interaction on the web; on a wide band
+               of real photography it adds nothing, and the tiles already have
+               a motion of their own.
 
-               And no hover scale. Eight tiles that each swell under the pointer
-               is the single most-used interaction on the web; on a wide band of
-               real photography it adds nothing the parallax drift is not
-               already doing, and it costs the grid its stillness. */}
-            <ParallaxImage
-              src={ind.image}
-              shift="2%"
-              zoom={1.06}
+               All eight are given the same interval on purpose: the spread
+               belongs in the browser, not here. Anything random written at
+               this point is baked into the built HTML and served identical to
+               every visitor for the life of the deploy — `ImageSwap` rolls its
+               own wait per tile per cycle instead. */}
+            <ImageSwap
+              images={[ind.image, ind.imageSwap]}
+              interval={3500}
               class="absolute inset-0"
             />
             <span

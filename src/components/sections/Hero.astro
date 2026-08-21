@@ -49,7 +49,7 @@ import { site } from "@/config/site";
     class="wrap relative z-[2] w-full pt-[220px] pb-[64px] max-mob:pt-[140px] max-mob:pb-[44px]"
   >
     <span
-      class="reveal reveal-1 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-[14px] py-[7px] font-mono text-label font-medium tracking-[1px] text-white uppercase backdrop-blur-sm max-xs:text-[10.5px]"
+      class="reveal reveal-1 inline-flex items-center gap-2 rounded-md px-[14px] py-[7px] font-mono text-label font-medium tracking-[1px] text-white uppercase backdrop-blur-sm max-xs:text-[10.5px]"
     >
       <span
         class="status-dot relative h-[6px] w-[6px] rounded-full bg-brand-bright"
@@ -79,7 +79,7 @@ import { site } from "@/config/site";
           <Button
             variant={cta.variant === "outline" ? "outline-white" : cta.variant}
             href={cta.href}
-            size="lg"
+            size="sm"
             class="press"
           >
             {cta.label}
@@ -90,16 +90,16 @@ import { site } from "@/config/site";
 
     <!-- Base panel — survey-tag coordinates + the drifting wordmarks. -->
     <div
-      class="reveal reveal-5 mt-14 flex items-center gap-6 rounded-md border border-white/12 bg-white/[0.06] px-6 py-4 backdrop-blur-sm max-mob:mt-10 max-cmp:flex-col max-cmp:items-start max-cmp:gap-3 max-cmp:px-5"
+      class="reveal reveal-5 mt-14 flex items-center gap-6 rounded-md px-6 py-4 backdrop-blur-sm max-mob:mt-10 max-cmp:flex-col max-cmp:items-start max-cmp:gap-3 max-cmp:px-5"
     >
-      <span
+      <!-- <span
         class="shrink-0 font-mono text-label tracking-[0.5px] text-white/55"
       >
         {site.geo.lat}º N&nbsp;&nbsp;{site.geo.lng}º E
       </span>
       <span
         class="h-4 w-px shrink-0 bg-white/15 max-cmp:hidden"
-        aria-hidden="true"></span>
+        aria-hidden="true"></span> -->
       <PartnerStrip
         variant="marquee"
         class="min-w-0 flex-1 max-cmp:w-full max-cmp:flex-none"

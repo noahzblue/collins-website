@@ -6,7 +6,7 @@
  * Shared by /equipment/<slug> and /industries/<slug> so both page types stay
  * on the same crop, scrim and heading size.
  */
-import BgImage from "./BgImage.astro";
+import ParallaxImage from "./ParallaxImage.astro";
 import Breadcrumb from "./Breadcrumb.astro";
 
 interface Props {
@@ -24,7 +24,11 @@ const { image, trail, current, title } = Astro.props;
   data-next-theme="glass"
   class="relative flex min-h-[460px] items-end overflow-clip bg-ink max-mob:min-h-[380px]"
 >
-  {image && <BgImage src={image} />}
+  {
+    image && (
+      <ParallaxImage src={image} loading="eager" class="absolute inset-0" />
+    )
+  }
   <div class="scrim-banner absolute inset-0" aria-hidden="true"></div>
 
   <div

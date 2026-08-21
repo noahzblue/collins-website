@@ -26,6 +26,13 @@ export interface Industry {
   duty: { title: string; body: string };
   /** Photo tile / page banner. */
   image: string;
+  /**
+   * A second photograph of the same sector, shown only by the homepage tile:
+   * it and `image` take turns, pushed in and out of frame by `ImageSwap`.
+   * The banner on /industries/<slug> stays on `image` — a page header that
+   * changes its own picture under the reader is a distraction, not a detail.
+   */
+  imageSwap: string;
   /** Equipment category ids, most requested first. */
   categories: string[];
 }
@@ -41,6 +48,7 @@ export const industries: Industry[] = [
       body: "A tower crane and a batching plant draw far more at start-up than they do in service. We specify against the largest starting load on your schedule, so the set you take actually starts what you run — and we re-size free when the programme changes.",
     },
     image: "/images/industry-construction.jpg",
+    imageSwap: "/images/industry-construction-2.jpg",
     categories: ["generators", "tower-lights", "forklifts", "telehandlers"],
   },
   {
@@ -53,6 +61,7 @@ export const industries: Industry[] = [
       body: "A prime-rated set running 24 hours is a different machine from a standby one, and filtration is what decides whether it reaches its service interval. Units for energy sites go out on continuous duty ratings with uprated filtration and a servicing schedule attached.",
     },
     image: "/images/industry-oil-gas.jpg",
+    imageSwap: "/images/industry-oil-gas-2.jpg",
     categories: ["generators", "air-compressors", "tower-lights"],
   },
   {
@@ -65,6 +74,7 @@ export const industries: Industry[] = [
       body: "Quayside handling starts where general warehouse handling stops. The forklifts we send to ports are specified at the top of our range — up to 15 ton — with the mast and attachment configuration matched to the box, not to a pallet.",
     },
     image: "/images/industry-marine-ports.jpg",
+    imageSwap: "/images/industry-marine-ports-2.jpg",
     categories: ["forklifts", "mobile-cranes", "generators"],
   },
   {
@@ -77,6 +87,7 @@ export const industries: Industry[] = [
       body: "Canopied sets and a considered position do most of the work; the rest is redundancy. For show nights we hold a standby unit against the primary, because the failure you plan for is the one that never makes it into the audience's evening.",
     },
     image: "/images/industry-events.jpg",
+    imageSwap: "/images/industry-events-2.jpg",
     categories: ["generators", "tower-lights", "scissor-lifts"],
   },
   {
@@ -89,6 +100,7 @@ export const industries: Industry[] = [
       body: "A standby set that sits untested for a year is a liability, not a backup. Units on a facilities contract go on a scheduled servicing interval with periodic load testing, so the first time it carries the building isn't the first time it has run under load.",
     },
     image: "/images/industry-facilities.jpg",
+    imageSwap: "/images/industry-facilities-2.jpg",
     categories: ["generators", "air-compressors", "scissor-lifts"],
   },
   {
@@ -101,6 +113,7 @@ export const industries: Industry[] = [
       body: "In abrasive ground the machine is rarely what fails first — the wear parts are. We hold consumables for the plant we supply into quarry work, so a ground engaging tool or a filter set is a same-day collection rather than a two-week lead time.",
     },
     image: "/images/industry-mining.jpg",
+    imageSwap: "/images/industry-mining-2.jpg",
     categories: [
       "excavators",
       "air-compressors",
@@ -118,6 +131,7 @@ export const industries: Industry[] = [
       body: "On public works the machine is half the requirement and the file is the other half. Every unit goes out with its condition report, and our trade licence, register number and licensed activities are published on this site so a procurement officer can check them without asking.",
     },
     image: "/images/industry-infrastructure.jpg",
+    imageSwap: "/images/industry-infrastructure-2.jpg",
     categories: ["excavators", "generators", "tower-lights", "mobile-cranes"],
   },
   {
@@ -130,6 +144,7 @@ export const industries: Industry[] = [
       body: "Indoor handling and yard handling are two different specifications, and running one machine for both costs you either emissions compliance or duty cycle. We split the fleet: electric counterbalance inside, diesel outside, delivered around your shift pattern rather than across it.",
     },
     image: "/images/industry-manufacturing.jpg",
+    imageSwap: "/images/industry-manufacturing-2.jpg",
     categories: ["generators", "forklifts", "scissor-lifts"],
   },
 ];

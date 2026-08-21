@@ -4,89 +4,87 @@
  * statement of what the business is, which appeared nowhere on the site.
  * Worse, the hero used to imply the opposite order.
  *
- * Two rows on a dark full-bleed band: the tonal anchor mid-page, and the
- * highest-value block on the homepage.
+ * **One block of markup, two layouts.**
  *
- * It reads as an accordion rather than as two side-by-side panels for one
- * reason: side by side, the two modes are alternatives you compare at a
- * glance and then leave. Opened one at a time, each one gets the entire
- * 1200px column — a photograph at a size that means something, and copy with
- * room around it — and the section makes its argument twice instead of
- * halving it. It advances on its own every 8s, so the second answer arrives
- * without being asked for.
+ * Side by side (≥ nav) the two modes are two columns split by a hairline,
+ * both open, nothing hidden. That is the argument the section is making made
+ * visible: sales and rental are the same fleet on two sets of terms, and you
+ * can read both answers at once instead of trading one for the other. There
+ * is no photograph and no dark band — the sentence "buy it, or hire the same
+ * machine" does not need illustrating, and stripping the band back to the page
+ * white puts the two words SALES and RENTAL at the top of the visual hierarchy
+ * where they belong.
  *
- * The trigger is deliberately oversized: a ~140px row of tracked uppercase
- * mono with a number in front of it. At that scale the two words ARE the
- * section, and everything below them is supporting material.
+ * Stacked (< nav) two columns become two half-width columns, which is no
+ * comparison at all — so below the breakpoint it collapses to the accordion
+ * this section has always been: an oversized tracked-mono trigger row, one
+ * panel open at a time, advancing on its own every 8s so the second answer
+ * arrives without being asked for. Auto-advance, hover-pause, the progress
+ * line and the reduced-motion hold all come from `scripts/rotator.ts`.
  *
- * Auto-advance, hover-pause, the progress line and the reduced-motion hold
- * all come from `scripts/rotator.ts` — same clock for the switch and the bar,
- * so they cannot drift.
+ * The `<button>` inside each `<h3>` is the WAI-ARIA accordion pattern, and it
+ * is only a control in the stacked layout. Side by side there is nothing to
+ * expand, so the script marks it `aria-disabled` and takes it out of the tab
+ * order rather than offering a keyboard user an action that does nothing.
  */
 import Section from "@/components/ui/Section.astro";
 import Eyebrow from "@/components/ui/Eyebrow.astro";
 import Button from "@/components/ui/Button.astro";
 import Icon from "@/components/ui/Icon.astro";
-import ParallaxImage from "@/components/ui/ParallaxImage.astro";
 import { supplyModes } from "@/data/content";
 ---
 
-<Section id="supply" tone="dark" class="relative overflow-clip">
-  {
-    /* Keeps the dark band from reading as flat, at an opacity low enough that
-     it never competes with the copy. */
-  }
-  <ParallaxImage
-    src="/images/hero-yard.jpg"
-    shift="6%"
-    class="absolute inset-0 opacity-[0.08]"
-  />
-
-  <div class="wrap relative">
-    <Eyebrow tone="brand-bright" class="mb-[16px]">
-      {supplyModes.eyebrow}
-    </Eyebrow>
+{
+  /* A hairline top edge: the section above it is also white, and without a
+     boundary the two run together. */
+}
+<Section id="supply" class="border-t border-line">
+  <div class="wrap">
+    <Eyebrow class="mb-[16px]">{supplyModes.eyebrow}</Eyebrow>
     <h2
-      class="max-w-[760px] text-h2 leading-[1.06] text-white"
+      class="max-w-[760px] text-h2 leading-[1.06]"
       data-reveal="lines"
       set:html={supplyModes.title.join("<br>")}
     />
 
     <div
       id="supply-modes"
-      class="mt-[72px] border-t border-white/14 max-mob:mt-[44px]"
+      class="modes border- mt-[68px] border-line max-mob:mt-[44px]"
       data-reveal
     >
       {
         supplyModes.modes.map((mode, i) => (
           <div class="mode" data-open={i === 0 ? "true" : "false"}>
-            <button
-              type="button"
-              class="mode-trigger relative flex w-full cursor-pointer items-center gap-10 py-[46px] text-left max-mob:gap-6 max-mob:py-[30px]"
-              aria-expanded={i === 0 ? "true" : "false"}
-              aria-controls={`supply-panel-${i}`}
-              id={`supply-trigger-${i}`}
-            >
-              <span class="mode-num font-mono text-micro tracking-[2px] transition-colors duration-300">
-                {String(i + 1).padStart(2, "0")}
-              </span>
-              <span class="mode-label font-mono text-[clamp(30px,4.4vw,56px)] leading-[1] tracking-[-0.03em] uppercase transition-colors duration-300">
-                {mode.label}
-              </span>
-              <span class="mode-sign ml-auto shrink-0 text-white/45 transition-all duration-500">
-                <Icon name="plus" size={26} />
-              </span>
-
-              {/* The rule under the header doubles as the timer: the fill is
-                  driven by the rotator's own clock, so a hover freezes it
-                  mid-travel instead of snapping it. */}
-              <span
-                class="mode-rule absolute inset-x-0 bottom-0 h-px bg-white/14"
-                aria-hidden="true"
+            <h3 class="mode-head">
+              <button
+                type="button"
+                class="mode-trigger relative flex w-full cursor-pointer items-center gap-7 py-[34px] text-left max-mob:gap-5 max-mob:py-[26px]"
+                aria-expanded={i === 0 ? "true" : "false"}
+                aria-controls={`supply-panel-${i}`}
+                id={`supply-trigger-${i}`}
               >
-                <span class="mode-fill absolute inset-y-0 left-0 w-full origin-left bg-brand-bright" />
-              </span>
-            </button>
+                <span class="mode-num font-mono text-micro tracking-[2px] transition-colors duration-300">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <span class="mode-label font-mono text-[clamp(28px,3.4vw,44px)] leading-[1] tracking-[-0.03em] uppercase transition-colors duration-300">
+                  {mode.label}
+                </span>
+                <span class="mode-sign ml-auto shrink-0 transition-all duration-500">
+                  <Icon name="plus" size={24} />
+                </span>
+
+                {/* The rule under the head doubles as the timer while the
+                    modes are stacked: the fill is driven by the rotator's own
+                    clock, so a hover freezes it mid-travel instead of
+                    snapping it. Side by side it is just a divider. */}
+                <span
+                  class="mode-rule absolute inset-x-0 bottom-0 h-px bg-line"
+                  aria-hidden="true"
+                >
+                  <span class="mode-fill absolute inset-y-0 left-0 w-full origin-left bg-brand-bright" />
+                </span>
+              </button>
+            </h3>
 
             <div
               class="mode-panel grid transition-[grid-template-rows] duration-[620ms]"
@@ -95,30 +93,22 @@ import { supplyModes } from "@/data/content";
               aria-labelledby={`supply-trigger-${i}`}
             >
               <div class="mode-clip overflow-hidden">
-                <div class="grid grid-cols-[1.08fr_0.92fr] items-center gap-[72px] pt-[56px] pb-[80px] max-nav:grid-cols-1 max-nav:gap-10 max-mob:pt-[36px] max-mob:pb-[52px]">
-                  <ParallaxImage
-                    src={mode.image}
-                    shift="5%"
-                    class="aspect-[16/10] w-full rounded-md"
-                  />
-
-                  <div class="max-w-[460px]">
-                    <span class="block font-mono text-label font-medium tracking-[2px] text-brand-bright uppercase">
-                      {mode.lead}
-                    </span>
-                    <p class="mt-6 mb-0 text-intro leading-relaxed text-[#aab2c0]">
-                      {mode.body}
-                    </p>
-                    <Button
-                      variant="outline-white"
-                      href={mode.cta.href}
-                      size="lg"
-                      class="press mt-10"
-                    >
-                      {mode.cta.label}
-                      <Icon name="arrow-right" size={16} />
-                    </Button>
-                  </div>
+                <div class="max-w-[440px] pt-[30px] pb-[56px] max-mob:pt-[24px] max-mob:pb-[40px]">
+                  <span class="block font-mono text-label font-medium tracking-[2px] text-brand uppercase">
+                    {mode.lead}
+                  </span>
+                  <p class="mt-5 mb-0 text-lead-lg leading-relaxed text-muted">
+                    {mode.body}
+                  </p>
+                  <Button
+                    variant="outline"
+                    href={mode.cta.href}
+                    size="lg"
+                    class="press mt-9"
+                  >
+                    {mode.cta.label}
+                    <Icon name="arrow-right" size={16} />
+                  </Button>
                 </div>
               </div>
             </div>
@@ -128,7 +118,7 @@ import { supplyModes } from "@/data/content";
     </div>
 
     <p
-      class="mt-14 mb-0 max-w-[760px] border-t border-white/14 pt-10 text-lead-lg leading-relaxed text-[#aab2c0] max-mob:mt-9 max-mob:pt-7"
+      class="mt-14 mb-0 max-w-[760px] border-t border-line pt-4 text-tag leading-relaxed text-muted uppercase max-mob:mt-9 max-mob:pt-7"
       data-reveal
     >
       {supplyModes.footnote}
@@ -137,32 +127,39 @@ import { supplyModes } from "@/data/content";
 </Section>
 
 <style>
+  /* ---- Stacked: the accordion. Also the base state, so a viewport this
+     component has no rule for gets the layout that works at any width. ---- */
+
+  .mode-head {
+    margin: 0;
+  }
   .mode-num {
-    color: rgb(255 255 255 / 0.4);
+    color: var(--color-faint);
   }
   .mode-label {
-    color: rgb(255 255 255 / 0.55);
+    color: var(--color-muted);
+  }
+  .mode-sign {
+    color: var(--color-faint);
   }
   .mode[data-open="true"] .mode-num {
-    color: rgb(255 255 255 / 0.75);
+    color: var(--color-brand);
   }
   .mode[data-open="true"] .mode-label {
-    color: #fff;
+    color: var(--color-ink);
   }
   .mode-trigger:hover .mode-num,
-  .mode-trigger:focus-visible .mode-num,
   .mode-trigger:hover .mode-label,
-  .mode-trigger:focus-visible .mode-label {
-    color: var(--color-brand-bright);
-  }
   .mode-trigger:hover .mode-sign,
+  .mode-trigger:focus-visible .mode-num,
+  .mode-trigger:focus-visible .mode-label,
   .mode-trigger:focus-visible .mode-sign {
-    color: var(--color-brand-bright);
+    color: var(--color-brand);
   }
 
   /* One glyph, two states — see icons.ts. */
   .mode[data-open="true"] .mode-sign {
-    color: rgb(255 255 255 / 0.75);
+    color: var(--color-ink);
     rotate: 45deg;
   }
 
@@ -194,6 +191,56 @@ import { supplyModes } from "@/data/content";
     transform: scaleX(var(--t, 0));
   }
 
+  /* ---- Side by side: two columns, both open. ---- */
+  @media (min-width: 981px) {
+    .modes {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+    /* The divider is a border on the second column rather than a gap, so it
+       runs the full height of the taller of the two. */
+    .mode:first-child {
+      padding-right: 64px;
+    }
+    .mode + .mode {
+      border-left: 1px solid var(--color-line);
+      padding-left: 64px;
+    }
+    /* …and the rule under each label reaches back out through that padding to
+       meet the divider, so the two halves read as one continuous line rather
+       than as two rules that stop short at different places. */
+    .mode:first-child .mode-rule {
+      right: -64px;
+    }
+    .mode + .mode .mode-rule {
+      left: -64px;
+    }
+
+    /* Nothing to expand, nothing to time, nothing to press. */
+    .mode-sign,
+    .mode-fill {
+      display: none;
+    }
+    .mode-trigger {
+      cursor: default;
+      pointer-events: none;
+    }
+    .mode-panel {
+      grid-template-rows: 1fr;
+    }
+    .mode-clip {
+      visibility: visible;
+      transition: none;
+    }
+    /* Both labels are live, so neither is dimmed. */
+    .mode-label {
+      color: var(--color-ink);
+    }
+    .mode[data-open="true"] .mode-num {
+      color: var(--color-faint);
+    }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .mode-panel,
     .mode-clip,
@@ -209,7 +256,8 @@ import { supplyModes } from "@/data/content";
 </style>
 
 <script>
-  import { createRotator } from "@/scripts/rotator";
+  import { createRotator, type Rotator } from "@/scripts/rotator";
+  import { untilPageSwap } from "@/scripts/untilPageSwap";
 
   // Re-runs after every client-router navigation as well as on first load,
   // so the swapped-in DOM gets wired up.
@@ -223,26 +271,75 @@ import { supplyModes } from "@/data/content";
     ];
     const fills = [...root.querySelectorAll<HTMLElement>(".mode-fill")];
 
-    const rotator = createRotator({
-      root,
-      count: modes.length,
-      interval: 8000,
-      onSelect: (i) => {
-        modes.forEach((m, j) => m.setAttribute("data-open", String(j === i)));
-        triggers.forEach((t, j) =>
-          t.setAttribute("aria-expanded", String(j === i)),
-        );
-      },
-      // One clock for the switch and the bar, so they can't disagree.
-      onProgress: (i, t) => {
-        fills.forEach((fill, j) =>
-          fill.style.setProperty("--t", String(j === i ? t : 0)),
-        );
-      },
-    });
+    /* The same breakpoint the stylesheet above switches on. Two sources for
+       one number is a bug waiting to happen, but a media query is the only
+       thing that can tell a script which of two layouts the CSS has picked. */
+    const stacked = window.matchMedia("(max-width: 980px)");
 
-    triggers.forEach((t, i) =>
-      t.addEventListener("click", () => rotator.select(i)),
-    );
+    /** The accordion's own lifetime — separate from the page's, because it
+        is torn down and rebuilt whenever the layout crosses the breakpoint. */
+    let live: AbortController | null = null;
+    let rotator: Rotator | null = null;
+
+    const openAll = () => {
+      for (const mode of modes) mode.setAttribute("data-open", "true");
+      for (const trigger of triggers) {
+        trigger.setAttribute("aria-expanded", "true");
+        trigger.setAttribute("aria-disabled", "true");
+        trigger.tabIndex = -1;
+      }
+    };
+
+    const startAccordion = () => {
+      live = new AbortController();
+      const { signal } = live;
+
+      for (const trigger of triggers) {
+        trigger.removeAttribute("aria-disabled");
+        trigger.tabIndex = 0;
+      }
+
+      rotator = createRotator({
+        root,
+        count: modes.length,
+        interval: 8000,
+        signal,
+        onSelect: (i) => {
+          modes.forEach((m, j) => m.setAttribute("data-open", String(j === i)));
+          triggers.forEach((t, j) =>
+            t.setAttribute("aria-expanded", String(j === i)),
+          );
+        },
+        // One clock for the switch and the bar, so they can't disagree.
+        onProgress: (i, t) => {
+          fills.forEach((fill, j) =>
+            fill.style.setProperty("--t", String(j === i ? t : 0)),
+          );
+        },
+      });
+
+      triggers.forEach((trigger, i) =>
+        trigger.addEventListener("click", () => rotator?.select(i), { signal }),
+      );
+    };
+
+    const stopAccordion = () => {
+      rotator?.stop();
+      rotator = null;
+      live?.abort();
+      live = null;
+    };
+
+    const sync = () => {
+      if (stacked.matches) {
+        if (!rotator) startAccordion();
+      } else {
+        stopAccordion();
+        openAll();
+      }
+    };
+
+    sync();
+    stacked.addEventListener("change", sync, { signal: untilPageSwap() });
   });
 </script>

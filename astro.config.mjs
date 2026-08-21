@@ -13,9 +13,9 @@ export default defineConfig({
   site: "https://www.collinscouae.com",
 
   // Links are fetched before they're clicked, so the client router has the
-  // next page in cache and navigation costs no round trip. The page veil
-  // (layout/PageVeil.astro) depends on this: a 520ms cover that has to wait on
-  // a network round trip reads as buffering.
+  // next page in cache and navigation costs no round trip. The page transition
+  // (styles/global.css) depends on this: a ~290ms fade is only honest if the
+  // next page is already in memory when the fade ends.
   prefetch: { prefetchAll: true, defaultStrategy: "viewport" },
 
   // 30+ pages after the site expansion — a sitemap stops being optional.

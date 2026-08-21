@@ -3,14 +3,16 @@
  * Button / CTA. Renders an <a> when `href` is set, otherwise a <button>.
  * All button styling in the design lives here — pick a `variant`.
  *
- * Style: sentence-case pill buttons (rounded-full) in Geist Mono at 500 —
- * the calm, premium look. Blue is the primary action; everything else is
- * quiet.
+ * Style: sentence-case buttons in Geist Mono at 500 — the calm, premium
+ * look. Blue is the primary action; everything else is quiet. Corners are
+ * `rounded-md`, the same 5px the cards, the header bar and the photo frames
+ * use: buttons are part of the same rectilinear system, not a pill floating
+ * on top of it. `rounded-full` on this site now means a chip or a dot.
  */
 interface Props {
   href?: string;
   variant?: "primary" | "outline" | "outline-white";
-  size?: "md" | "lg";
+  size?: "xs" | "sm" | "md" | "lg";
   type?: "button" | "submit";
   class?: string;
   [key: string]: unknown;
@@ -26,18 +28,20 @@ const {
 } = Astro.props;
 
 const base =
-  "inline-flex items-center justify-center gap-2 font-mono font-medium whitespace-nowrap rounded-full transition-all duration-200 cursor-pointer";
+  "inline-flex items-center justify-center gap-2 font-mono font-medium whitespace-nowrap rounded-md transition-all duration-200 cursor-pointer";
 
 const sizes: Record<NonNullable<Props["size"]>, string> = {
+  xs: "px-[14px] py-[6px] text-sm",
+  sm: "px-[19px] py-[9px] text-sm",
   md: "px-[24px] py-[12px] text-sm",
   lg: "px-[30px] py-[15px] text-base",
 };
 
 const variants: Record<NonNullable<Props["variant"]>, string> = {
   primary:
-    "bg-brand-bright text-white shadow-[0_1px_2px_rgba(10,14,23,0.10)] hover:bg-brand-hover hover:shadow-[0_6px_18px_rgba(47,111,255,0.28)]",
+    "bg-brand-bright text-white shadow-[0_1px_2px_rgba(10,14,23,0.10)] hover:bg-white hover:text-brand hover:shadow-[0_6px_18px_rgba(47,111,255,0.28)]",
   outline:
-    "bg-white border border-line-strong text-ink hover:border-ink hover:bg-surface",
+    "bg-white border-t border-b border-line-strong text-ink hover:border-none hover:bg-none hover:bg-brand-tint rounded-none",
   "outline-white":
     "bg-transparent border border-white/40 text-white hover:bg-white hover:text-ink hover:border-white",
 };
