@@ -50,7 +50,7 @@ const badges = availabilityBadges(category.data);
   </div>
 
   <div class="flex flex-1 flex-col p-7 max-xs:p-6">
-    <h3 class="text-[21px] font-semibold">{name}</h3>
+    <h3 class="text-[21px]">{name}</h3>
     <p class="mt-1 text-sm text-muted">{rangeLabel}</p>
     {
       showCardLine && (
@@ -61,7 +61,7 @@ const badges = availabilityBadges(category.data);
     <div class="mt-5 flex items-center gap-2">
       {badges.map((badge) => <Pill>{badge}</Pill>)}
       <span
-        class="ml-auto inline-flex items-center gap-[6px] text-meta font-semibold text-brand"
+        class="ml-auto inline-flex items-center gap-[6px] text-meta font-medium text-brand"
       >
         View
         <Icon

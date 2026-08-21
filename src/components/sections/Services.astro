@@ -43,7 +43,7 @@ import { servicesSection } from "@/data/content";
                   <span class="svc-icon flex h-[44px] w-[44px] shrink-0 items-center justify-center rounded-[13px] transition-colors duration-300">
                     <Icon name={s.icon} size={21} />
                   </span>
-                  <span class="svc-title text-subhead font-semibold transition-colors duration-300">
+                  <span class="svc-title text-subhead font-medium transition-colors duration-300">
                     {s.title}
                   </span>
                 </span>
@@ -91,7 +91,7 @@ import { servicesSection } from "@/data/content";
                 ))
               }
             </span>
-            <span id="svc-card-title" class="text-base font-semibold text-ink">
+            <span id="svc-card-title" class="text-base font-medium text-ink">
               {services[0].stat.title}
             </span>
           </div>
@@ -150,38 +150,43 @@ import { servicesSection } from "@/data/content";
 <script>
   import { createRotator } from "@/scripts/rotator";
 
-  const split = document.getElementById("services-split");
-  if (split) {
-    const rows = [...split.querySelectorAll<HTMLButtonElement>(".svc-row")];
-    const imgs = [...split.querySelectorAll<HTMLElement>(".svc-img")];
-    const glyphs = [...split.querySelectorAll<HTMLElement>(".svc-card-glyph")];
-    const cardTitle = split.querySelector<HTMLElement>("#svc-card-title")!;
-    const cardLine = split.querySelector<HTMLElement>("#svc-card-line")!;
-    // Data-card copy mirrors the `stat` field per service in data/services.ts.
-    const stats = JSON.parse(split.dataset.stats ?? "[]") as {
-      title: string;
-      line: string;
-    }[];
+  // Re-runs after every client-router navigation as well as on first load,
+  // so the swapped-in DOM gets wired up.
+  document.addEventListener("astro:page-load", () => {
+    const split = document.getElementById("services-split");
+    if (split) {
+      const rows = [...split.querySelectorAll<HTMLButtonElement>(".svc-row")];
+      const imgs = [...split.querySelectorAll<HTMLElement>(".svc-img")];
+      const glyphs = [
+        ...split.querySelectorAll<HTMLElement>(".svc-card-glyph"),
+      ];
+      const cardTitle = split.querySelector<HTMLElement>("#svc-card-title")!;
+      const cardLine = split.querySelector<HTMLElement>("#svc-card-line")!;
+      // Data-card copy mirrors the `stat` field per service in data/services.ts.
+      const stats = JSON.parse(split.dataset.stats ?? "[]") as {
+        title: string;
+        line: string;
+      }[];
 
-    // No `interval` — the accordion only ever moves on a click.
-    const rotator = createRotator({
-      root: split,
-      count: rows.length,
-      onSelect: (i) => {
-        rows.forEach((r, j) =>
-          r.setAttribute("aria-expanded", String(j === i)),
-        );
-        imgs.forEach((im, j) => im.classList.toggle("is-active", j === i));
-        glyphs.forEach((g, j) => g.classList.toggle("hidden", j !== i));
-        if (stats[i]) {
-          cardTitle.textContent = stats[i].title;
-          cardLine.textContent = stats[i].line;
-        }
-      },
-    });
-
-    rows.forEach((r, i) =>
-      r.addEventListener("click", () => rotator.select(i)),
-    );
-  }
+      // No `interval` — the accordion only ever moves on a click.
+      const rotator = createRotator({
+        root: split,
+        count: rows.length,
+        onSelect: (i) => {
+          rows.forEach((r, j) =>
+            r.setAttribute("aria-expanded", String(j === i)),
+          );
+          imgs.forEach((im, j) => im.classList.toggle("is-active", j === i));
+          glyphs.forEach((g, j) => g.classList.toggle("hidden", j !== i));
+          if (stats[i]) {
+            cardTitle.textContent = stats[i].title;
+            cardLine.textContent = stats[i].line;
+          }
+        },
+      });
+      rows.forEach((r, i) =>
+        r.addEventListener("click", () => rotator.select(i)),
+      );
+    }
+  });
 </script>

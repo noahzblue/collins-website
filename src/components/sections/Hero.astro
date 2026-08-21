@@ -1,37 +1,54 @@
 ---
-/** Hero — full-bleed industrial photography, headline over a gradient scrim. */
+/** Hero — full-bleed industrial footage, headline over a gradient scrim, and a
+ *  glass base panel carrying the manufacturer wordmarks. */
 import Button from "@/components/ui/Button.astro";
-import { hero, partnersLabel } from "@/data/content";
-import { partners } from "@/data/proof";
+import PartnerStrip from "@/components/ui/PartnerStrip.astro";
+import { hero } from "@/data/content";
 import { site } from "@/config/site";
 ---
 
 <section
   class="hero relative flex h-[100svh] min-h-[640px] items-end overflow-hidden max-mob:h-auto max-mob:min-h-0"
-  style="background-image:url('/images/hero-yard.jpg')"
 >
-  <!-- Ambient yard footage. The section's background-image is the same frame,
-       so reduced-motion, small screens, and playback failure all degrade to it. -->
-  <video
-    class="hero-video absolute inset-0 h-full w-full object-cover"
-    autoplay
-    muted
-    loop
-    playsinline
-    preload="metadata"
-    poster="/images/hero-yard.jpg"
-    aria-hidden="true"
-  >
-    <source src="/videos/hero-yard.mp4" type="video/mp4" />
-  </video>
+  <!-- Ambient yard footage. The still underneath is the same frame, so
+       reduced-motion, small screens, and playback failure all degrade to it. -->
+  <div class="hero-media absolute inset-0" aria-hidden="true">
+    <div
+      class="hero-still absolute inset-0 bg-cover bg-center bg-no-repeat"
+      style="background-image:url('/images/hero-yard.jpg')"
+    >
+    </div>
+    <video
+      class="hero-video absolute inset-0 h-full w-full object-cover"
+      autoplay
+      muted
+      loop
+      playsinline
+      preload="metadata"
+      poster="/images/hero-yard.jpg"
+    >
+      <source src="/videos/hero-yard.mp4" type="video/mp4" />
+    </video>
+  </div>
 
   <div class="hero-scrim absolute inset-0 z-[1]" aria-hidden="true"></div>
+
+  <!-- Depth-of-field ramp: three stacked backdrop blurs, each masked to start
+       lower than the last, so the frame softens gradually toward the copy. -->
+  <div
+    class="hero-blur absolute inset-x-0 bottom-0 z-[1] h-[46%]"
+    aria-hidden="true"
+  >
+    <span class="b1"></span>
+    <span class="b2"></span>
+    <span class="b3"></span>
+  </div>
 
   <div
     class="wrap relative z-[2] w-full pt-[220px] pb-[64px] max-mob:pt-[140px] max-mob:pb-[44px]"
   >
     <span
-      class="reveal reveal-1 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-[14px] py-[7px] text-label font-semibold tracking-[1px] text-white uppercase backdrop-blur-sm max-xs:text-[10.5px]"
+      class="reveal reveal-1 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-[14px] py-[7px] font-mono text-label font-medium tracking-[1px] text-white uppercase backdrop-blur-sm max-xs:text-[10.5px]"
     >
       <span
         class="status-dot relative h-[6px] w-[6px] rounded-full bg-brand-bright"
@@ -40,7 +57,7 @@ import { site } from "@/config/site";
     </span>
 
     <h1
-      class="reveal reveal-2 mt-6 max-w-[820px] text-display leading-[1.05] tracking-[-0.03em] text-white max-mob:mt-5"
+      class="reveal reveal-2 mt-6 max-w-[820px] text-display leading-[1.05] text-white max-mob:mt-5"
     >
       {hero.title.lead}<span class="text-brand-bright"
         >{hero.title.emphasis}</span
@@ -69,45 +86,37 @@ import { site } from "@/config/site";
       }
     </div>
 
-    <!-- Base strip — survey-tag coordinates + manufacturer wordmarks. -->
+    <!-- Base panel — survey-tag coordinates + the drifting wordmarks. -->
     <div
-      class="reveal reveal-5 mt-14 flex flex-wrap items-center justify-between gap-x-10 gap-y-4 border-t border-white/15 pt-6 max-mob:mt-10 max-mob:pt-5"
+      class="reveal reveal-5 mt-14 flex items-center gap-6 rounded-[14px] border border-white/12 bg-white/[0.06] px-6 py-4 backdrop-blur-sm max-mob:mt-10 max-cmp:flex-col max-cmp:items-start max-cmp:gap-3 max-cmp:px-5"
     >
-      <span class="font-mono text-label tracking-[0.5px] text-white/55">
+      <span
+        class="shrink-0 font-mono text-label tracking-[0.5px] text-white/55"
+      >
         {site.geo.lat}º N&nbsp;&nbsp;{site.geo.lng}º E
       </span>
-      <div
-        class="flex flex-wrap items-center gap-x-8 gap-y-3 max-mob:gap-x-6"
-        aria-label={partnersLabel}
-      >
-        {
-          partners.map((name) => (
-            <span class="font-display text-note font-semibold tracking-[1.5px] text-white/45 max-xs:text-tag">
-              {name}
-            </span>
-          ))
-        }
-      </div>
+      <span
+        class="h-4 w-px shrink-0 bg-white/15 max-cmp:hidden"
+        aria-hidden="true"></span>
+      <PartnerStrip
+        variant="marquee"
+        class="min-w-0 flex-1 max-cmp:w-full max-cmp:flex-none"
+      />
     </div>
   </div>
 </section>
 
 <style>
-  /* Dark scrim: heaviest where the copy sits (bottom-left), clearing toward
-     the frame's negative space so the crane and fleet on the right read. */
-  .hero {
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-  }
-
   /* Video is an enhancement only — phones and reduced-motion users get the
-     identical still frame via the section background, with no download cost. */
+     identical still frame underneath, with no download cost. */
   @media (prefers-reduced-motion: reduce), (max-width: 900px) {
     .hero-video {
       display: none;
     }
   }
+
+  /* Dark scrim: heaviest where the copy sits (bottom-left), clearing toward
+     the frame's negative space so the crane and fleet on the right read. */
   .hero-scrim {
     background:
       linear-gradient(
@@ -123,6 +132,31 @@ import { site } from "@/config/site";
         rgba(6, 10, 20, 0.1) 45%,
         rgba(6, 10, 20, 0) 70%
       );
+  }
+
+  /* Each layer blurs harder and starts lower; stacked, they read as one
+     gradient of focus instead of a visible blur edge. */
+  .hero-blur > span {
+    position: absolute;
+    inset: 0;
+  }
+  .hero-blur .b1 {
+    -webkit-backdrop-filter: blur(2px);
+    backdrop-filter: blur(2px);
+    -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 34%);
+    mask-image: linear-gradient(180deg, transparent 0%, #000 34%);
+  }
+  .hero-blur .b2 {
+    -webkit-backdrop-filter: blur(7px);
+    backdrop-filter: blur(7px);
+    -webkit-mask-image: linear-gradient(180deg, transparent 30%, #000 66%);
+    mask-image: linear-gradient(180deg, transparent 30%, #000 66%);
+  }
+  .hero-blur .b3 {
+    -webkit-backdrop-filter: blur(18px);
+    backdrop-filter: blur(18px);
+    -webkit-mask-image: linear-gradient(180deg, transparent 62%, #000 100%);
+    mask-image: linear-gradient(180deg, transparent 62%, #000 100%);
   }
 
   /* Entrance choreography — the hero reveals once, top to bottom, on load. */

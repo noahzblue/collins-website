@@ -63,36 +63,40 @@ const { categories } = Astro.props;
 </style>
 
 <script>
-  /* Highlight whichever row is crossing the middle of the viewport. The
-     rootMargin collapses the observation area to a thin band there, so only
-     one row is intersecting at a time and the rail can't flicker between two.
-     A fast scroll can leave nothing in the band — the last active link stays
-     lit rather than the rail going blank. */
-  const links = [
-    ...document.querySelectorAll<HTMLAnchorElement>("[data-index-link]"),
-  ];
+  // Re-runs after every client-router navigation as well as on first load,
+  // so the swapped-in DOM gets wired up.
+  document.addEventListener("astro:page-load", () => {
+    /* Highlight whichever row is crossing the middle of the viewport. The
+       rootMargin collapses the observation area to a thin band there, so only
+       one row is intersecting at a time and the rail can't flicker between two.
+       A fast scroll can leave nothing in the band — the last active link stays
+       lit rather than the rail going blank. */
+    const links = [
+      ...document.querySelectorAll<HTMLAnchorElement>("[data-index-link]"),
+    ];
 
-  if (links.length > 0) {
-    const setActive = (id: string) => {
-      for (const link of links) {
-        link.classList.toggle("is-active", link.dataset.indexLink === id);
-      }
-    };
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) setActive(entry.target.id);
+    if (links.length > 0) {
+      const setActive = (id: string) => {
+        for (const link of links) {
+          link.classList.toggle("is-active", link.dataset.indexLink === id);
         }
-      },
-      { rootMargin: "-45% 0px -45% 0px" },
-    );
+      };
 
-    for (const link of links) {
-      const row = document.getElementById(link.dataset.indexLink!);
-      if (row) observer.observe(row);
+      const observer = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (entry.isIntersecting) setActive(entry.target.id);
+          }
+        },
+        { rootMargin: "-45% 0px -45% 0px" },
+      );
+
+      for (const link of links) {
+        const row = document.getElementById(link.dataset.indexLink!);
+        if (row) observer.observe(row);
+      }
+
+      setActive(links[0].dataset.indexLink!);
     }
-
-    setActive(links[0].dataset.indexLink!);
-  }
+  });
 </script>

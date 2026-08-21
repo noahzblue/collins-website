@@ -1,0 +1,89 @@
+---
+/**
+ * A photo that drifts as the page scrolls.
+ *
+ * The image sits slightly over-scaled inside a clipped frame and slides from
+ * its top edge toward its bottom edge as that frame crosses the viewport — so
+ * scrolling down carries it one way and scrolling back carries it the other.
+ * A CSS scroll-driven animation does the tracking, which means no scroll
+ * listener, no rAF loop, and nothing for the parent to keep track of: drop it
+ * anywhere on any page and it reacts to its own position on its own.
+ *
+ * The frame sizes the photo, so give it a size — a height, or the usual
+ * absolute fill:
+ *
+ *   <ParallaxImage src="/images/yard.jpg" class="absolute inset-0" />
+ *   <ParallaxImage src="/images/yard.jpg" alt="The Sajjah yard"
+ *                  class="h-[520px] rounded-[18px]" />
+ *
+ * Reduced-motion readers, and browsers without scroll-driven animation, get
+ * the same still frame — the zoom holds, only the drift is dropped.
+ *
+ * One constraint worth knowing: the frame clips with `overflow: clip`, not
+ * `overflow: hidden`, because a hidden box IS a scroll container — the photo
+ * would then measure itself against a box that never scrolls and sit frozen
+ * mid-travel. Any ancestor that clips this component has to use `clip` too
+ * (Tailwind: `overflow-clip`).
+ */
+interface Props {
+  src: string;
+  /** Empty alt = decorative (the default). Pass real text if it carries meaning. */
+  alt?: string;
+  /** Travel, as a share of the photo's height. Mild on purpose — keep it small. */
+  shift?: string;
+  /** Overscan that hides the travel. Must exceed twice `shift`. */
+  zoom?: number;
+  loading?: "lazy" | "eager";
+  class?: string;
+}
+
+const {
+  src,
+  alt = "",
+  shift = "8%",
+  zoom = 1.12,
+  loading = "lazy",
+  class: extra = "",
+} = Astro.props;
+---
+
+<div
+  class:list={["parallax overflow-clip", extra]}
+  style={`--px-shift:${shift};--px-zoom:${zoom}`}
+>
+  <img
+    src={src}
+    alt={alt}
+    loading={loading}
+    decoding="async"
+    aria-hidden={alt === "" ? "true" : undefined}
+    class="h-full w-full object-cover"
+  />
+</div>
+
+<style>
+  .parallax > img {
+    scale: var(--px-zoom);
+    animation-name: px-drift;
+    animation-timing-function: linear;
+    animation-fill-mode: both;
+    /* Progress is driven by the frame's trip through the viewport, not by
+       time — duration stays at its `auto` default. */
+    animation-timeline: view();
+  }
+
+  @keyframes px-drift {
+    from {
+      translate: 0 calc(var(--px-shift) * -1);
+    }
+    to {
+      translate: 0 var(--px-shift);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .parallax > img {
+      animation-name: none;
+    }
+  }
+</style>

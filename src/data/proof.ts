@@ -19,28 +19,28 @@ export interface Feature {
 
 export const trustFeatures: Feature[] = [
   {
+    icon: "clock",
+    title: "Readiness",
+    body: "Serviced, fuelled and load tested stock standing in the Sajjah yard. Mobilisation is measured in hours, not weeks \u2014 most units leave the same day they're confirmed.",
+    image: "/images/why-readiness.jpg",
+  },
+  {
     icon: "award",
-    title: "Top international brands",
-    body: "Perkins, Cummins, JCB, Kalmar, Deutz and more — every unit sourced to spec from manufacturers we trust, so the machine that arrives is exactly the machine you ordered.",
-    image: "/images/why-brands.jpg",
+    title: "Reliability",
+    body: "Branded units from established manufacturers, maintained on schedule and documented. Every machine is function tested and handed over with a signed condition report.",
+    image: "/images/why-reliability.jpg",
+  },
+  {
+    icon: "phone",
+    title: "Accountability",
+    body: "One named contact from enquiry to off hire \u2014 you won't be passed between departments mid-project. Breakdowns are ours to fix, not yours to chase.",
+    image: "/images/why-accountability.jpg",
   },
   {
     icon: "tag",
-    title: "Flexible sales & rental",
-    body: "Buy outright or rent by the day, week or month. Terms flex around your project timeline, so the fleet scales up or down as the job changes.",
-    image: "/images/why-rental.jpg",
-  },
-  {
-    icon: "layers",
-    title: "Wide equipment range",
-    body: "Generators to cranes, compressors to tower lights — one supplier and one point of contact for the whole site, with genuine spare parts to keep it all running.",
-    image: "/images/why-range.jpg",
-  },
-  {
-    icon: "truck",
-    title: "Fast delivery & ready stock",
-    body: "Local UAE stock dispatched fast — most units leave our Dubai yard within hours of confirmation, with export handling across the wider region.",
-    image: "/images/why-delivery.jpg",
+    title: "Fair dealing",
+    body: "Clear rates, honest condition reports and no charges that were not on the agreement. Quotations are issued the same working day wherever possible.",
+    image: "/images/why-fair-dealing.jpg",
   },
 ];
 

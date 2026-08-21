@@ -42,11 +42,11 @@ import { testimonialsSection } from "@/data/content";
                     <Icon name="star" size={15} />
                   ))}
                 </div>
-                <blockquote class="mt-5 font-display text-[clamp(22px,2.5vw,31px)] leading-[1.32] font-semibold tracking-[-0.015em] text-ink">
+                <blockquote class="mt-5 font-display text-[clamp(22px,2.5vw,31px)] leading-[1.32] font-medium tracking-[-0.015em] text-ink">
                   “{t.quote}”
                 </blockquote>
                 <figcaption class="mt-7">
-                  <div class="text-base font-semibold text-ink">{t.name}</div>
+                  <div class="text-base font-medium text-ink">{t.name}</div>
                   <div class="mt-0.5 text-note text-faint">{t.role}</div>
                 </figcaption>
               </figure>
@@ -110,23 +110,28 @@ import { testimonialsSection } from "@/data/content";
 <script>
   import { createRotator } from "@/scripts/rotator";
 
-  const block = document.getElementById("quote-split");
-  if (block) {
-    const slides = [...block.querySelectorAll<HTMLElement>(".quote-slide")];
-    const dots = [...block.querySelectorAll<HTMLButtonElement>(".quote-dot")];
+  // Re-runs after every client-router navigation as well as on first load,
+  // so the swapped-in DOM gets wired up.
+  document.addEventListener("astro:page-load", () => {
+    const block = document.getElementById("quote-split");
+    if (block) {
+      const slides = [...block.querySelectorAll<HTMLElement>(".quote-slide")];
+      const dots = [...block.querySelectorAll<HTMLButtonElement>(".quote-dot")];
 
-    const rotator = createRotator({
-      root: block,
-      count: slides.length,
-      interval: 7000,
-      onSelect: (i) => {
-        slides.forEach((s, j) => s.classList.toggle("is-active", j === i));
-        dots.forEach((d, j) => d.setAttribute("aria-current", String(j === i)));
-      },
-    });
-
-    dots.forEach((d, i) =>
-      d.addEventListener("click", () => rotator.select(i)),
-    );
-  }
+      const rotator = createRotator({
+        root: block,
+        count: slides.length,
+        interval: 7000,
+        onSelect: (i) => {
+          slides.forEach((s, j) => s.classList.toggle("is-active", j === i));
+          dots.forEach((d, j) =>
+            d.setAttribute("aria-current", String(j === i)),
+          );
+        },
+      });
+      dots.forEach((d, i) =>
+        d.addEventListener("click", () => rotator.select(i)),
+      );
+    }
+  });
 </script>

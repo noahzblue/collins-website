@@ -6,6 +6,7 @@
  * Pages supply only their own content — chrome is never imported per page, so
  * a new route cannot ship without a header or footer.
  */
+import { ClientRouter } from "astro:transitions";
 import "@/styles/global.css";
 import Header from "@/components/layout/Header.astro";
 import Footer from "@/components/layout/Footer.astro";
@@ -36,9 +37,48 @@ const { title = site.seo.title, description = site.seo.description } =
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Inter+Tight:wght@500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500&family=Geist+Mono:wght@400;500&display=swap"
       rel="stylesheet"
     />
+    <!-- Client-side routing: the next page swaps in without a reload, so the
+         header, hero video and marquee never flash or restart on navigation.
+         Scripts that touch the DOM carry `data-astro-rerun`. -->
+    <ClientRouter />
+
+    <!-- Smooth scroll. Deliberately NOT `data-astro-rerun`: this script runs
+         once per document, so a page swap can't stack a second Lenis (and a
+         second rAF loop) on top of the first. See docs/site-expansion/02. -->
+    <script>
+      import Lenis from "lenis";
+      import "lenis/dist/lenis.css";
+
+      const lenis = new Lenis({
+        autoRaf: true,
+        // Anchor jumps land 104px down — `--spacing-header-gap`, the token the
+        // floating header occupies. Lenis does its own scrolling and never
+        // reads `scroll-padding-top`, so the bare `anchors: true` would put the
+        // target underneath the header.
+        anchors: { offset: -104 },
+        // Start/stop with the wrapper's `overflow`, so `overflow: hidden` on
+        // <body> (mobile nav, any modal) freezes the page without a manual
+        // stop()/start() pair that can get stuck.
+        autoToggle: true,
+        allowNestedScroll: true,
+        stopInertiaOnNavigate: true,
+        // Higher = less smoothing. Library default is 0.1, which reads as lag
+        // on a site that gets scanned for spec ranges.
+        lerp: 0.55,
+        // `respectReducedMotion` defaults to true — do not turn it off.
+      });
+
+      // The client router replaces the body and restores scroll itself. Re-measure
+      // the new page, and adopt whatever position the router set so Lenis doesn't
+      // animate a slide from the old one.
+      document.addEventListener("astro:after-swap", () => {
+        lenis.resize();
+        lenis.scrollTo(window.scrollY, { immediate: true, force: true });
+      });
+    </script>
   </head>
   <body>
     <Header />

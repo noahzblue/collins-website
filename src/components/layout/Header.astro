@@ -24,7 +24,7 @@ import { mainNav } from "@/data/navigation";
         mainNav.map((link) => (
           <a
             href={link.href}
-            class="nav-link text-detail font-medium transition-colors duration-150"
+            class="nav-link font-mono text-detail font-medium transition-colors duration-150"
           >
             {link.label}
           </a>
@@ -89,24 +89,33 @@ import { mainNav } from "@/data/navigation";
 </style>
 
 <script>
-  const header = document.getElementById("site-header")!;
-  const hero = document.querySelector<HTMLElement>(".hero");
-  let ticking = false;
+  import { untilPageSwap } from "@/scripts/untilPageSwap";
 
-  // Pages without a hero have light backgrounds — frosted white from the start.
-  const apply = () => {
-    const limit = hero ? hero.offsetHeight - 84 : -1;
-    header.dataset.tone = window.scrollY > limit ? "solid" : "glass";
-    ticking = false;
-  };
-  const onScroll = () => {
-    if (!ticking) {
-      ticking = true;
-      requestAnimationFrame(apply);
-    }
-  };
+  // Re-runs after every client-router navigation as well as on first load,
+  // so the swapped-in DOM gets wired up.
+  document.addEventListener("astro:page-load", () => {
+    const gone = untilPageSwap();
+    const header = document.getElementById("site-header")!;
+    const hero = document.querySelector<HTMLElement>(".hero");
+    let ticking = false;
 
-  apply();
-  window.addEventListener("scroll", onScroll, { passive: true });
-  window.addEventListener("resize", onScroll);
+    // Pages without a hero have light backgrounds — frosted white from the start.
+    const apply = () => {
+      const limit = hero ? hero.offsetHeight - 84 : -1;
+      header.dataset.tone = window.scrollY > limit ? "solid" : "glass";
+      ticking = false;
+    };
+    const onScroll = () => {
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(apply);
+      }
+    };
+    apply();
+    window.addEventListener("scroll", onScroll, {
+      passive: true,
+      signal: gone,
+    });
+    window.addEventListener("resize", onScroll, { signal: gone });
+  });
 </script>

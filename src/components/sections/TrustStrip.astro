@@ -1,19 +1,23 @@
 ---
 /**
- * "Why Collins" — big statement, then one dark photo card with a constant
+ * "Why Collins" — big statement, then one wide dark photo card with a constant
  * headline, a mono counter, and four tabs along the base that swap the
  * photo + copy (siteassist.com pattern). Auto-advances every 6s, pauses
  * while hovered, and holds still for reduced-motion users.
+ *
+ * The card runs on the wide 1600px band rather than the 1200px text column,
+ * and the four tab blocks are bottom-aligned so they sit on the base of the
+ * photo whether their description is open or closed.
  */
 import Section from "@/components/ui/Section.astro";
 import Eyebrow from "@/components/ui/Eyebrow.astro";
-import BgImage from "@/components/ui/BgImage.astro";
+import ParallaxImage from "@/components/ui/ParallaxImage.astro";
 import { trustFeatures } from "@/data/proof";
 import { trust } from "@/data/content";
 ---
 
 <Section id="why-collins">
-  <div class="wrap">
+  <div class="wrap wrap-wide">
     <Eyebrow class="mb-[16px]">{trust.eyebrow}</Eyebrow>
     <h2 class="max-w-[820px] text-[clamp(28px,3.6vw,44px)] leading-[1.12]">
       {trust.statement}
@@ -21,13 +25,14 @@ import { trust } from "@/data/content";
 
     <div
       id="why-card"
-      class="relative mt-[56px] flex min-h-[620px] flex-col justify-between overflow-hidden rounded-[18px] bg-ink max-mob:mt-[36px] max-mob:min-h-0"
+      class="relative mt-[56px] flex min-h-[620px] flex-col justify-between overflow-clip rounded-[18px] bg-ink max-mob:mt-[36px] max-mob:min-h-0"
     >
       {
         trustFeatures.map((f, i) => (
-          <BgImage
+          <ParallaxImage
             src={f.image}
-            class:list={["tab-img", i === 0 && "is-active"]}
+            loading={i === 0 ? "eager" : "lazy"}
+            class:list={["tab-img absolute inset-0", i === 0 && "is-active"]}
           />
         ))
       }
@@ -55,7 +60,7 @@ import { trust } from "@/data/content";
       </div>
 
       <div
-        class="relative grid grid-cols-4 gap-8 px-10 pt-16 pb-9 max-nav:grid-cols-2 max-nav:gap-6 max-cmp:grid-cols-1 max-xs:px-6 max-xs:pb-6"
+        class="relative grid grid-cols-4 items-end gap-8 px-10 pt-16 pb-9 max-nav:grid-cols-2 max-nav:gap-6 max-cmp:grid-cols-1 max-xs:px-6 max-xs:pb-6"
         role="tablist"
         aria-label={trust.eyebrow}
       >
@@ -137,39 +142,42 @@ import { trust } from "@/data/content";
 <script>
   import { createRotator } from "@/scripts/rotator";
 
-  const card = document.getElementById("why-card");
-  if (card) {
-    const tabs = [...card.querySelectorAll<HTMLButtonElement>(".why-tab")];
-    const imgs = [...card.querySelectorAll<HTMLElement>(".tab-img")];
-    const num = card.querySelector<HTMLElement>("#why-num")!;
+  // Re-runs after every client-router navigation as well as on first load,
+  // so the swapped-in DOM gets wired up.
+  document.addEventListener("astro:page-load", () => {
+    const card = document.getElementById("why-card");
+    if (card) {
+      const tabs = [...card.querySelectorAll<HTMLButtonElement>(".why-tab")];
+      const imgs = [...card.querySelectorAll<HTMLElement>(".tab-img")];
+      const num = card.querySelector<HTMLElement>("#why-num")!;
 
-    // Re-trigger the CSS fill animation from zero on the active tab.
-    const restartFill = () => {
-      const fill = card.querySelector<HTMLElement>(
-        '.why-tab[aria-selected="true"] .bar-fill',
-      );
-      if (!fill) return;
-      fill.style.animation = "none";
-      void fill.offsetWidth;
-      fill.style.animation = "";
-    };
-
-    const rotator = createRotator({
-      root: card,
-      count: tabs.length,
-      interval: 6000, // keep in sync with the why-progress duration in <style>
-      onResume: restartFill,
-      onSelect: (i) => {
-        tabs.forEach((t, j) =>
-          t.setAttribute("aria-selected", String(j === i)),
+      // Re-trigger the CSS fill animation from zero on the active tab.
+      const restartFill = () => {
+        const fill = card.querySelector<HTMLElement>(
+          '.why-tab[aria-selected="true"] .bar-fill',
         );
-        imgs.forEach((im, j) => im.classList.toggle("is-active", j === i));
-        num.textContent = String(i + 1).padStart(2, "0");
-      },
-    });
+        if (!fill) return;
+        fill.style.animation = "none";
+        void fill.offsetWidth;
+        fill.style.animation = "";
+      };
 
-    tabs.forEach((t, i) =>
-      t.addEventListener("click", () => rotator.select(i)),
-    );
-  }
+      const rotator = createRotator({
+        root: card,
+        count: tabs.length,
+        interval: 6000, // keep in sync with the why-progress duration in <style>
+        onResume: restartFill,
+        onSelect: (i) => {
+          tabs.forEach((t, j) =>
+            t.setAttribute("aria-selected", String(j === i)),
+          );
+          imgs.forEach((im, j) => im.classList.toggle("is-active", j === i));
+          num.textContent = String(i + 1).padStart(2, "0");
+        },
+      });
+      tabs.forEach((t, i) =>
+        t.addEventListener("click", () => rotator.select(i)),
+      );
+    }
+  });
 </script>

@@ -3,8 +3,9 @@
  * Button / CTA. Renders an <a> when `href` is set, otherwise a <button>.
  * All button styling in the design lives here — pick a `variant`.
  *
- * Style: sentence-case pill buttons (rounded-full), medium weight — the calm,
- * premium look. Blue is the primary action; everything else is quiet.
+ * Style: sentence-case pill buttons (rounded-full) in Geist Mono at 500 —
+ * the calm, premium look. Blue is the primary action; everything else is
+ * quiet.
  */
 interface Props {
   href?: string;
@@ -25,7 +26,7 @@ const {
 } = Astro.props;
 
 const base =
-  "inline-flex items-center justify-center gap-2 font-semibold whitespace-nowrap rounded-full transition-all duration-200 cursor-pointer";
+  "inline-flex items-center justify-center gap-2 font-mono font-medium whitespace-nowrap rounded-full transition-all duration-200 cursor-pointer";
 
 const sizes: Record<NonNullable<Props["size"]>, string> = {
   md: "px-[24px] py-[12px] text-sm",

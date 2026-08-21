@@ -38,7 +38,7 @@ const parseStat = (value: string) => {
           const { target, suffix } = parseStat(s.value);
           return (
             <div class="px-10 py-10 first:pl-0 max-cmp:px-0 max-cmp:py-7">
-              <div class="font-display text-[clamp(40px,4.8vw,60px)] leading-none font-semibold text-ink">
+              <div class="font-display text-[clamp(40px,4.8vw,60px)] leading-none font-medium text-ink">
                 <span class="stat-num" data-target={target}>
                   {target}
                 </span>
@@ -92,35 +92,41 @@ const parseStat = (value: string) => {
 </style>
 
 <script>
-  const band = document.getElementById("stat-band");
-  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  if (band && !reduced) {
-    const nums = [...band.querySelectorAll<HTMLElement>(".stat-num")];
-    const DURATION = 1200;
+  // Re-runs after every client-router navigation as well as on first load,
+  // so the swapped-in DOM gets wired up.
+  document.addEventListener("astro:page-load", () => {
+    const band = document.getElementById("stat-band");
+    const reduced = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    if (band && !reduced) {
+      const nums = [...band.querySelectorAll<HTMLElement>(".stat-num")];
+      const DURATION = 1200;
 
-    const run = (el: HTMLElement) => {
-      const target = Number(el.dataset.target ?? "0");
-      const start = performance.now();
-      const tick = (now: number) => {
-        const t = Math.min((now - start) / DURATION, 1);
-        const eased = 1 - Math.pow(1 - t, 3);
-        el.textContent = String(Math.round(target * eased));
-        if (t < 1) requestAnimationFrame(tick);
+      const run = (el: HTMLElement) => {
+        const target = Number(el.dataset.target ?? "0");
+        const start = performance.now();
+        const tick = (now: number) => {
+          const t = Math.min((now - start) / DURATION, 1);
+          const eased = 1 - Math.pow(1 - t, 3);
+          el.textContent = String(Math.round(target * eased));
+          if (t < 1) requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
       };
-      requestAnimationFrame(tick);
-    };
 
-    const io = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            nums.forEach(run);
-            io.disconnect();
-          }
-        });
-      },
-      { threshold: 0.4 },
-    );
-    io.observe(band);
-  }
+      const io = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              nums.forEach(run);
+              io.disconnect();
+            }
+          });
+        },
+        { threshold: 0.4 },
+      );
+      io.observe(band);
+    }
+  });
 </script>

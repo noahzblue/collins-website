@@ -14,7 +14,7 @@ export const hero = {
     emphasis: "industrial & heavy machinery",
     tail: " rental and sales.",
   },
-  sub: "Reliable, top-quality branded equipment — generators, forklifts, compressors and cranes — to buy or rent, delivered fast across the UAE.",
+  sub: "Reliable, top quality branded equipment  generators, forklifts, compressors and cranes to buy or rent, delivered fast across the UAE.",
   ctas: [
     {
       label: "Request a quote",
@@ -31,8 +31,9 @@ export const hero = {
 
 /** "Why Collins" — big statement + tabbed proof card. */
 export const trust = {
-  eyebrow: "What we do",
-  statement: "We Offer Expert Equipment Sourcing and Global Export Solutions",
+  eyebrow: "What drives us",
+  statement:
+    "The first call in the Emirates for equipment that has to work on the day it arrives.",
   /** Constant headline over the photo card; tabs swap image + copy below it. */
   cardTitle: ["Built to keep", "your site moving."],
 };

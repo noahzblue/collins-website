@@ -1,6 +1,7 @@
 ---
 /**
- * Small accent label above headings.
+ * Small accent label above headings. Mono — it belongs to the structural
+ * layer (labels, nav, buttons, numbers), not to the reading type.
  * - kind "label": bold 12px tracked caps (section heads, copy blocks).
  * - kind "hero":  larger inherited size used in the hero & quote band.
  * `bar` toggles the short accent rule before the text.
@@ -25,20 +26,18 @@ const barColor = tone === "brand-bright" ? "bg-brand-bright" : "bg-brand";
 const typo =
   kind === "hero"
     ? "text-lead font-normal max-mob:text-micro max-mob:mb-[16px]"
-    : "text-label font-semibold tracking-[2px] uppercase";
-
-const barW = kind === "hero" ? "w-[34px]" : "w-[24px]";
+    : "text-label font-medium tracking-[2px] uppercase";
 ---
 
 <div
   class:list={[
-    "font-sans",
+    "font-mono",
     typo,
     textColor,
     bar && "flex items-center gap-[10px]",
     extra,
   ]}
 >
-  {bar && <span class:list={["h-[2px]", barColor, barW]} aria-hidden="true" />}
+  {bar && <span class:list={["h-2 w-2", barColor]} aria-hidden="true" />}
   <slot />
 </div>

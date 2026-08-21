@@ -73,7 +73,7 @@ const methods = [
                 </span>
                 <span>
                   <span class="block text-caption text-faint">{m.label}</span>
-                  <span class="block text-base font-semibold text-ink">
+                  <span class="block text-base font-medium text-ink">
                     {m.value}
                   </span>
                 </span>
@@ -89,7 +89,7 @@ const methods = [
         data-wa={site.whatsapp.href}
         class="card p-9 shadow-[0_24px_60px_-36px_rgba(10,14,23,0.4)] max-xs:p-6"
       >
-        <label class="mb-5 block text-meta font-semibold text-ink">
+        <label class="mb-5 block text-meta font-medium text-ink">
           Request a quote — we reply within one business day.
         </label>
         <div class="grid grid-cols-2 gap-3 max-cmp:grid-cols-1">
@@ -197,28 +197,34 @@ const methods = [
 </style>
 
 <script>
-  const form = document.getElementById("quote-form") as HTMLFormElement | null;
-  if (form) {
-    form.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const data = new FormData(form);
-      const get = (key: string) => String(data.get(key) ?? "").trim();
+  // Re-runs after every client-router navigation as well as on first load,
+  // so the swapped-in DOM gets wired up.
+  document.addEventListener("astro:page-load", () => {
+    const form = document.getElementById(
+      "quote-form",
+    ) as HTMLFormElement | null;
+    if (form) {
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const data = new FormData(form);
+        const get = (key: string) => String(data.get(key) ?? "").trim();
 
-      const lines = [
-        "New quote request — collinscouae.com",
-        `Name: ${[get("first_name"), get("last_name")].filter(Boolean).join(" ")}`,
-        `Email: ${get("email")}`,
-        `Phone: ${get("phone")}`,
-        `Equipment: ${get("category")}`,
-        get("mode") &&
-          `Buy or rent: ${get("mode")}${get("duration") ? ` · ${get("duration")}` : ""}`,
-        get("message") && `Details: ${get("message")}`,
-      ].filter(Boolean);
+        const lines = [
+          "New quote request — collinscouae.com",
+          `Name: ${[get("first_name"), get("last_name")].filter(Boolean).join(" ")}`,
+          `Email: ${get("email")}`,
+          `Phone: ${get("phone")}`,
+          `Equipment: ${get("category")}`,
+          get("mode") &&
+            `Buy or rent: ${get("mode")}${get("duration") ? ` · ${get("duration")}` : ""}`,
+          get("message") && `Details: ${get("message")}`,
+        ].filter(Boolean);
 
-      window.open(
-        `${form.dataset.wa}?text=${encodeURIComponent(lines.join("\n"))}`,
-        "_blank",
-      );
-    });
-  }
+        window.open(
+          `${form.dataset.wa}?text=${encodeURIComponent(lines.join("\n"))}`,
+          "_blank",
+        );
+      });
+    }
+  });
 </script>

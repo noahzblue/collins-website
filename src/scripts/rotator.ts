@@ -43,7 +43,13 @@ export function createRotator({
 
   const arm = () => {
     clearTimeout(timer);
-    if (auto) timer = setTimeout(() => select((index + 1) % count), interval);
+    // `root.isConnected` stops the chain after a client-router navigation:
+    // the swapped-out page's rotator re-arms once, finds itself detached and
+    // stops, leaving only the new page's rotator running.
+    if (auto)
+      timer = setTimeout(() => {
+        if (root.isConnected) select((index + 1) % count);
+      }, interval);
   };
 
   const select = (i: number) => {

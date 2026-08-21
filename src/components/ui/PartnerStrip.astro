@@ -1,0 +1,220 @@
+---
+/**
+ * Manufacturer wordmark strip — the "trusted by" row.
+ *
+ * Two variants:
+ *   `static`  — the marks in a plain row that wraps on narrow screens.
+ *   `marquee` — the same marks drifting sideways. The drift is scroll-reactive:
+ *               it idles slowly, accelerates with the reader's scroll and flips
+ *               direction when they scroll back (see the script at the bottom).
+ *
+ * Reduced-motion readers get the still row from either variant.
+ */
+import { partners } from "@/data/proof";
+import { partnersLabel } from "@/data/content";
+
+interface Props {
+  items?: string[];
+  label?: string;
+  variant?: "static" | "marquee";
+  /** `dark` = pale marks over photography; `light` = slate marks on white. */
+  tone?: "dark" | "light";
+  class?: string;
+}
+
+const {
+  items = partners,
+  label = partnersLabel,
+  variant = "static",
+  tone = "dark",
+  class: extra = "",
+} = Astro.props;
+
+const mark = [
+  "font-mono text-note font-medium tracking-[1.5px] whitespace-nowrap max-xs:text-tag",
+  tone === "dark" ? "text-white/45" : "text-faint",
+].join(" ");
+---
+
+{
+  variant === "marquee" ? (
+    <div class:list={["mq relative overflow-hidden", extra]} data-marquee>
+      <div class="mq-track flex w-max">
+        <ul class="mq-group flex items-center" aria-label={label}>
+          {items.map((name) => (
+            <li class={mark}>{name}</li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  ) : (
+    <ul
+      class:list={[
+        "flex flex-wrap items-center gap-x-8 gap-y-3 max-mob:gap-x-6",
+        extra,
+      ]}
+      aria-label={label}
+    >
+      {items.map((name) => (
+        <li class={mark}>{name}</li>
+      ))}
+    </ul>
+  )
+}
+
+<style>
+  .mq {
+    --mq-gap: 56px;
+    /* The marks dissolve into the panel rather than being cut off. */
+    -webkit-mask-image: linear-gradient(
+      90deg,
+      transparent 0,
+      #000 32px,
+      #000 calc(100% - 32px),
+      transparent 100%
+    );
+    mask-image: linear-gradient(
+      90deg,
+      transparent 0,
+      #000 32px,
+      #000 calc(100% - 32px),
+      transparent 100%
+    );
+  }
+  @media (max-width: 900px) {
+    .mq {
+      --mq-gap: 40px;
+    }
+  }
+
+  /* The trailing gap lives on the group, so one group's width is exactly the
+     distance the track travels per loop — the script relies on that. */
+  .mq-group {
+    gap: var(--mq-gap);
+    padding-right: var(--mq-gap);
+  }
+</style>
+
+<script>
+  import { untilPageSwap } from "@/scripts/untilPageSwap";
+
+  // Re-runs after every client-router navigation as well as on first load,
+  // so the swapped-in DOM gets wired up.
+  document.addEventListener("astro:page-load", () => {
+    /**
+     * Scroll-reactive marquee.
+     *
+     * Every strip shares one scroll listener and one rAF loop. The track holds a
+     * signed velocity: it rests at a slow idle drift, each scroll event adds an
+     * impulse proportional to the distance scrolled, and the velocity eases back
+     * to the idle speed afterwards. Because the impulse is signed, scrolling up
+     * flips the strip's direction and it keeps drifting that way until the reader
+     * scrolls the other way.
+     */
+    const IDLE = 26; // px/s the strip drifts when nobody is scrolling
+    const IMPULSE = 0.7; // px/s of velocity gained per px scrolled
+    const MAX = 1400; // px/s ceiling, so a flick stays readable
+    const EASE = 3.2; // per second, how fast velocity returns to IDLE
+    const MAX_CLONES = 24;
+
+    interface Strip {
+      track: HTMLElement;
+      group: HTMLElement;
+      /** One group's width — the loop distance. */
+      width: number;
+      x: number;
+    }
+
+    const roots = [...document.querySelectorAll<HTMLElement>("[data-marquee]")];
+
+    if (
+      roots.length &&
+      !window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      const strips = roots.map(measure).filter((s): s is Strip => s !== null);
+
+      if (strips.length) {
+        const gone = untilPageSwap();
+        let velocity = -IDLE;
+        let direction = -1;
+        let lastY = window.scrollY;
+        let lastT = performance.now();
+
+        window.addEventListener(
+          "scroll",
+          () => {
+            const y = window.scrollY;
+            const delta = y - lastY;
+            lastY = y;
+            if (!delta) return;
+            // Scrolling down carries the marks left, scrolling up carries them right.
+            direction = delta > 0 ? -1 : 1;
+            velocity = clamp(velocity - delta * IMPULSE, -MAX, MAX);
+          },
+          { passive: true, signal: gone },
+        );
+
+        const frame = (now: number) => {
+          if (gone.aborted) return; // this page is gone; its loop goes with it
+          const dt = Math.min((now - lastT) / 1000, 0.05);
+          lastT = now;
+
+          velocity += (IDLE * direction - velocity) * Math.min(1, EASE * dt);
+          const step = velocity * dt;
+
+          for (const s of strips) {
+            // Keep x within (-width, 0]: one group's width of travel is a
+            // seamless loop, so the wrap is invisible in either direction.
+            let x = (s.x + step) % s.width;
+            if (x > 0) x -= s.width;
+            s.x = x;
+            s.track.style.transform = `translate3d(${x}px,0,0)`;
+          }
+          requestAnimationFrame(frame);
+        };
+        requestAnimationFrame(frame);
+
+        const remeasure = () => strips.forEach(reset);
+        window.addEventListener("resize", remeasure, { signal: gone });
+        document.fonts?.ready.then(remeasure);
+      }
+    }
+
+    /** Clone the wordmarks until the track can cover the strip plus one loop. */
+    function measure(root: HTMLElement): Strip | null {
+      const track = root.querySelector<HTMLElement>(".mq-track");
+      const group = track?.firstElementChild as HTMLElement | null;
+      if (!track || !group) return null;
+
+      const strip: Strip = { track, group, width: 0, x: 0 };
+      track.style.willChange = "transform";
+      return fill(root, strip) ? strip : null;
+    }
+
+    function reset(strip: Strip) {
+      const root = strip.track.parentElement!;
+      while (strip.track.lastElementChild !== strip.group)
+        strip.track.lastElementChild!.remove();
+      strip.x = 0;
+      fill(root, strip);
+    }
+
+    function fill(root: HTMLElement, strip: Strip): boolean {
+      const width = strip.group.offsetWidth;
+      if (!width) return false;
+      strip.width = width;
+
+      const needed = root.offsetWidth + width;
+      for (let i = 0; strip.track.offsetWidth < needed && i < MAX_CLONES; i++) {
+        const copy = strip.group.cloneNode(true) as HTMLElement;
+        copy.removeAttribute("aria-label");
+        copy.setAttribute("aria-hidden", "true");
+        strip.track.append(copy);
+      }
+      return true;
+    }
+    function clamp(v: number, lo: number, hi: number) {
+      return v < lo ? lo : v > hi ? hi : v;
+    }
+  });
+</script>

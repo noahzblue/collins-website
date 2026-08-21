@@ -74,9 +74,14 @@
   --text-h2: clamp(30px, 3.8vw, 46px); /* primary section heading */
   --text-h3: clamp(26px, 3vw, 36px); /* in-page block heading */
 
-  /* Fonts (loaded from Google Fonts in Base.astro) */
-  --font-sans: "Inter", system-ui, sans-serif; /* body */
-  --font-display: "Inter Tight", "Inter", system-ui, sans-serif; /* headings */
+  /* Fonts (loaded from Google Fonts in Base.astro).
+     Two families, one role split: Geist carries reading type (body copy,
+     h2, h3, intros); Geist Mono carries structural type (h1/h4, eyebrows,
+     pills, buttons, nav, stat numbers, captions, coordinates).
+     Everything sits at 400 — 500 is the heaviest weight the site uses. */
+  --font-sans: "Geist", system-ui, sans-serif; /* body */
+  --font-display: "Geist", system-ui, sans-serif; /* headings */
+  --font-mono: "Geist Mono", ui-monospace, monospace; /* structural layer */
 
   /* ---- Layout --------------------------------------------- */
 
@@ -97,9 +102,12 @@
    BASE — element defaults Tailwind's Preflight doesn't cover.
    ============================================================ */
 @layer base {
+  /* No `scroll-behavior: smooth` here — Lenis (Base.astro) owns scroll
+     animation, including anchor jumps, and the two fight over it. */
   html {
-    scroll-behavior: smooth;
-    /* Anchor jumps clear the floating fixed header. */
+    /* Native anchor landings (no-JS, and browser find-in-page) clear the
+       floating fixed header. Lenis has its own `anchors.offset` for the same
+       reason — it never reads this. */
     scroll-padding-top: var(--spacing-header-gap);
   }
   body {
@@ -109,19 +117,30 @@
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }
-  /* Headings: Inter Tight, sentence case, tight optical tracking.
-     Sizes are set per component from the --text-h* tokens; this is
-     the shared feel. */
+  /* Headings: sizes are set per component from the --text-h* tokens; this
+     is the shared feel. Flat 400 — no bold display type anywhere. */
   h1,
   h2,
   h3,
   h4 {
     font-family: var(--font-display);
-    font-weight: 600;
+    font-weight: 400;
     letter-spacing: -0.02em;
     line-height: 1.08;
     color: var(--color-ink);
     text-wrap: balance;
+  }
+  /* h1 and h4 are the structural rungs — uppercase mono, tracked tight. */
+  h1,
+  h4 {
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+  }
+  h1 {
+    letter-spacing: -0.0625em;
+  }
+  h4 {
+    letter-spacing: -0.02375em;
   }
   ::selection {
     background: var(--color-brand);
@@ -141,9 +160,14 @@
 @layer components {
   /* Centered max-width container used by every section. */
   .wrap {
-    max-width: 1200px;
+    max-width: var(--wrap-max, 1200px);
     margin-inline: auto;
     padding-inline: 32px;
+  }
+  /* Wide band — sections that carry a full-width photo panel rather than a
+     column of prose. Add alongside .wrap: `class="wrap wrap-wide"`. */
+  .wrap-wide {
+    --wrap-max: 1600px;
   }
   @media (max-width: 900px) {
     .wrap {

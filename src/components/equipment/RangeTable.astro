@@ -36,7 +36,7 @@ const hasPowerType = ranges.some((r) => r.powerType);
 const hasDuty = ranges.some((r) => r.typicalDuty);
 
 const th =
-  "px-6 py-[13px] text-tag font-semibold uppercase tracking-[1.4px] text-faint max-xs:px-5";
+  "px-6 py-[13px] text-tag font-medium uppercase tracking-[1.4px] text-faint max-xs:px-5";
 const td = "px-6 py-[17px] align-middle max-cmp:p-0 max-xs:px-5";
 ---
 
@@ -70,7 +70,7 @@ const td = "px-6 py-[17px] align-middle max-cmp:p-0 max-xs:px-5";
         ranges.map((range) => (
           <tr class="border-b border-line transition-colors last:border-0 hover:bg-surface max-cmp:block max-cmp:px-5 max-cmp:py-5">
             <td
-              class={`${td} text-cell font-semibold whitespace-nowrap text-ink max-cmp:inline-flex max-cmp:text-intro`}
+              class={`${td} text-cell font-medium whitespace-nowrap text-ink max-cmp:inline-flex max-cmp:text-intro`}
             >
               {range.label}
             </td>
@@ -113,7 +113,7 @@ const td = "px-6 py-[17px] align-middle max-cmp:p-0 max-xs:px-5";
                 href={enquireHref(name, mode, range.label)}
                 target="_blank"
                 rel="noopener"
-                class="group inline-flex items-center gap-[5px] text-note font-semibold text-brand transition-colors hover:text-brand-hover"
+                class="group inline-flex items-center gap-[5px] text-note font-medium text-brand transition-colors hover:text-brand-hover"
               >
                 Enquire
                 <Icon
