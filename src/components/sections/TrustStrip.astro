@@ -5,29 +5,29 @@
  * photo + copy (siteassist.com pattern). Auto-advances every 6s, pauses
  * while hovered, and holds still for reduced-motion users.
  */
-import Section from "../ui/Section.astro";
-import Eyebrow from "../ui/Eyebrow.astro";
-import { trustFeatures } from "../../data/catalog";
-import { trust } from "../../data/content";
+import Section from "@/components/ui/Section.astro";
+import Eyebrow from "@/components/ui/Eyebrow.astro";
+import BgImage from "@/components/ui/BgImage.astro";
+import { trustFeatures } from "@/data/proof";
+import { trust } from "@/data/content";
 ---
 
 <Section id="why-collins">
   <div class="wrap">
     <Eyebrow class="mb-[16px]">{trust.eyebrow}</Eyebrow>
-    <h2 class="text-[clamp(28px,3.6vw,44px)] leading-[1.12] max-w-[820px]">
+    <h2 class="max-w-[820px] text-[clamp(28px,3.6vw,44px)] leading-[1.12]">
       {trust.statement}
     </h2>
 
     <div
       id="why-card"
-      class="relative overflow-hidden rounded-[18px] bg-ink mt-[56px] min-h-[620px] flex flex-col justify-between max-mob:mt-[36px] max-mob:min-h-0"
+      class="relative mt-[56px] flex min-h-[620px] flex-col justify-between overflow-hidden rounded-[18px] bg-ink max-mob:mt-[36px] max-mob:min-h-0"
     >
       {
         trustFeatures.map((f, i) => (
-          <div
-            class:list={["tab-img absolute inset-0 bg-cover bg-center", i === 0 && "is-active"]}
-            style={`background-image:url('${f.image}')`}
-            aria-hidden="true"
+          <BgImage
+            src={f.image}
+            class:list={["tab-img", i === 0 && "is-active"]}
           />
         ))
       }
@@ -39,21 +39,23 @@ import { trust } from "../../data/content";
       >
       </div>
 
-      <div class="relative flex items-start justify-between gap-6 p-10 max-xs:p-6">
+      <div
+        class="relative flex items-start justify-between gap-6 p-10 max-xs:p-6"
+      >
         <h3
-          class="text-white text-[clamp(26px,2.8vw,38px)] leading-[1.1]"
+          class="text-[clamp(26px,2.8vw,38px)] leading-[1.1] text-white"
           set:html={trust.cardTitle.join("<br>")}
         />
         <span
           id="why-num"
-          class="font-mono text-[clamp(28px,3vw,40px)] text-white/85 leading-none pt-1"
+          class="pt-1 font-mono text-[clamp(28px,3vw,40px)] leading-none text-white/85"
         >
           01
         </span>
       </div>
 
       <div
-        class="relative grid grid-cols-4 gap-8 px-10 pb-9 pt-16 max-nav:grid-cols-2 max-nav:gap-6 max-cmp:grid-cols-1 max-xs:px-6 max-xs:pb-6"
+        class="relative grid grid-cols-4 gap-8 px-10 pt-16 pb-9 max-nav:grid-cols-2 max-nav:gap-6 max-cmp:grid-cols-1 max-xs:px-6 max-xs:pb-6"
         role="tablist"
         aria-label={trust.eyebrow}
       >
@@ -62,21 +64,21 @@ import { trust } from "../../data/content";
             <button
               type="button"
               role="tab"
-              class="why-tab group text-left cursor-pointer"
+              class="why-tab group cursor-pointer text-left"
               aria-selected={i === 0 ? "true" : "false"}
               data-index={i}
             >
-              <span class="block text-[16.5px] font-medium text-white/65 transition-colors duration-300 group-aria-selected:text-white">
+              <span class="block text-lead-lg font-medium text-white/65 transition-colors duration-300 group-aria-selected:text-white">
                 {f.title}
               </span>
               <span class="desc-wrap grid transition-[grid-template-rows] duration-500 ease-out">
                 <span class="block overflow-hidden">
-                  <span class="block pt-2 text-[13.5px] leading-relaxed text-white/70">
+                  <span class="block pt-2 text-note leading-relaxed text-white/70">
                     {f.body}
                   </span>
                 </span>
               </span>
-              <span class="bar relative block h-px mt-4 bg-white/25 overflow-hidden">
+              <span class="bar relative mt-4 block h-px overflow-hidden bg-white/25">
                 <span class="bar-fill absolute inset-y-0 left-0 w-0 bg-brand-bright" />
               </span>
             </button>
@@ -133,46 +135,41 @@ import { trust } from "../../data/content";
 </style>
 
 <script>
+  import { createRotator } from "@/scripts/rotator";
+
   const card = document.getElementById("why-card");
   if (card) {
     const tabs = [...card.querySelectorAll<HTMLButtonElement>(".why-tab")];
     const imgs = [...card.querySelectorAll<HTMLElement>(".tab-img")];
     const num = card.querySelector<HTMLElement>("#why-num")!;
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const INTERVAL = 6000;
-    let idx = 0;
-    let timer: ReturnType<typeof setTimeout> | undefined;
 
     // Re-trigger the CSS fill animation from zero on the active tab.
     const restartFill = () => {
-      const fill = tabs[idx].querySelector<HTMLElement>(".bar-fill");
+      const fill = card.querySelector<HTMLElement>(
+        '.why-tab[aria-selected="true"] .bar-fill',
+      );
       if (!fill) return;
       fill.style.animation = "none";
       void fill.offsetWidth;
       fill.style.animation = "";
     };
 
-    const arm = () => {
-      clearTimeout(timer);
-      if (!reduced) {
-        timer = setTimeout(() => select((idx + 1) % tabs.length), INTERVAL);
-      }
-    };
-
-    const select = (i: number) => {
-      idx = i;
-      tabs.forEach((t, j) => t.setAttribute("aria-selected", String(j === i)));
-      imgs.forEach((im, j) => im.classList.toggle("is-active", j === i));
-      num.textContent = String(i + 1).padStart(2, "0");
-      arm();
-    };
-
-    tabs.forEach((t, i) => t.addEventListener("click", () => select(i)));
-    card.addEventListener("mouseenter", () => clearTimeout(timer));
-    card.addEventListener("mouseleave", () => {
-      restartFill();
-      arm();
+    const rotator = createRotator({
+      root: card,
+      count: tabs.length,
+      interval: 6000, // keep in sync with the why-progress duration in <style>
+      onResume: restartFill,
+      onSelect: (i) => {
+        tabs.forEach((t, j) =>
+          t.setAttribute("aria-selected", String(j === i)),
+        );
+        imgs.forEach((im, j) => im.classList.toggle("is-active", j === i));
+        num.textContent = String(i + 1).padStart(2, "0");
+      },
     });
-    arm();
+
+    tabs.forEach((t, i) =>
+      t.addEventListener("click", () => rotator.select(i)),
+    );
   }
 </script>

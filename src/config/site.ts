@@ -4,7 +4,7 @@
  * across the header, footer, floating buttons, quote band and <head>.
  */
 
-import type { IconName } from "../components/ui/icons";
+import type { IconName } from "@/components/ui/icons";
 
 export interface ContactLink {
   /** Human-readable text shown on the page. */
@@ -24,9 +24,6 @@ export interface SocialLink {
 export const site = {
   name: "Collins Equipments",
   legalName: "Collins Equipments LLC",
-
-  /** Two-line wordmark used by the logo. */
-  wordmark: { line1: "COLLINS", line2: "EQUIPMENTS LLC" },
 
   /** Short description used in the footer brand column. */
   blurb:

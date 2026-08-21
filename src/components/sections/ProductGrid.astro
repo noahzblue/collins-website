@@ -5,11 +5,11 @@
  * the homepage can't drift from the catalogue.
  */
 import { getCollection } from "astro:content";
-import Section from "../ui/Section.astro";
-import SectionHeading from "../ui/SectionHeading.astro";
-import Icon from "../ui/Icon.astro";
-import CategoryCard from "../equipment/CategoryCard.astro";
-import { fleet } from "../../data/content";
+import Section from "@/components/ui/Section.astro";
+import SectionHeading from "@/components/ui/SectionHeading.astro";
+import Icon from "@/components/ui/Icon.astro";
+import CategoryCard from "@/components/equipment/CategoryCard.astro";
+import { fleet } from "@/data/content";
 
 const featured = (await getCollection("equipment"))
   .filter((category) => category.data.featured)
@@ -41,7 +41,7 @@ const featured = (await getCollection("equipment"))
     <div class="mt-10 text-center">
       <a
         href={fleet.viewAll.href}
-        class="inline-flex items-center gap-2 text-[15px] font-semibold text-ink transition-colors hover:text-brand"
+        class="inline-flex items-center gap-2 text-base font-semibold text-ink transition-colors hover:text-brand"
       >
         {fleet.viewAll.label}
         <Icon name="arrow-right" size={17} />

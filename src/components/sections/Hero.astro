@@ -1,19 +1,19 @@
 ---
 /** Hero — full-bleed industrial photography, headline over a gradient scrim. */
-import Button from "../ui/Button.astro";
-import { hero, partnersLabel } from "../../data/content";
-import { partners } from "../../data/catalog";
-import { site } from "../../config/site";
+import Button from "@/components/ui/Button.astro";
+import { hero, partnersLabel } from "@/data/content";
+import { partners } from "@/data/proof";
+import { site } from "@/config/site";
 ---
 
 <section
-  class="hero relative overflow-hidden min-h-[640px] h-[100svh] flex items-end max-mob:h-auto max-mob:min-h-0"
+  class="hero relative flex h-[100svh] min-h-[640px] items-end overflow-hidden max-mob:h-auto max-mob:min-h-0"
   style="background-image:url('/images/hero-yard.jpg')"
 >
   <!-- Ambient yard footage. The section's background-image is the same frame,
        so reduced-motion, small screens, and playback failure all degrade to it. -->
   <video
-    class="hero-video absolute inset-0 w-full h-full object-cover"
+    class="hero-video absolute inset-0 h-full w-full object-cover"
     autoplay
     muted
     loop
@@ -31,27 +31,30 @@ import { site } from "../../config/site";
     class="wrap relative z-[2] w-full pt-[220px] pb-[64px] max-mob:pt-[140px] max-mob:pb-[44px]"
   >
     <span
-      class="reveal reveal-1 inline-flex items-center gap-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-white px-[14px] py-[7px] text-[12px] font-semibold tracking-[1px] uppercase max-xs:text-[10.5px]"
+      class="reveal reveal-1 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-[14px] py-[7px] text-label font-semibold tracking-[1px] text-white uppercase backdrop-blur-sm max-xs:text-[10.5px]"
     >
-      <span class="status-dot relative w-[6px] h-[6px] rounded-full bg-brand-bright"></span>
+      <span
+        class="status-dot relative h-[6px] w-[6px] rounded-full bg-brand-bright"
+      ></span>
       {hero.eyebrow}
     </span>
 
     <h1
-      class="reveal reveal-2 mt-6 max-w-[820px] text-white text-[clamp(38px,5.6vw,68px)] leading-[1.05] tracking-[-0.03em] max-mob:mt-5"
+      class="reveal reveal-2 mt-6 max-w-[820px] text-display leading-[1.05] tracking-[-0.03em] text-white max-mob:mt-5"
     >
-      {hero.title.lead}<span class="text-brand-bright">{hero.title.emphasis}</span
+      {hero.title.lead}<span class="text-brand-bright"
+        >{hero.title.emphasis}</span
       >{hero.title.tail}
     </h1>
 
     <p
-      class="reveal reveal-3 mt-5 max-w-[560px] text-pretty text-[18px] leading-relaxed text-white/75 max-mob:text-[16px] max-mob:mt-4"
+      class="reveal reveal-3 mt-5 max-w-[560px] text-subhead leading-relaxed text-pretty text-white/75 max-mob:mt-4 max-mob:text-lead"
     >
       {hero.sub}
     </p>
 
     <div
-      class="reveal reveal-4 mt-10 flex gap-3 flex-wrap max-mob:mt-7 max-xs:flex-col max-xs:items-stretch"
+      class="reveal reveal-4 mt-10 flex flex-wrap gap-3 max-mob:mt-7 max-xs:flex-col max-xs:items-stretch"
     >
       {
         hero.ctas.map((cta) => (
@@ -68,18 +71,18 @@ import { site } from "../../config/site";
 
     <!-- Base strip — survey-tag coordinates + manufacturer wordmarks. -->
     <div
-      class="reveal reveal-5 mt-14 pt-6 border-t border-white/15 flex items-center justify-between flex-wrap gap-x-10 gap-y-4 max-mob:mt-10 max-mob:pt-5"
+      class="reveal reveal-5 mt-14 flex flex-wrap items-center justify-between gap-x-10 gap-y-4 border-t border-white/15 pt-6 max-mob:mt-10 max-mob:pt-5"
     >
-      <span class="font-mono text-[12px] tracking-[0.5px] text-white/55">
+      <span class="font-mono text-label tracking-[0.5px] text-white/55">
         {site.geo.lat}º N&nbsp;&nbsp;{site.geo.lng}º E
       </span>
       <div
-        class="flex items-center flex-wrap gap-x-8 gap-y-3 max-mob:gap-x-6"
+        class="flex flex-wrap items-center gap-x-8 gap-y-3 max-mob:gap-x-6"
         aria-label={partnersLabel}
       >
         {
           partners.map((name) => (
-            <span class="font-display text-[13.5px] font-semibold tracking-[1.5px] text-white/45 max-xs:text-[11.5px]">
+            <span class="font-display text-note font-semibold tracking-[1.5px] text-white/45 max-xs:text-tag">
               {name}
             </span>
           ))

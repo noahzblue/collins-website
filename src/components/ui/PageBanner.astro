@@ -1,0 +1,42 @@
+---
+/**
+ * Full-bleed photo banner that opens a subpage: image, scrim, breadcrumb, h1.
+ * Anything below the heading (spec line, badges, tagline) goes in the slot.
+ *
+ * Shared by /equipment/<slug> and /industries/<slug> so both page types stay
+ * on the same crop, scrim and heading size.
+ */
+import BgImage from "./BgImage.astro";
+import Breadcrumb from "./Breadcrumb.astro";
+
+interface Props {
+  /** Omit and the banner falls back to flat ink — no broken-image gap. */
+  image?: string;
+  trail: { label: string; href: string }[];
+  current: string;
+  title: string;
+}
+
+const { image, trail, current, title } = Astro.props;
+---
+
+<section
+  class="relative flex min-h-[460px] items-end overflow-hidden bg-ink max-mob:min-h-[380px]"
+>
+  {image && <BgImage src={image} />}
+  <div class="scrim-banner absolute inset-0" aria-hidden="true"></div>
+
+  <div
+    class="wrap relative z-[1] w-full pt-[180px] pb-[52px] max-mob:pt-[130px] max-mob:pb-[40px]"
+  >
+    <Breadcrumb trail={trail} current={current} tone="on-dark" class="mb-4" />
+
+    <h1
+      class="max-w-[780px] text-h1 leading-[1.05] tracking-[-0.025em] text-white"
+    >
+      {title}
+    </h1>
+
+    <slot />
+  </div>
+</section>

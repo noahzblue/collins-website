@@ -16,31 +16,33 @@ interface Props {
 const { categories } = Astro.props;
 ---
 
-{/* The outer div is the grid cell and stretches to the full height of the rows
-    beside it; `sticky` only has room to travel because of that. */}
+{
+  /* The outer div is the grid cell and stretches to the full height of the rows
+    beside it; `sticky` only has room to travel because of that. */
+}
 <div class="max-nav:hidden">
-<nav class="sticky top-[104px]" aria-label="Equipment categories">
-  <ul class="flex flex-col border-l border-line">
-    {
-      categories.map((item) => (
-        <li>
-          <a
-            href={`#${item.id}`}
-            data-index-link={item.id}
-            class="idx flex items-center gap-[10px] py-[6px] pl-[13px] -ml-px border-l border-transparent transition-colors duration-200"
-          >
-            <span class="idx-num font-mono text-[11px] tracking-[0.5px] text-faint transition-colors duration-200">
-              {String(item.data.sortOrder).padStart(2, "0")}
-            </span>
-            <span class="idx-label text-[13.5px] leading-[1.3] text-muted transition-colors duration-200">
-              {item.data.name}
-            </span>
-          </a>
-        </li>
-      ))
-    }
-  </ul>
-</nav>
+  <nav class="sticky top-header-gap" aria-label="Equipment categories">
+    <ul class="flex flex-col border-l border-line">
+      {
+        categories.map((item) => (
+          <li>
+            <a
+              href={`#${item.id}`}
+              data-index-link={item.id}
+              class="idx -ml-px flex items-center gap-[10px] border-l border-transparent py-[6px] pl-[13px] transition-colors duration-200"
+            >
+              <span class="idx-num font-mono text-micro tracking-[0.5px] text-faint transition-colors duration-200">
+                {String(item.data.sortOrder).padStart(2, "0")}
+              </span>
+              <span class="idx-label text-note leading-[1.3] text-muted transition-colors duration-200">
+                {item.data.name}
+              </span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </nav>
 </div>
 
 <style>

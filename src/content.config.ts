@@ -11,13 +11,13 @@
  * slug that doesn't exist, or a missing `seoTitle` fails the build instead of
  * shipping a broken page.
  */
-import { defineCollection, reference } from 'astro:content';
-import { file } from 'astro/loaders';
+import { defineCollection, reference } from "astro:content";
+import { file } from "astro/loaders";
 // Astro 7 deprecates re-exporting `z` from astro:content — import it direct.
-import { z } from 'astro/zod';
+import { z } from "astro/zod";
 
 /** yard = on the ground in Sajjah · on_request = short lead · sourced = to order */
-const availability = z.enum(['yard', 'on_request', 'sourced']);
+const availability = z.enum(["yard", "on_request", "sourced"]);
 
 const range = z.object({
   /** Rating or size as it is quoted — "250 kVA", "5 ton", "12 m". */
@@ -35,15 +35,15 @@ const dutyScenario = z.object({
 });
 
 const equipment = defineCollection({
-  loader: file('src/content/equipment/categories.json'),
+  loader: file("src/content/equipment/categories.json"),
   schema: z.object({
     name: z.string(),
     family: z.enum([
-      'Power & air',
-      'Material handling',
-      'Access',
-      'Lifting',
-      'Earthmoving',
+      "Power & air",
+      "Material handling",
+      "Access",
+      "Lifting",
+      "Earthmoving",
     ]),
     /** Spec line under the name on cards and in the banner. */
     rangeLabel: z.string(),
@@ -62,7 +62,7 @@ const equipment = defineCollection({
     ranges: z.array(range).min(1),
     /** Sizing advice. Defaults to [] so the block simply doesn't render. */
     dutyGuide: z.array(dutyScenario).default([]),
-    related: z.array(reference('equipment')).length(3),
+    related: z.array(reference("equipment")).length(3),
     seoTitle: z.string(),
     seoDescription: z.string(),
     sortOrder: z.number().int(),

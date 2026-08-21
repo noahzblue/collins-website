@@ -1,22 +1,22 @@
 ---
 /** Site-wide footer — light surface matching the blue/white system. */
-import Logo from "./ui/Logo.astro";
-import Icon from "./ui/Icon.astro";
-import { site } from "../config/site";
-import { footerColumns } from "../data/navigation";
+import Logo from "@/components/ui/Logo.astro";
+import Icon from "@/components/ui/Icon.astro";
+import { site } from "@/config/site";
+import { footerColumns } from "@/data/navigation";
 
 const year = new Date().getFullYear();
 ---
 
-<footer class="bg-surface border-t border-line text-muted pt-24 max-mob:pt-16">
+<footer class="border-t border-line bg-surface pt-24 text-muted max-mob:pt-16">
   <div class="wrap">
     <div
-      class="grid grid-cols-[1.4fr_0.9fr_0.9fr_1fr] gap-12 pb-16 border-b border-line max-nav:grid-cols-2 max-nav:gap-10 max-cmp:grid-cols-1"
+      class="grid grid-cols-[1.4fr_0.9fr_0.9fr_1fr] gap-12 border-b border-line pb-16 max-nav:grid-cols-2 max-nav:gap-10 max-cmp:grid-cols-1"
     >
       <!-- Brand -->
       <div>
-        <Logo variant="header" />
-        <p class="text-[14px] leading-relaxed text-muted mt-5 mb-6 max-w-[280px]">
+        <Logo />
+        <p class="mt-5 mb-6 max-w-[280px] text-sm leading-relaxed text-muted">
           {site.blurb}
         </p>
         <div class="flex gap-[10px]">
@@ -27,7 +27,7 @@ const year = new Date().getFullYear();
                 target="_blank"
                 rel="noopener"
                 aria-label={s.label}
-                class="w-9 h-9 border border-line-strong rounded-full flex items-center justify-center text-muted transition-colors hover:border-brand hover:text-brand"
+                class="flex h-9 w-9 items-center justify-center rounded-full border border-line-strong text-muted transition-colors hover:border-brand hover:text-brand"
               >
                 <Icon name={s.icon} size={15} />
               </a>
@@ -40,16 +40,13 @@ const year = new Date().getFullYear();
       {
         footerColumns.map((col) => (
           <div>
-            <h5 class="text-ink text-[13px] font-semibold tracking-[1.5px] uppercase mb-5">
+            <h5 class="mb-5 text-meta font-semibold tracking-[1.5px] text-ink uppercase">
               {col.title}
             </h5>
             <ul class="flex flex-col gap-[11px]">
               {col.links.map((link) => (
-                <li class="text-[14px]">
-                  <a
-                    href={link.href}
-                    class="transition-colors hover:text-ink"
-                  >
+                <li class="text-sm">
+                  <a href={link.href} class="transition-colors hover:text-ink">
                     {link.label}
                   </a>
                 </li>
@@ -61,10 +58,12 @@ const year = new Date().getFullYear();
 
       <!-- Contact -->
       <div>
-        <h5 class="text-ink text-[13px] font-semibold tracking-[1.5px] uppercase mb-5">
+        <h5
+          class="mb-5 text-meta font-semibold tracking-[1.5px] text-ink uppercase"
+        >
           Contact
         </h5>
-        <ul class="flex flex-col gap-[11px] text-[14px]">
+        <ul class="flex flex-col gap-[11px] text-sm">
           <li>{site.address}</li>
           <li>
             <a href={site.phone.href} class="transition-colors hover:text-ink">
@@ -85,7 +84,7 @@ const year = new Date().getFullYear();
     </div>
 
     <div
-      class="py-7 flex justify-between flex-wrap gap-[10px] text-[13px] text-faint max-xs:flex-col max-xs:items-start max-xs:gap-2"
+      class="flex flex-wrap justify-between gap-[10px] py-7 text-meta text-faint max-xs:flex-col max-xs:items-start max-xs:gap-2"
     >
       <span>© {year} {site.legalName}. All rights reserved.</span>
       <span>{site.credit}</span>

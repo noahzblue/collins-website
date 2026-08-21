@@ -9,15 +9,15 @@
  * here, numbered, in the rail.
  */
 import { getCollection } from "astro:content";
-import Base from "../../layouts/Base.astro";
-import Footer from "../../components/Footer.astro";
-import Section from "../../components/ui/Section.astro";
-import Eyebrow from "../../components/ui/Eyebrow.astro";
-import Button from "../../components/ui/Button.astro";
-import CategoryRow from "../../components/equipment/CategoryRow.astro";
-import CategoryIndex from "../../components/equipment/CategoryIndex.astro";
-import { equipmentHub } from "../../data/content";
-import { site } from "../../config/site";
+import Base from "@/layouts/Base.astro";
+import Section from "@/components/ui/Section.astro";
+import Eyebrow from "@/components/ui/Eyebrow.astro";
+import Breadcrumb from "@/components/ui/Breadcrumb.astro";
+import Button from "@/components/ui/Button.astro";
+import CategoryRow from "@/components/equipment/CategoryRow.astro";
+import CategoryIndex from "@/components/equipment/CategoryIndex.astro";
+import { equipmentHub } from "@/data/content";
+import { site } from "@/config/site";
 
 const all = (await getCollection("equipment")).sort(
   (a, b) => a.data.sortOrder - b.data.sortOrder,
@@ -28,18 +28,18 @@ const all = (await getCollection("equipment")).sort(
   <!-- Page header -->
   <header class="pt-[150px] pb-[64px] max-mob:pt-[120px] max-mob:pb-[48px]">
     <div class="wrap">
-      <nav class="text-[13px] text-faint mb-5" aria-label="Breadcrumb">
-        <a href="/" class="transition-colors hover:text-brand">Home</a>
-        <span class="mx-2">/</span>
-        <span class="text-muted">Equipment</span>
-      </nav>
+      <Breadcrumb
+        trail={[{ label: "Home", href: "/" }]}
+        current="Equipment"
+        class="mb-5"
+      />
 
       <Eyebrow class="mb-[16px]">{equipmentHub.eyebrow}</Eyebrow>
       <h1
-        class="text-[clamp(34px,5vw,56px)] leading-[1.05] tracking-[-0.025em]"
+        class="text-h1 leading-[1.05] tracking-[-0.025em]"
         set:html={equipmentHub.title.join("<br>")}
       />
-      <p class="text-[17px] leading-relaxed text-muted max-w-[620px] mt-6">
+      <p class="mt-6 max-w-[620px] text-intro leading-relaxed text-muted">
         {equipmentHub.intro}
       </p>
     </div>
@@ -58,7 +58,7 @@ const all = (await getCollection("equipment")).sort(
             all.map((category, i) => (
               <>
                 {i > 0 && (
-                  <hr class="border-0 border-t border-line my-[80px] max-mob:my-[56px]" />
+                  <hr class="my-[80px] border-0 border-t border-line max-mob:my-[56px]" />
                 )}
                 <CategoryRow category={category} flip={i % 2 === 1} />
               </>
@@ -69,17 +69,17 @@ const all = (await getCollection("equipment")).sort(
 
       <!-- Closing enquiry -->
       <div
-        class="card flex justify-between items-center gap-8 p-9 flex-wrap mt-[96px] max-mob:mt-[64px] max-xs:p-7"
+        class="card mt-[96px] flex flex-wrap items-center justify-between gap-8 p-9 max-mob:mt-[64px] max-xs:p-7"
       >
         <div>
-          <h2 class="text-[22px] font-semibold mb-2">
+          <h2 class="mb-2 text-[22px] font-semibold">
             {equipmentHub.closing.title}
           </h2>
-          <p class="text-[15px] leading-relaxed text-muted max-w-[520px]">
+          <p class="max-w-[520px] text-base leading-relaxed text-muted">
             {equipmentHub.closing.body}
           </p>
         </div>
-        <div class="flex gap-3 flex-wrap">
+        <div class="flex flex-wrap gap-3">
           <Button variant="primary" href="/#contact">Request a quote</Button>
           <Button
             variant="outline"
@@ -93,6 +93,4 @@ const all = (await getCollection("equipment")).sort(
       </div>
     </div>
   </Section>
-
-  <Footer />
 </Base>

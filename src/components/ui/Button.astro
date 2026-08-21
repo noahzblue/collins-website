@@ -8,7 +8,7 @@
  */
 interface Props {
   href?: string;
-  variant?: "primary" | "ink" | "outline" | "outline-white" | "whatsapp";
+  variant?: "primary" | "outline" | "outline-white";
   size?: "md" | "lg";
   type?: "button" | "submit";
   class?: string;
@@ -28,19 +28,17 @@ const base =
   "inline-flex items-center justify-center gap-2 font-semibold whitespace-nowrap rounded-full transition-all duration-200 cursor-pointer";
 
 const sizes: Record<NonNullable<Props["size"]>, string> = {
-  md: "px-[24px] py-[12px] text-[14px]",
-  lg: "px-[30px] py-[15px] text-[15px]",
+  md: "px-[24px] py-[12px] text-sm",
+  lg: "px-[30px] py-[15px] text-base",
 };
 
 const variants: Record<NonNullable<Props["variant"]>, string> = {
   primary:
     "bg-brand-bright text-white shadow-[0_1px_2px_rgba(10,14,23,0.10)] hover:bg-brand-hover hover:shadow-[0_6px_18px_rgba(47,111,255,0.28)]",
-  ink: "bg-ink text-white hover:bg-ink-soft",
   outline:
     "bg-white border border-line-strong text-ink hover:border-ink hover:bg-surface",
   "outline-white":
     "bg-transparent border border-white/40 text-white hover:bg-white hover:text-ink hover:border-white",
-  whatsapp: "bg-whatsapp text-white hover:brightness-95",
 };
 
 const cls = `${base} ${sizes[size]} ${variants[variant]} ${extra}`;

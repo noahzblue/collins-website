@@ -1,24 +1,17 @@
 ---
 /**
  * Collins brand wordmark. The SVG is imported raw and inlined so its colour
- * follows `currentColor` — `variant` recolours it for the light header
- * (brand blue) or the dark footer (white). `tagline` toggles the small
- * "EQUIPMENTS LLC" line beneath it; text comes from the site config.
+ * follows `currentColor` — it renders brand blue by default, and the header
+ * flips it to white while it sits over the hero video (see Header.astro).
  */
-import { site } from "../../config/site";
-import wordmark from "../../assets/collins-logo.svg?raw";
+import { site } from "@/config/site";
+import wordmark from "@/assets/collins-logo.svg?raw";
 
 interface Props {
-  variant?: "header" | "footer";
-  tagline?: boolean;
   class?: string;
 }
 
-const { variant = "header", tagline = true, class: extra = "" } = Astro.props;
-const isFooter = variant === "footer";
-
-const wordmarkColor = isFooter ? "text-white" : "text-brand";
-const taglineColor = isFooter ? "text-[#999]" : "text-navy";
+const { class: extra = "" } = Astro.props;
 ---
 
 <a
@@ -27,10 +20,7 @@ const taglineColor = isFooter ? "text-[#999]" : "text-navy";
   aria-label={`${site.name} — home`}
 >
   <span
-    class:list={[
-      wordmarkColor,
-      "[&>svg]:h-[35px] [&>svg]:w-auto [&>svg]:block max-mob:[&>svg]:h-[24px]",
-    ]}
+    class="text-brand [&>svg]:block [&>svg]:h-[35px] [&>svg]:w-auto max-mob:[&>svg]:h-[24px]"
     set:html={wordmark}
   />
 </a>

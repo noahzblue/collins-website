@@ -5,12 +5,12 @@
  * pre-filled (fields carry real name/required attrs so a POST endpoint
  * can be dropped in later without markup changes).
  */
-import Section from "../ui/Section.astro";
-import Eyebrow from "../ui/Eyebrow.astro";
-import Button from "../ui/Button.astro";
-import Icon from "../ui/Icon.astro";
-import { site } from "../../config/site";
-import { contactSection } from "../../data/content";
+import Section from "@/components/ui/Section.astro";
+import Eyebrow from "@/components/ui/Eyebrow.astro";
+import Button from "@/components/ui/Button.astro";
+import Icon from "@/components/ui/Icon.astro";
+import { site } from "@/config/site";
+import { contactSection } from "@/data/content";
 import { getCollection } from "astro:content";
 
 const mapsHref = `https://maps.google.com/?q=${site.geo.lat},${site.geo.lng}`;
@@ -21,9 +21,24 @@ const equipmentCategoryNames = (await getCollection("equipment"))
   .map((category) => category.data.name);
 
 const methods = [
-  { icon: "phone", label: "Call us", value: site.phone.display, href: site.phone.href },
-  { icon: "whatsapp", label: "WhatsApp", value: "Chat with our team", href: site.whatsapp.href },
-  { icon: "mail", label: "Email", value: site.email, href: `mailto:${site.email}` },
+  {
+    icon: "phone",
+    label: "Call us",
+    value: site.phone.display,
+    href: site.phone.href,
+  },
+  {
+    icon: "whatsapp",
+    label: "WhatsApp",
+    value: "Chat with our team",
+    href: site.whatsapp.href,
+  },
+  {
+    icon: "mail",
+    label: "Email",
+    value: site.email,
+    href: `mailto:${site.email}`,
+  },
   { icon: "pin", label: "Visit", value: site.address, href: mapsHref },
 ] as const;
 ---
@@ -31,16 +46,16 @@ const methods = [
 <Section id="contact" tone="gray">
   <div class="wrap">
     <div
-      class="grid grid-cols-[0.9fr_1.1fr] gap-16 items-start max-nav:grid-cols-1 max-nav:gap-10"
+      class="grid grid-cols-[0.9fr_1.1fr] items-start gap-16 max-nav:grid-cols-1 max-nav:gap-10"
     >
       <!-- Left: pitch + contact methods -->
       <div>
         <Eyebrow class="mb-4">{contactSection.eyebrow}</Eyebrow>
         <h2
-          class="text-[clamp(30px,3.8vw,46px)] leading-[1.06] mb-5"
+          class="mb-5 text-h2 leading-[1.06]"
           set:html={contactSection.title.join("<br>")}
         />
-        <p class="text-[16px] leading-relaxed text-muted max-w-[440px] mb-9">
+        <p class="mb-9 max-w-[440px] text-lead leading-relaxed text-muted">
           {contactSection.body}
         </p>
 
@@ -51,14 +66,14 @@ const methods = [
                 href={m.href}
                 target={m.href.startsWith("http") ? "_blank" : undefined}
                 rel={m.href.startsWith("http") ? "noopener" : undefined}
-                class="group flex items-center gap-4 rounded-[14px] bg-white border border-line p-4 transition-all duration-200 hover:border-line-strong hover:shadow-[0_12px_30px_-20px_rgba(10,14,23,0.3)]"
+                class="group flex items-center gap-4 rounded-[14px] border border-line bg-white p-4 transition-all duration-200 hover:border-line-strong hover:shadow-[0_12px_30px_-20px_rgba(10,14,23,0.3)]"
               >
-                <span class="flex items-center justify-center w-[44px] h-[44px] rounded-[12px] bg-brand-tint text-brand shrink-0">
+                <span class="flex h-[44px] w-[44px] shrink-0 items-center justify-center rounded-[12px] bg-brand-tint text-brand">
                   <Icon name={m.icon} size={20} />
                 </span>
                 <span>
-                  <span class="block text-[12.5px] text-faint">{m.label}</span>
-                  <span class="block text-[15px] font-semibold text-ink">
+                  <span class="block text-caption text-faint">{m.label}</span>
+                  <span class="block text-base font-semibold text-ink">
                     {m.value}
                   </span>
                 </span>
@@ -74,20 +89,51 @@ const methods = [
         data-wa={site.whatsapp.href}
         class="card p-9 shadow-[0_24px_60px_-36px_rgba(10,14,23,0.4)] max-xs:p-6"
       >
-        <label class="block text-[13px] font-semibold text-ink mb-5">
+        <label class="mb-5 block text-meta font-semibold text-ink">
           Request a quote — we reply within one business day.
         </label>
         <div class="grid grid-cols-2 gap-3 max-cmp:grid-cols-1">
-          <input class="q-field" type="text" name="first_name" autocomplete="given-name" placeholder="First name" required />
-          <input class="q-field" type="text" name="last_name" autocomplete="family-name" placeholder="Last name" />
+          <input
+            class="q-field"
+            type="text"
+            name="first_name"
+            autocomplete="given-name"
+            placeholder="First name"
+            required
+          />
+          <input
+            class="q-field"
+            type="text"
+            name="last_name"
+            autocomplete="family-name"
+            placeholder="Last name"
+          />
         </div>
         <div class="grid grid-cols-2 gap-3 max-cmp:grid-cols-1">
-          <input class="q-field" type="email" name="email" autocomplete="email" placeholder="Email" required />
-          <input class="q-field" type="tel" name="phone" autocomplete="tel" placeholder="Phone" required />
+          <input
+            class="q-field"
+            type="email"
+            name="email"
+            autocomplete="email"
+            placeholder="Email"
+            required
+          />
+          <input
+            class="q-field"
+            type="tel"
+            name="phone"
+            autocomplete="tel"
+            placeholder="Phone"
+            required
+          />
         </div>
         <select class="q-field" name="category" required>
           <option value="">Choose equipment category</option>
-          {equipmentCategoryNames.map((category) => <option>{category}</option>)}
+          {
+            equipmentCategoryNames.map((category) => (
+              <option>{category}</option>
+            ))
+          }
         </select>
         <div class="grid grid-cols-2 gap-3 max-cmp:grid-cols-1">
           <select class="q-field" name="mode">
@@ -95,15 +141,27 @@ const methods = [
             <option>Buy</option>
             <option>Rent</option>
           </select>
-          <input class="q-field" type="text" name="duration" placeholder="Duration (if renting)" />
+          <input
+            class="q-field"
+            type="text"
+            name="duration"
+            placeholder="Duration (if renting)"
+          />
         </div>
-        <textarea class="q-field" name="message" rows="3" placeholder="Tell us what you need"></textarea>
-        <Button variant="primary" type="submit" class="w-full mt-2">
+        <textarea
+          class="q-field"
+          name="message"
+          rows="3"
+          placeholder="Tell us what you need"></textarea>
+        <Button variant="primary" type="submit" class="mt-2 w-full">
           Submit request
         </Button>
-        <p class="text-[12.5px] text-faint mt-4 mb-0 text-center">
-          Submitting opens WhatsApp with your request pre-filled — or email us at
-          {" "}<a href={`mailto:${site.email}`} class="underline hover:text-ink">{site.email}</a>.
+        <p class="mt-4 mb-0 text-center text-caption text-faint">
+          Submitting opens WhatsApp with your request pre-filled — or email us
+          at
+          {" "}<a href={`mailto:${site.email}`} class="underline hover:text-ink"
+            >{site.email}</a
+          >.
         </p>
       </form>
     </div>

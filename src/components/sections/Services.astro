@@ -4,28 +4,29 @@
  * mini data-card (siteassist "Platform" pattern). Selecting a row swaps the
  * photo and the data-card; the first row starts open.
  */
-import Section from "../ui/Section.astro";
-import Eyebrow from "../ui/Eyebrow.astro";
-import Icon from "../ui/Icon.astro";
-import { services } from "../../data/catalog";
-import { servicesSection } from "../../data/content";
+import Section from "@/components/ui/Section.astro";
+import Eyebrow from "@/components/ui/Eyebrow.astro";
+import Icon from "@/components/ui/Icon.astro";
+import BgImage from "@/components/ui/BgImage.astro";
+import { services } from "@/data/services";
+import { servicesSection } from "@/data/content";
 ---
 
 <Section id="services">
   <div class="wrap">
     <div
       id="services-split"
-      class="grid grid-cols-[0.9fr_1.1fr] gap-16 items-center max-nav:grid-cols-1 max-nav:gap-10"
+      class="grid grid-cols-[0.9fr_1.1fr] items-center gap-16 max-nav:grid-cols-1 max-nav:gap-10"
       data-stats={JSON.stringify(services.map((s) => s.stat))}
     >
       <!-- Left: heading + accordion -->
       <div>
         <Eyebrow class="mb-4">{servicesSection.eyebrow}</Eyebrow>
         <h2
-          class="text-[clamp(30px,3.8vw,46px)] leading-[1.06] mb-4"
+          class="mb-4 text-h2 leading-[1.06]"
           set:html={servicesSection.title.join("<br>")}
         />
-        <p class="text-[16px] leading-relaxed text-muted max-w-[440px] mb-10">
+        <p class="mb-10 max-w-[440px] text-lead leading-relaxed text-muted">
           {servicesSection.intro}
         </p>
 
@@ -34,21 +35,21 @@ import { servicesSection } from "../../data/content";
             services.map((s, i) => (
               <button
                 type="button"
-                class="svc-row group block w-full text-left border-b border-line py-6 cursor-pointer"
+                class="svc-row group block w-full cursor-pointer border-b border-line py-6 text-left"
                 aria-expanded={i === 0 ? "true" : "false"}
                 data-index={i}
               >
                 <span class="flex items-center gap-4">
-                  <span class="svc-icon flex items-center justify-center w-[44px] h-[44px] rounded-[13px] shrink-0 transition-colors duration-300">
+                  <span class="svc-icon flex h-[44px] w-[44px] shrink-0 items-center justify-center rounded-[13px] transition-colors duration-300">
                     <Icon name={s.icon} size={21} />
                   </span>
-                  <span class="svc-title text-[18px] font-semibold transition-colors duration-300">
+                  <span class="svc-title text-subhead font-semibold transition-colors duration-300">
                     {s.title}
                   </span>
                 </span>
                 <span class="svc-body grid transition-[grid-template-rows] duration-500 ease-out">
                   <span class="block overflow-hidden">
-                    <span class="block pt-3 pl-[60px] text-[15px] leading-relaxed text-muted max-xs:pl-0">
+                    <span class="block pt-3 pl-[60px] text-base leading-relaxed text-muted max-xs:pl-0">
                       {s.body}
                     </span>
                   </span>
@@ -60,37 +61,44 @@ import { servicesSection } from "../../data/content";
       </div>
 
       <!-- Right: photo panel + floating data-card -->
-      <div class="relative rounded-[18px] overflow-hidden aspect-[4/3] max-nav:aspect-[16/10]">
+      <div
+        class="relative aspect-[4/3] overflow-hidden rounded-[18px] max-nav:aspect-[16/10]"
+      >
         {
           services.map((s, i) => (
-            <div
-              class:list={["svc-img absolute inset-0 bg-cover bg-center", i === 0 && "is-active"]}
-              style={`background-image:url('${s.image}')`}
-              aria-hidden="true"
+            <BgImage
+              src={s.image}
+              class:list={["svc-img", i === 0 && "is-active"]}
             />
           ))
         }
         <div
-          class="absolute left-5 bottom-5 max-w-[290px] rounded-[14px] bg-white/92 backdrop-blur-md border border-white/60 shadow-[0_18px_44px_-22px_rgba(10,14,23,0.45)] p-5 max-xs:left-4 max-xs:bottom-4 max-xs:p-4"
+          class="absolute bottom-5 left-5 max-w-[290px] rounded-[14px] border border-white/60 bg-white/92 p-5 shadow-[0_18px_44px_-22px_rgba(10,14,23,0.45)] backdrop-blur-md max-xs:bottom-4 max-xs:left-4 max-xs:p-4"
         >
           <div class="flex items-center gap-3">
             <span
               id="svc-card-icon"
-              class="flex items-center justify-center w-[38px] h-[38px] rounded-[11px] bg-brand-tint text-brand shrink-0"
+              class="flex h-[38px] w-[38px] shrink-0 items-center justify-center rounded-[11px] bg-brand-tint text-brand"
             >
               {
                 services.map((s, i) => (
-                  <span class:list={["svc-card-glyph", i !== 0 && "hidden"]} data-index={i}>
+                  <span
+                    class:list={["svc-card-glyph", i !== 0 && "hidden"]}
+                    data-index={i}
+                  >
                     <Icon name={s.icon} size={18} />
                   </span>
                 ))
               }
             </span>
-            <span id="svc-card-title" class="text-[15px] font-semibold text-ink">
+            <span id="svc-card-title" class="text-base font-semibold text-ink">
               {services[0].stat.title}
             </span>
           </div>
-          <p id="svc-card-line" class="text-[13.5px] leading-relaxed text-muted mt-2 mb-0">
+          <p
+            id="svc-card-line"
+            class="mt-2 mb-0 text-note leading-relaxed text-muted"
+          >
             {services[0].stat.line}
           </p>
         </div>
@@ -140,6 +148,8 @@ import { servicesSection } from "../../data/content";
 </style>
 
 <script>
+  import { createRotator } from "@/scripts/rotator";
+
   const split = document.getElementById("services-split");
   if (split) {
     const rows = [...split.querySelectorAll<HTMLButtonElement>(".svc-row")];
@@ -147,22 +157,31 @@ import { servicesSection } from "../../data/content";
     const glyphs = [...split.querySelectorAll<HTMLElement>(".svc-card-glyph")];
     const cardTitle = split.querySelector<HTMLElement>("#svc-card-title")!;
     const cardLine = split.querySelector<HTMLElement>("#svc-card-line")!;
-    // Data-card copy mirrors the `stat` field per service in data/catalog.ts.
+    // Data-card copy mirrors the `stat` field per service in data/services.ts.
     const stats = JSON.parse(split.dataset.stats ?? "[]") as {
       title: string;
       line: string;
     }[];
 
-    const select = (i: number) => {
-      rows.forEach((r, j) => r.setAttribute("aria-expanded", String(j === i)));
-      imgs.forEach((im, j) => im.classList.toggle("is-active", j === i));
-      glyphs.forEach((g, j) => g.classList.toggle("hidden", j !== i));
-      if (stats[i]) {
-        cardTitle.textContent = stats[i].title;
-        cardLine.textContent = stats[i].line;
-      }
-    };
+    // No `interval` — the accordion only ever moves on a click.
+    const rotator = createRotator({
+      root: split,
+      count: rows.length,
+      onSelect: (i) => {
+        rows.forEach((r, j) =>
+          r.setAttribute("aria-expanded", String(j === i)),
+        );
+        imgs.forEach((im, j) => im.classList.toggle("is-active", j === i));
+        glyphs.forEach((g, j) => g.classList.toggle("hidden", j !== i));
+        if (stats[i]) {
+          cardTitle.textContent = stats[i].title;
+          cardLine.textContent = stats[i].line;
+        }
+      },
+    });
 
-    rows.forEach((r, i) => r.addEventListener("click", () => select(i)));
+    rows.forEach((r, i) =>
+      r.addEventListener("click", () => rotator.select(i)),
+    );
   }
 </script>

@@ -1,8 +1,11 @@
-/** Site data — proof points, services, partners and stats.
- *  Equipment categories live in the `equipment` content collection
- *  (src/content/equipment/categories.json). */
+/** Evidence that Collins can do the job — the four "why us" points, the
+ *  manufacturer wordmarks, the headline numbers and client quotes.
+ *
+ *  Equipment categories are NOT here: they live in the `equipment` content
+ *  collection (src/content/equipment/categories.json). Services live in
+ *  src/data/services.ts. */
 
-import type { IconName } from "../components/ui/icons";
+import type { IconName } from "@/components/ui/icons";
 
 /* ---------- "Why Collins": four proof points (tabbed photo card) ---------- */
 
@@ -41,43 +44,7 @@ export const trustFeatures: Feature[] = [
   },
 ];
 
-/* ---------- Services overview ---------- */
-
-export interface Service {
-  icon: IconName;
-  title: string;
-  body: string;
-  /** Photo shown while this service is active in the accordion. */
-  image: string;
-  /** Floating mini data-card over the photo. */
-  stat: { title: string; line: string };
-}
-
-export const services: Service[] = [
-  {
-    icon: "refresh",
-    title: "General trading & rental",
-    body: "Flexible buy-or-rent terms across every equipment category, structured around your project timeline.",
-    image: "/images/service-rental.jpg",
-    stat: { title: "Flexible terms", line: "Day, week or month — scale up or down anytime." },
-  },
-  {
-    icon: "search",
-    title: "Equipment sourcing",
-    body: "Direct access to trusted manufacturers — Perkins, Kalmar, JCB, Cummins, Deutz — sourced to spec.",
-    image: "/images/service-sourcing.jpg",
-    stat: { title: "Sourced to spec", line: "Direct from the manufacturers we trust." },
-  },
-  {
-    icon: "globe",
-    title: "Logistics & export",
-    body: "Regional delivery and export handling across the UAE, Oman, Saudi Arabia, Qatar and Africa.",
-    image: "/images/service-logistics.jpg",
-    stat: { title: "Regional reach", line: "UAE · Oman · KSA · Qatar · Africa." },
-  },
-];
-
-/* ---------- Partners ---------- */
+/* ---------- Manufacturer wordmarks (hero base strip) ---------- */
 
 export const partners: string[] = [
   "PERKINS",
@@ -88,7 +55,7 @@ export const partners: string[] = [
   "TADANO",
 ];
 
-/* ---------- Proof: stats + testimonials (placeholder — confirm figures) ---------- */
+/* ---------- Stats + testimonials (placeholder — confirm figures) ---------- */
 
 export interface Stat {
   value: string;
@@ -131,4 +98,3 @@ export const testimonials: Testimonial[] = [
     rating: 5,
   },
 ];
-

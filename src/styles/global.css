@@ -1,48 +1,96 @@
 @import "tailwindcss";
 
 /* ============================================================
-   THEME — single source of truth for the design system.
-   Tokens defined here generate matching Tailwind utilities:
-     --color-brand        -> bg-brand / text-brand / border-brand
-     --font-display       -> font-display
-     --breakpoint-nav     -> nav: / max-nav: variants
+   THEME — the single source of truth for the design system.
+   Tokens here generate the matching Tailwind utilities:
+     --color-brand   -> bg-brand / text-brand / border-brand
+     --text-base     -> text-base
+     --font-display  -> font-display
+     --spacing-gutter-> p-gutter / mt-gutter
+     --breakpoint-nav-> nav: / max-nav: variants
    Change a value here and it updates everywhere.
 
    Direction: "Refined Blue + Slate" — a calm, minimal, premium
-   system (Apple / Stripe school). Mostly quiet neutrals doing the
-   structural work, with blue reserved as a precise accent.
+   system (Apple / Stripe school). Mostly quiet neutrals doing
+   the structural work, with blue reserved as a precise accent.
+
+   RULE: components use these tokens. Reach for an arbitrary
+   value (text-[17px]) only for a genuine one-off inside one
+   component — never for anything a second component will need.
    ============================================================ */
 @theme {
+  /* ---- Colour --------------------------------------------- */
+
   /* Brand — used sparingly, so it stays loud when it appears. */
-  --color-brand: #0050f0;          /* deep brand blue — eyebrows, links, pins */
-  --color-brand-bright: #2f6fff;   /* action blue — primary buttons / CTAs */
-  --color-brand-hover: #0246d6;    /* darker press state for primary buttons */
-  --color-brand-tint: #eef3ff;     /* faint blue wash — accent surfaces / chips */
+  --color-brand: #0050f0; /* deep brand blue — eyebrows, links, pins */
+  --color-brand-bright: #2f6fff; /* action blue — primary buttons / CTAs */
+  --color-brand-hover: #0246d6; /* darker press state for primary buttons */
+  --color-brand-tint: #eef3ff; /* faint blue wash — accent surfaces / chips */
 
   /* Neutrals — the premium scale that carries the layout. */
-  --color-ink: #0a0e17;            /* near-black (softened) — dark sections & text */
-  --color-ink-soft: #141a26;       /* slightly lifted near-black — dark cards */
-  --color-body: #33383f;           /* default body text on white */
-  --color-muted: #5b6472;          /* slate — secondary / supporting text */
-  --color-faint: #8a919c;          /* tertiary — captions, meta, disabled */
-  --color-line: #e7e9ee;           /* hairline borders / dividers */
-  --color-line-strong: #d6dae2;    /* slightly stronger hairline */
-  --color-surface: #f7f8fa;        /* off-white section background */
-  --color-surface-2: #eef1f5;      /* second-step off-white */
+  --color-ink: #0a0e17; /* near-black (softened) — dark sections & text */
+  --color-ink-soft: #141a26; /* slightly lifted near-black — dark cards */
+  --color-body: #33383f; /* default body text on white */
+  --color-muted: #5b6472; /* slate — secondary / supporting text */
+  --color-faint: #8a919c; /* tertiary — captions, meta, disabled */
+  --color-line: #e7e9ee; /* hairline borders / dividers */
+  --color-line-strong: #d6dae2; /* slightly stronger hairline */
+  --color-surface: #f7f8fa; /* off-white section background */
+  --color-surface-2: #eef1f5; /* second-step off-white */
 
   /* Support */
-  --color-navy: #081459;           /* deep navy — wordmark sub, signature */
-  --color-whatsapp: #25d366;       /* WhatsApp green */
+  --color-navy: #081459; /* deep navy — wordmark sub, signature */
+  --color-whatsapp: #25d366; /* WhatsApp green */
+  --color-scrim: #060a14; /* cool black behind photo overlays */
+
+  /* ---- Type ----------------------------------------------- */
+
+  /* Tailwind's rem-based default sizes are cleared so this scale is
+     the site's complete text vocabulary — if a size isn't below, it
+     doesn't exist. Values are px to match the built design exactly. */
+  --text-*: initial;
+
+  /* Body & UI. Pick by role, not by number.
+     NB: a size token may not share a name with a colour token — both
+     generate `text-<name>` and the colour wins silently. */
+  --text-micro: 11px; /* tracked caps: index-rail numbers */
+  --text-tag: 11.5px; /* table heads, family label, tile number */
+  --text-label: 12px; /* eyebrow caps, pills, badges */
+  --text-caption: 12.5px; /* form hints, contact-method labels */
+  --text-meta: 13px; /* breadcrumbs, footer headings, credit */
+  --text-note: 13.5px; /* dense supporting copy, inline links */
+  --text-sm: 14px; /* footer links, buttons (md) */
+  --text-detail: 14.5px; /* card body, stat labels */
+  --text-base: 15px; /* DEFAULT body copy — start here */
+  --text-cell: 15.5px; /* table cells, included-list items */
+  --text-lead: 16px; /* section intro paragraphs */
+  --text-lead-lg: 16.5px; /* larger intro, banner spec line */
+  --text-intro: 17px; /* page intro paragraphs */
+  --text-subhead: 18px; /* accordion titles, tile names */
+
+  /* Headings. Fluid — one token per level, not per component. */
+  --text-display: clamp(38px, 5.6vw, 68px); /* homepage hero h1 */
+  --text-h1: clamp(34px, 5vw, 56px); /* every other page h1 */
+  --text-h2: clamp(30px, 3.8vw, 46px); /* primary section heading */
+  --text-h3: clamp(26px, 3vw, 36px); /* in-page block heading */
 
   /* Fonts (loaded from Google Fonts in Base.astro) */
-  --font-sans: "Inter", system-ui, sans-serif;                 /* body */
+  --font-sans: "Inter", system-ui, sans-serif; /* body */
   --font-display: "Inter Tight", "Inter", system-ui, sans-serif; /* headings */
 
+  /* ---- Layout --------------------------------------------- */
+
+  /* The fixed pill header occupies top-4 (16px) + h-16 (64px).
+     Anything that has to clear it uses these, never a raw px. */
+  --spacing-header: 80px; /* the header's occupied height */
+  --spacing-header-gap: 104px; /* header + breathing room: sticky tops,
+                                  anchor landings */
+
   /* Breakpoints — desktop-first; responsive rules use the max-* variants. */
-  --breakpoint-nav: 980px;  /* nav hides, two-column splits & grids collapse */
-  --breakpoint-mob: 900px;  /* mobile spacing / typography pass */
-  --breakpoint-cmp: 600px;  /* compact single-column */
-  --breakpoint-xs: 520px;   /* smallest phones */
+  --breakpoint-nav: 980px; /* nav hides, two-column splits & grids collapse */
+  --breakpoint-mob: 900px; /* mobile spacing / typography pass */
+  --breakpoint-cmp: 600px; /* compact single-column */
+  --breakpoint-xs: 520px; /* smallest phones */
 }
 
 /* ============================================================
@@ -52,7 +100,7 @@
   html {
     scroll-behavior: smooth;
     /* Anchor jumps clear the floating fixed header. */
-    scroll-padding-top: 96px;
+    scroll-padding-top: var(--spacing-header-gap);
   }
   body {
     color: var(--color-body);
@@ -62,8 +110,12 @@
     text-rendering: optimizeLegibility;
   }
   /* Headings: Inter Tight, sentence case, tight optical tracking.
-     Sizes/weights are set per component; this is the shared feel. */
-  h1, h2, h3, h4 {
+     Sizes are set per component from the --text-h* tokens; this is
+     the shared feel. */
+  h1,
+  h2,
+  h3,
+  h4 {
     font-family: var(--font-display);
     font-weight: 600;
     letter-spacing: -0.02em;
@@ -83,6 +135,8 @@
 
 /* ============================================================
    COMPONENTS — shared layout + surface helpers.
+   Keep this list short: anything with markup belongs in an
+   .astro component, not a class here.
    ============================================================ */
 @layer components {
   /* Centered max-width container used by every section. */
@@ -92,10 +146,14 @@
     padding-inline: 32px;
   }
   @media (max-width: 900px) {
-    .wrap { padding-inline: 20px; }
+    .wrap {
+      padding-inline: 20px;
+    }
   }
   @media (max-width: 520px) {
-    .wrap { padding-inline: 16px; }
+    .wrap {
+      padding-inline: 16px;
+    }
   }
 
   /* Premium card: white surface, hairline border, soft rounding.
@@ -104,5 +162,16 @@
     background: #ffffff;
     border: 1px solid var(--color-line);
     border-radius: 18px;
+  }
+
+  /* Photo scrim for full-bleed banners — dark top and bottom so
+     breadcrumbs and headings hold contrast over any image. */
+  .scrim-banner {
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--color-scrim) 40%, transparent) 0%,
+      color-mix(in srgb, var(--color-scrim) 25%, transparent) 45%,
+      color-mix(in srgb, var(--color-scrim) 80%, transparent) 100%
+    );
   }
 }

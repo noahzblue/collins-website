@@ -1,12 +1,13 @@
 ---
 /** About teaser — mission + borderless stat band (count-up) + head-office strip. */
-import Section from "../ui/Section.astro";
-import SectionHeading from "../ui/SectionHeading.astro";
-import Button from "../ui/Button.astro";
-import Icon from "../ui/Icon.astro";
-import { stats } from "../../data/catalog";
-import { aboutSection } from "../../data/content";
-import { site } from "../../config/site";
+import Section from "@/components/ui/Section.astro";
+import SectionHeading from "@/components/ui/SectionHeading.astro";
+import Button from "@/components/ui/Button.astro";
+import Pill from "@/components/ui/Pill.astro";
+import ContactRows from "@/components/ui/ContactRows.astro";
+import { stats } from "@/data/proof";
+import { aboutSection } from "@/data/content";
+import { site } from "@/config/site";
 
 const office = aboutSection.office;
 
@@ -30,17 +31,20 @@ const parseStat = (value: string) => {
     <!-- Stat band — borderless, hairline-divided, numbers count up on scroll. -->
     <div
       id="stat-band"
-      class="grid grid-cols-3 border-y border-line divide-x divide-line max-cmp:grid-cols-1 max-cmp:divide-x-0 max-cmp:divide-y max-cmp:divide-line"
+      class="grid grid-cols-3 divide-x divide-line border-y border-line max-cmp:grid-cols-1 max-cmp:divide-x-0 max-cmp:divide-y max-cmp:divide-line"
     >
       {
         stats.map((s) => {
           const { target, suffix } = parseStat(s.value);
           return (
-            <div class="py-10 px-10 first:pl-0 max-cmp:px-0 max-cmp:py-7">
-              <div class="font-display font-semibold text-ink leading-none text-[clamp(40px,4.8vw,60px)]">
-                <span class="stat-num" data-target={target}>{target}</span>{suffix}
+            <div class="px-10 py-10 first:pl-0 max-cmp:px-0 max-cmp:py-7">
+              <div class="font-display text-[clamp(40px,4.8vw,60px)] leading-none font-semibold text-ink">
+                <span class="stat-num" data-target={target}>
+                  {target}
+                </span>
+                {suffix}
               </div>
-              <div class="text-[14.5px] text-muted mt-3">{s.label}</div>
+              <div class="mt-3 text-detail text-muted">{s.label}</div>
             </div>
           );
         })
@@ -49,33 +53,24 @@ const parseStat = (value: string) => {
 
     <!-- Head-office strip -->
     <div
-      class="card overflow-hidden mt-14 grid grid-cols-[1fr_1.1fr] max-nav:grid-cols-1 max-mob:mt-10"
+      class="card mt-14 grid grid-cols-[1fr_1.1fr] overflow-hidden max-nav:grid-cols-1 max-mob:mt-10"
     >
       <div
         class="office-photo min-h-[320px] max-nav:min-h-[240px]"
         style="background-image:linear-gradient(180deg,rgba(10,14,23,0) 45%,rgba(10,14,23,0.5) 100%),url('/images/about-office.jpg')"
       >
       </div>
-      <div class="p-10 flex flex-col justify-center max-xs:p-7">
-        <span
-          class="self-start inline-block rounded-full bg-brand-tint text-brand text-[11px] font-semibold tracking-[1px] uppercase px-[12px] py-[6px]"
-        >
-          {office.tag}
-        </span>
-        <h3 class="text-[clamp(28px,3vw,38px)] mt-4 mb-5">{office.city}</h3>
-        {(
-          [
+      <div class="flex flex-col justify-center p-10 max-xs:p-7">
+        <Pill tone="tint" size="lg" class="self-start">{office.tag}</Pill>
+        <h3 class="mt-4 mb-5 text-[clamp(28px,3vw,38px)]">{office.city}</h3>
+        <ContactRows
+          rows={[
             { icon: "pin", text: office.address },
             { icon: "clock", text: office.hours },
             { icon: "phone", text: site.phone.display },
-          ] as const
-        ).map((row) => (
-          <div class="flex items-center gap-3 text-[15px] text-body mb-[10px]">
-            <Icon name={row.icon} size={17} class="text-brand shrink-0" />
-            <span>{row.text}</span>
-          </div>
-        ))}
-        <div class="flex gap-3 mt-6 flex-wrap">
+          ]}
+        />
+        <div class="mt-6 flex flex-wrap gap-3">
           <Button variant="primary" href={site.phone.href}>
             Call the branch
           </Button>

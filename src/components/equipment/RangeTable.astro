@@ -10,13 +10,14 @@
  * availability and the enquiry link on the last line.
  */
 import type { CollectionEntry } from "astro:content";
-import Icon from "../ui/Icon.astro";
+import Icon from "@/components/ui/Icon.astro";
+import Pill from "@/components/ui/Pill.astro";
 import {
   AVAILABILITY_LABEL,
   AVAILABILITY_TONE,
   enquireHref,
   type Mode,
-} from "../../lib/equipment";
+} from "@/lib/equipment";
 
 type Ranges = CollectionEntry<"equipment">["data"]["ranges"];
 
@@ -35,17 +36,29 @@ const hasPowerType = ranges.some((r) => r.powerType);
 const hasDuty = ranges.some((r) => r.typicalDuty);
 
 const th =
-  "px-6 py-[13px] text-[11.5px] font-semibold uppercase tracking-[1.4px] text-faint max-xs:px-5";
+  "px-6 py-[13px] text-tag font-semibold uppercase tracking-[1.4px] text-faint max-xs:px-5";
 const td = "px-6 py-[17px] align-middle max-cmp:p-0 max-xs:px-5";
 ---
 
 <div data-mode-panel={mode} class="card overflow-hidden">
   <table class="w-full border-collapse text-left max-cmp:block">
     <thead class="max-cmp:hidden">
-      <tr class="bg-surface border-b border-line">
+      <tr class="border-b border-line bg-surface">
         <th scope="col" class={th}>Size / rating</th>
-        {hasPowerType && <th scope="col" class={th}>Type</th>}
-        {hasDuty && <th scope="col" class={`${th} w-full`}>Typical duty</th>}
+        {
+          hasPowerType && (
+            <th scope="col" class={th}>
+              Type
+            </th>
+          )
+        }
+        {
+          hasDuty && (
+            <th scope="col" class={`${th} w-full`}>
+              Typical duty
+            </th>
+          )
+        }
         <th scope="col" class={th}>Availability</th>
         <th scope="col" class={`${th} text-right`}>
           <span class="sr-only">Enquire</span>
@@ -55,32 +68,36 @@ const td = "px-6 py-[17px] align-middle max-cmp:p-0 max-xs:px-5";
     <tbody class="max-cmp:block">
       {
         ranges.map((range) => (
-          <tr class="border-b border-line last:border-0 transition-colors hover:bg-surface max-cmp:block max-cmp:px-5 max-cmp:py-5">
-            <td class={`${td} whitespace-nowrap text-[15.5px] font-semibold text-ink max-cmp:inline-flex max-cmp:text-[17px]`}>
+          <tr class="border-b border-line transition-colors last:border-0 hover:bg-surface max-cmp:block max-cmp:px-5 max-cmp:py-5">
+            <td
+              class={`${td} text-cell font-semibold whitespace-nowrap text-ink max-cmp:inline-flex max-cmp:text-intro`}
+            >
               {range.label}
             </td>
 
             {hasPowerType && (
-              <td class={`${td} whitespace-nowrap max-cmp:inline-flex max-cmp:ml-3`}>
-                {range.powerType && (
-                  <span class="inline-flex items-center rounded-full border border-line-strong px-[10px] py-[3px] text-[12.5px] text-muted">
-                    {range.powerType}
-                  </span>
-                )}
+              <td
+                class={`${td} whitespace-nowrap max-cmp:ml-3 max-cmp:inline-flex`}
+              >
+                {range.powerType && <Pill>{range.powerType}</Pill>}
               </td>
             )}
 
             {hasDuty && (
-              <td class={`${td} text-[14.5px] leading-relaxed text-muted max-cmp:block max-cmp:mt-[10px]`}>
+              <td
+                class={`${td} text-detail leading-relaxed text-muted max-cmp:mt-[10px] max-cmp:block`}
+              >
                 {range.typicalDuty}
               </td>
             )}
 
-            <td class={`${td} whitespace-nowrap max-cmp:inline-flex max-cmp:mt-[14px]`}>
-              <span class="inline-flex items-center gap-[7px] text-[13px] font-medium text-body">
+            <td
+              class={`${td} whitespace-nowrap max-cmp:mt-[14px] max-cmp:inline-flex`}
+            >
+              <span class="inline-flex items-center gap-[7px] text-meta font-medium text-body">
                 <span
                   class:list={[
-                    "w-[6px] h-[6px] rounded-full",
+                    "h-[6px] w-[6px] rounded-full",
                     AVAILABILITY_TONE[range.availability],
                   ]}
                   aria-hidden="true"
@@ -89,12 +106,14 @@ const td = "px-6 py-[17px] align-middle max-cmp:p-0 max-xs:px-5";
               </span>
             </td>
 
-            <td class={`${td} whitespace-nowrap text-right max-cmp:inline-flex max-cmp:ml-5 max-cmp:mt-[14px]`}>
+            <td
+              class={`${td} text-right whitespace-nowrap max-cmp:mt-[14px] max-cmp:ml-5 max-cmp:inline-flex`}
+            >
               <a
                 href={enquireHref(name, mode, range.label)}
                 target="_blank"
                 rel="noopener"
-                class="group inline-flex items-center gap-[5px] text-[13.5px] font-semibold text-brand transition-colors hover:text-brand-hover"
+                class="group inline-flex items-center gap-[5px] text-note font-semibold text-brand transition-colors hover:text-brand-hover"
               >
                 Enquire
                 <Icon

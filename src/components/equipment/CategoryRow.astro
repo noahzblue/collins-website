@@ -9,8 +9,10 @@
  * mirror each other; on mobile the row collapses and the photo always leads.
  */
 import type { CollectionEntry } from "astro:content";
-import Icon from "../ui/Icon.astro";
-import Button from "../ui/Button.astro";
+import Icon from "@/components/ui/Icon.astro";
+import Button from "@/components/ui/Button.astro";
+import Pill from "@/components/ui/Pill.astro";
+import { availabilityBadges } from "@/lib/equipment";
 
 interface Props {
   category: CollectionEntry<"equipment">;
@@ -19,31 +21,22 @@ interface Props {
 }
 
 const { category, flip = false } = Astro.props;
-const {
-  name,
-  family,
-  rangeLabel,
-  summary,
-  highlights,
-  heroImage,
-  availableHire,
-  availableSale,
-  sortOrder,
-} = category.data;
+const { name, family, rangeLabel, summary, highlights, heroImage, sortOrder } =
+  category.data;
 
-const badges = [availableHire && "Hire", availableSale && "Buy"].filter(
-  Boolean,
-) as string[];
+const badges = availabilityBadges(category.data);
 
 const href = `/equipment/${category.id}`;
 ---
 
 <article
   id={category.id}
-  class="group grid grid-cols-2 gap-[72px] items-center scroll-mt-[110px] max-nav:grid-cols-1 max-nav:gap-9"
+  class="group grid scroll-mt-header-gap grid-cols-2 items-center gap-[72px] max-nav:grid-cols-1 max-nav:gap-9"
 >
-  {/* Media. Sources are 4:3 landscape; the 4:5 crop is what gives the row its
-      editorial column, so the photos are centred rather than fitted. */}
+  {
+    /* Media. Sources are 4:3 landscape; the 4:5 crop is what gives the row its
+      editorial column, so the photos are centred rather than fitted. */
+  }
   <a
     href={href}
     aria-hidden="true"
@@ -70,28 +63,30 @@ const href = `/equipment/${category.id}`;
 
   <div class="max-w-[460px] max-nav:max-w-none">
     <div class="flex items-center gap-[14px]">
-      <span class="font-mono text-[12.5px] tracking-[0.5px] text-brand">
+      <span class="font-mono text-caption tracking-[0.5px] text-brand">
         {String(sortOrder).padStart(2, "0")}
       </span>
       <span class="h-px w-[22px] bg-line-strong" aria-hidden="true"></span>
-      <span class="text-[11.5px] font-semibold uppercase tracking-[1.6px] text-faint">
+      <span
+        class="text-tag font-semibold tracking-[1.6px] text-faint uppercase"
+      >
         {family}
       </span>
     </div>
 
-    <h2 class="text-[clamp(28px,3.2vw,38px)] leading-[1.06] mt-[18px]">
+    <h2 class="mt-[18px] text-[clamp(28px,3.2vw,38px)] leading-[1.06]">
       <a href={href} class="transition-colors hover:text-brand">{name}</a>
     </h2>
-    <p class="text-[15px] text-muted mt-[10px]">{rangeLabel}</p>
+    <p class="mt-[10px] text-base text-muted">{rangeLabel}</p>
 
-    <ul class="flex flex-col gap-[9px] mt-7">
+    <ul class="mt-7 flex flex-col gap-[9px]">
       {
         highlights.map((line) => (
-          <li class="flex gap-[11px] text-[14.5px] leading-[1.45] font-medium text-body">
+          <li class="flex gap-[11px] text-detail leading-[1.45] font-medium text-body">
             <Icon
               name="arrow-right"
               size={15}
-              class="text-brand mt-[4px] shrink-0"
+              class="mt-[4px] shrink-0 text-brand"
             />
             <span>{line}</span>
           </li>
@@ -99,9 +94,9 @@ const href = `/equipment/${category.id}`;
       }
     </ul>
 
-    <p class="text-[16px] leading-relaxed text-muted mt-7">{summary}</p>
+    <p class="mt-7 text-lead leading-relaxed text-muted">{summary}</p>
 
-    <div class="flex items-center gap-4 flex-wrap mt-8">
+    <div class="mt-8 flex flex-wrap items-center gap-4">
       <Button variant="outline" href={href}>
         View {name.toLowerCase()}
         <Icon
@@ -111,13 +106,7 @@ const href = `/equipment/${category.id}`;
         />
       </Button>
       <div class="flex items-center gap-2">
-        {
-          badges.map((badge) => (
-            <span class="inline-flex items-center rounded-full border border-line-strong px-[11px] py-[4px] text-[12px] font-medium text-muted">
-              {badge}
-            </span>
-          ))
-        }
+        {badges.map((badge) => <Pill size="md">{badge}</Pill>)}
       </div>
     </div>
   </div>

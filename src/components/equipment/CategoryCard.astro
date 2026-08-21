@@ -5,7 +5,10 @@
  * category page.
  */
 import type { CollectionEntry } from "astro:content";
-import Icon from "../ui/Icon.astro";
+import Icon from "@/components/ui/Icon.astro";
+import Pill from "@/components/ui/Pill.astro";
+import BgImage from "@/components/ui/BgImage.astro";
+import { availabilityBadges } from "@/lib/equipment";
 
 interface Props {
   category: CollectionEntry<"equipment">;
@@ -16,58 +19,50 @@ interface Props {
 }
 
 const { category, index, showCardLine = true } = Astro.props;
-const { name, rangeLabel, cardLine, heroImage, availableHire, availableSale } =
-  category.data;
-
-const badges = [
-  availableHire && "Hire",
-  availableSale && "Buy",
-].filter(Boolean) as string[];
+const { name, rangeLabel, cardLine, heroImage } = category.data;
+const badges = availabilityBadges(category.data);
 ---
 
 <a
   href={`/equipment/${category.id}`}
-  class="group card relative flex flex-col overflow-hidden transition-all duration-200 hover:border-line-strong hover:shadow-[0_20px_50px_-28px_rgba(10,14,23,0.32)] hover:-translate-y-[3px]"
+  class="group card relative flex flex-col overflow-hidden transition-all duration-200 hover:-translate-y-[3px] hover:border-line-strong hover:shadow-[0_20px_50px_-28px_rgba(10,14,23,0.32)]"
 >
-  {/* Light neutral behind the photo: the six categories still waiting on a
-      hero image read as a quiet empty tile rather than a black hole. */}
+  {
+    /* Light neutral behind the photo: the six categories still waiting on a
+      hero image read as a quiet empty tile rather than a black hole. */
+  }
   <div class="relative aspect-[4/3] overflow-hidden bg-surface-2">
     {
       heroImage && (
-        <div
-          class="absolute inset-0 bg-cover bg-center transition-transform duration-500 ease-out group-hover:scale-[1.05]"
-          style={`background-image:url('${heroImage}')`}
-          aria-hidden="true"
+        <BgImage
+          src={heroImage}
+          class="transition-transform duration-500 ease-out group-hover:scale-[1.05]"
         />
       )
     }
     {
       index !== undefined && (
-        <span class="absolute top-4 right-4 font-mono text-[11.5px] tracking-[0.5px] text-white/90 bg-ink/35 backdrop-blur-sm rounded-full px-[10px] py-[5px]">
+        <span class="absolute top-4 right-4 rounded-full bg-ink/35 px-[10px] py-[5px] font-mono text-tag tracking-[0.5px] text-white/90 backdrop-blur-sm">
           {String(index).padStart(2, "0")}
         </span>
       )
     }
   </div>
 
-  <div class="flex flex-col flex-1 p-7 max-xs:p-6">
+  <div class="flex flex-1 flex-col p-7 max-xs:p-6">
     <h3 class="text-[21px] font-semibold">{name}</h3>
-    <p class="text-[14px] text-muted mt-1">{rangeLabel}</p>
+    <p class="mt-1 text-sm text-muted">{rangeLabel}</p>
     {
       showCardLine && (
-        <p class="text-[14.5px] leading-relaxed text-muted mt-3">{cardLine}</p>
+        <p class="mt-3 text-detail leading-relaxed text-muted">{cardLine}</p>
       )
     }
 
-    <div class="flex items-center gap-2 mt-5">
-      {
-        badges.map((badge) => (
-          <span class="inline-flex items-center rounded-full border border-line-strong px-[10px] py-[3px] text-[12px] font-medium text-muted">
-            {badge}
-          </span>
-        ))
-      }
-      <span class="ml-auto inline-flex items-center gap-[6px] text-[13px] font-semibold text-brand">
+    <div class="mt-5 flex items-center gap-2">
+      {badges.map((badge) => <Pill>{badge}</Pill>)}
+      <span
+        class="ml-auto inline-flex items-center gap-[6px] text-meta font-semibold text-brand"
+      >
         View
         <Icon
           name="arrow-up-right"

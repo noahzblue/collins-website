@@ -5,8 +5,8 @@
  * twelve pages simply skip it at launch.
  */
 import type { CollectionEntry } from "astro:content";
-import Eyebrow from "../ui/Eyebrow.astro";
-import { singular } from "../../lib/equipment";
+import Eyebrow from "@/components/ui/Eyebrow.astro";
+import { singular } from "@/lib/equipment";
 
 interface Props {
   scenarios: CollectionEntry<"equipment">["data"]["dutyGuide"];
@@ -20,20 +20,20 @@ const { scenarios, name } = Astro.props;
   scenarios.length > 0 && (
     <div>
       <Eyebrow class="mb-4">Sizing guide</Eyebrow>
-      <h2 class="text-[clamp(26px,3vw,36px)] leading-[1.1] mb-10 max-w-[620px]">
+      <h2 class="mb-10 max-w-[620px] text-h3 leading-[1.1]">
         Picking the right {singular(name)} for the job
       </h2>
 
       <div class="grid grid-cols-3 gap-5 max-nav:grid-cols-1">
         {scenarios.map((scenario, i) => (
-          <div class="card p-7 flex flex-col max-xs:p-6">
-            <span class="font-mono text-[12px] tracking-[0.5px] text-brand mb-4">
+          <div class="card flex flex-col p-7 max-xs:p-6">
+            <span class="mb-4 font-mono text-label tracking-[0.5px] text-brand">
               {String(i + 1).padStart(2, "0")}
             </span>
-            <h3 class="text-[18px] font-semibold leading-[1.25] mb-3">
+            <h3 class="mb-3 text-subhead leading-[1.25] font-semibold">
               {scenario.situation}
             </h3>
-            <p class="text-[14.5px] leading-relaxed text-muted">
+            <p class="text-detail leading-relaxed text-muted">
               {scenario.advice}
             </p>
           </div>

@@ -1,0 +1,45 @@
+---
+/**
+ * Small rounded chip — availability badges, "Hire" / "Buy", power types,
+ * the head-office tag. Every round label on the site renders through here so
+ * they cannot drift apart again.
+ *
+ *   <Pill>Hire</Pill>
+ *   <Pill tone="on-dark" size="md">For hire</Pill>
+ *   <Pill tone="tint" size="lg">Head Office</Pill>
+ */
+interface Props {
+  /** outline = hairline on white · on-dark = over a photo · tint = brand wash */
+  tone?: "outline" | "on-dark" | "tint";
+  size?: "sm" | "md" | "lg";
+  class?: string;
+}
+
+const { tone = "outline", size = "sm", class: extra = "" } = Astro.props;
+
+const tones: Record<NonNullable<Props["tone"]>, string> = {
+  outline: "border border-line-strong text-muted",
+  "on-dark": "border border-white/30 text-white/85",
+  tint: "bg-brand-tint text-brand uppercase tracking-[1px]",
+};
+
+const sizes: Record<NonNullable<Props["size"]>, string> = {
+  sm: "px-[10px] py-[3px] text-label",
+  md: "px-[11px] py-[4px] text-label",
+  lg: "px-[12px] py-[6px] text-micro",
+};
+
+const weight = tone === "tint" ? "font-semibold" : "font-medium";
+---
+
+<span
+  class:list={[
+    "inline-flex items-center rounded-full whitespace-nowrap",
+    tones[tone],
+    sizes[size],
+    weight,
+    extra,
+  ]}
+>
+  <slot />
+</span>

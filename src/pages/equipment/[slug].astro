@@ -13,18 +13,24 @@
  */
 import type { GetStaticPaths } from "astro";
 import { getCollection, getEntry, type CollectionEntry } from "astro:content";
-import Base from "../../layouts/Base.astro";
-import Footer from "../../components/Footer.astro";
-import Section from "../../components/ui/Section.astro";
-import Eyebrow from "../../components/ui/Eyebrow.astro";
-import Button from "../../components/ui/Button.astro";
-import Icon from "../../components/ui/Icon.astro";
-import RangeTable from "../../components/equipment/RangeTable.astro";
-import IncludedList from "../../components/equipment/IncludedList.astro";
-import DutyGuide from "../../components/equipment/DutyGuide.astro";
-import CategoryCard from "../../components/equipment/CategoryCard.astro";
-import { CTA_LABEL, enquireHref, singular } from "../../lib/equipment";
-import { site } from "../../config/site";
+import Base from "@/layouts/Base.astro";
+import Section from "@/components/ui/Section.astro";
+import Eyebrow from "@/components/ui/Eyebrow.astro";
+import Button from "@/components/ui/Button.astro";
+import Pill from "@/components/ui/Pill.astro";
+import PageBanner from "@/components/ui/PageBanner.astro";
+import ContactRows from "@/components/ui/ContactRows.astro";
+import RangeTable from "@/components/equipment/RangeTable.astro";
+import IncludedList from "@/components/equipment/IncludedList.astro";
+import DutyGuide from "@/components/equipment/DutyGuide.astro";
+import CategoryCard from "@/components/equipment/CategoryCard.astro";
+import {
+  CTA_LABEL,
+  availabilityBadges,
+  enquireHref,
+  singular,
+} from "@/lib/equipment";
+import { site } from "@/config/site";
 
 export const getStaticPaths = (async () => {
   const categories = await getCollection("equipment");
@@ -41,8 +47,6 @@ const {
   h1,
   rangeLabel,
   heroImage,
-  availableHire,
-  availableSale,
   ranges,
   dutyGuide,
   related,
@@ -64,80 +68,39 @@ if (relatedEntries.length !== related.length) {
     `equipment/${category.id}: \`related\` points at slug(s) that don't exist — ${missing.join(", ")}`,
   );
 }
-
-const badges = [availableHire && "For hire", availableSale && "For sale"].filter(
-  Boolean,
-) as string[];
-
-/* Keep the page off two grey sections in a row, and off a grey one directly
-   above the grey footer. */
-const relatedTone = "light" as const;
 ---
 
 <Base title={seoTitle} description={seoDescription}>
-  <!-- Banner -->
-  <section
-    class="relative overflow-hidden min-h-[460px] flex items-end bg-ink max-mob:min-h-[380px]"
+  <PageBanner
+    image={heroImage}
+    trail={[{ label: "Equipment", href: "/equipment" }]}
+    current={name}
+    title={h1}
   >
-    {
-      heroImage && (
-        <div
-          class="absolute inset-0 bg-cover bg-center"
-          style={`background-image:url('${heroImage}')`}
-          aria-hidden="true"
-        />
-      )
-    }
-    <div
-      class="absolute inset-0 bg-[linear-gradient(180deg,rgba(6,10,20,0.4)_0%,rgba(6,10,20,0.25)_45%,rgba(6,10,20,0.8)_100%)]"
-      aria-hidden="true"
-    >
+    <div class="mt-5 flex flex-wrap items-center gap-3">
+      <span class="text-lead-lg text-white/80">{rangeLabel}</span>
+      <span class="text-white/30" aria-hidden="true">·</span>
+      {
+        availabilityBadges(category.data, "long").map((badge) => (
+          <Pill tone="on-dark" size="md">
+            {badge}
+          </Pill>
+        ))
+      }
     </div>
-
-    <div
-      class="wrap relative z-[1] w-full pt-[180px] pb-[52px] max-mob:pt-[130px] max-mob:pb-[40px]"
-    >
-      <nav class="text-[13px] text-white/65 mb-4" aria-label="Breadcrumb">
-        <a href="/equipment" class="transition-colors hover:text-white">
-          Equipment
-        </a>
-        <span class="mx-2">/</span>
-        <span class="text-white/90">{name}</span>
-      </nav>
-
-      <h1
-        class="text-white text-[clamp(34px,4.6vw,54px)] leading-[1.05] tracking-[-0.025em] max-w-[780px]"
-      >
-        {h1}
-      </h1>
-
-      <div class="flex items-center gap-3 flex-wrap mt-5">
-        <span class="text-[16.5px] text-white/80">{rangeLabel}</span>
-        <span class="text-white/30" aria-hidden="true">·</span>
-        {
-          badges.map((badge) => (
-            <span class="inline-flex items-center rounded-full border border-white/30 px-[11px] py-[4px] text-[12.5px] font-medium text-white/85">
-              {badge}
-            </span>
-          ))
-        }
-      </div>
-    </div>
-  </section>
+  </PageBanner>
 
   <!-- Sizes and ratings -->
   <Section>
     <div class="wrap">
       <div
-        class="flex justify-between items-end gap-8 flex-wrap mb-9 max-mob:gap-4"
+        class="mb-9 flex flex-wrap items-end justify-between gap-8 max-mob:gap-4"
       >
         <div>
           <Eyebrow class="mb-4">{family}</Eyebrow>
-          <h2 class="text-[clamp(26px,3vw,36px)] leading-[1.1]">
-            Sizes and ratings
-          </h2>
+          <h2 class="text-h3 leading-[1.1]">Sizes and ratings</h2>
         </div>
-        <p class="text-[15px] leading-relaxed text-muted max-w-[400px]">
+        <p class="max-w-[400px] text-base leading-relaxed text-muted">
           Enquire on any line and we'll confirm availability, rate and delivery
           for your dates.
         </p>
@@ -145,7 +108,7 @@ const relatedTone = "light" as const;
 
       <RangeTable ranges={ranges} name={name} mode="hire" />
 
-      <p class="text-[13.5px] leading-relaxed text-faint mt-5 max-w-[720px]">
+      <p class="mt-5 max-w-[720px] text-note leading-relaxed text-faint">
         <strong class="font-semibold text-muted">In yard</strong> — on the ground
         and ready to dispatch. <strong class="font-semibold text-muted"
           >On request</strong
@@ -160,20 +123,20 @@ const relatedTone = "light" as const;
   <Section tone="gray">
     <div class="wrap">
       <div
-        class="grid grid-cols-[1.05fr_0.95fr] gap-16 items-start max-nav:grid-cols-1 max-nav:gap-10"
+        class="grid grid-cols-[1.05fr_0.95fr] items-start gap-16 max-nav:grid-cols-1 max-nav:gap-10"
       >
         <IncludedList mode="hire" />
 
         <div class="card p-8 max-xs:p-6">
-          <h3 class="text-[20px] font-semibold mb-3">
+          <h3 class="mb-3 text-[20px] font-semibold">
             Need a {singular(name)} on site?
           </h3>
-          <p class="text-[15px] leading-relaxed text-muted mb-7">
+          <p class="mb-7 text-base leading-relaxed text-muted">
             Tell us the load, the location and the dates — we'll come back with
             the size that fits and what it costs, usually the same day.
           </p>
 
-          <div class="flex gap-3 flex-wrap mb-7">
+          <div class="mb-7 flex flex-wrap gap-3">
             <Button
               variant="primary"
               href={enquireHref(name, "hire")}
@@ -185,23 +148,19 @@ const relatedTone = "light" as const;
             <Button variant="outline" href="/#contact">Request a quote</Button>
           </div>
 
-          <div class="flex flex-col gap-3 pt-6 border-t border-line">
-            <a
-              href={site.phone.href}
-              class="flex items-center gap-3 text-[15px] text-body transition-colors hover:text-brand"
-            >
-              <Icon name="phone" size={17} class="text-brand shrink-0" />
-              {site.phone.display}
-            </a>
-            <span class="flex items-center gap-3 text-[15px] text-muted">
-              <Icon name="clock" size={17} class="text-brand shrink-0" />
-              {site.hours}
-            </span>
-            <span class="flex items-center gap-3 text-[15px] text-muted">
-              <Icon name="pin" size={17} class="text-brand shrink-0" />
-              {site.locations}
-            </span>
-          </div>
+          <ContactRows
+            tone="muted"
+            class="border-t border-line pt-6"
+            rows={[
+              {
+                icon: "phone",
+                text: site.phone.display,
+                href: site.phone.href,
+              },
+              { icon: "clock", text: site.hours },
+              { icon: "pin", text: site.locations },
+            ]}
+          />
         </div>
       </div>
     </div>
@@ -218,17 +177,18 @@ const relatedTone = "light" as const;
     )
   }
 
-  <!-- Related categories -->
-  <Section tone={relatedTone} class="border-t border-line">
+  <!-- Related categories. Light tone keeps the page off two grey sections in
+       a row, and off a grey one directly above the grey footer. -->
+  <Section class="border-t border-line">
     <div class="wrap">
       <div class="mb-10">
         <Eyebrow class="mb-4">Also supplied</Eyebrow>
-        <h2 class="text-[clamp(26px,3vw,36px)] leading-[1.1]">
-          Often hired alongside
-        </h2>
+        <h2 class="text-h3 leading-[1.1]">Often hired alongside</h2>
       </div>
 
-      <div class="grid grid-cols-3 gap-5 max-nav:grid-cols-2 max-cmp:grid-cols-1">
+      <div
+        class="grid grid-cols-3 gap-5 max-nav:grid-cols-2 max-cmp:grid-cols-1"
+      >
         {
           relatedEntries.map((entry) => (
             <CategoryCard category={entry} showCardLine={false} />
@@ -237,6 +197,4 @@ const relatedTone = "light" as const;
       </div>
     </div>
   </Section>
-
-  <Footer />
 </Base>

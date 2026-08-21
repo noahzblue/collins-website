@@ -4,27 +4,27 @@
  * Smoked glass over the hero (the video reads through it), switching to
  * frosted white once scrolled past the hero. Tone lives on `data-tone`.
  */
-import Logo from "./ui/Logo.astro";
-import Button from "./ui/Button.astro";
-import { mainNav } from "../data/navigation";
+import Logo from "@/components/ui/Logo.astro";
+import Button from "@/components/ui/Button.astro";
+import { mainNav } from "@/data/navigation";
 ---
 
 <header
   id="site-header"
   data-tone="glass"
-  class="fixed top-4 inset-x-4 z-50 mx-auto max-w-[1200px] rounded-2xl border max-mob:top-3 max-mob:inset-x-3"
+  class="fixed inset-x-4 top-4 z-50 mx-auto max-w-[1200px] rounded-2xl border max-mob:inset-x-3 max-mob:top-3"
 >
   <div
-    class="flex items-center justify-between h-[64px] px-7 max-mob:h-[56px] max-mob:px-4"
+    class="flex h-[64px] items-center justify-between px-7 max-mob:h-[56px] max-mob:px-4"
   >
-    <Logo variant="header" />
+    <Logo />
 
     <nav class="flex items-center gap-[36px] max-nav:hidden">
       {
         mainNav.map((link) => (
           <a
             href={link.href}
-            class="nav-link text-[14.5px] font-medium transition-colors duration-150"
+            class="nav-link text-detail font-medium transition-colors duration-150"
           >
             {link.label}
           </a>

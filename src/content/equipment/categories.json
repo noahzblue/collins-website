@@ -19,18 +19,78 @@
     "featured": true,
     "sortOrder": 1,
     "ranges": [
-      { "label": "10 kVA", "powerType": "Diesel", "typicalDuty": "Site office, single container, tools", "availability": "yard" },
-      { "label": "20 kVA", "powerType": "Diesel", "typicalDuty": "Two offices plus lighting", "availability": "yard" },
-      { "label": "30 kVA", "powerType": "Diesel", "typicalDuty": "Small welding set, portable plant", "availability": "yard" },
-      { "label": "50 kVA", "powerType": "Diesel", "typicalDuty": "Accommodation block, mixed small tools", "availability": "yard" },
-      { "label": "100 kVA", "powerType": "Diesel", "typicalDuty": "Site cabins plus a tower crane on light duty", "availability": "yard" },
-      { "label": "150 kVA", "powerType": "Diesel", "typicalDuty": "Batching support, multiple welders", "availability": "yard" },
-      { "label": "250 kVA", "powerType": "Diesel", "typicalDuty": "Tower crane plus offices, no mains supply", "availability": "yard" },
-      { "label": "400 kVA", "powerType": "Diesel", "typicalDuty": "Full site power, medium contractor", "availability": "on_request" },
-      { "label": "500 kVA", "powerType": "Diesel", "typicalDuty": "Concrete plant, pumping, mixed loads", "availability": "on_request" },
-      { "label": "750 kVA", "powerType": "Diesel", "typicalDuty": "Large site or standby for a facility", "availability": "on_request" },
-      { "label": "1000 kVA", "powerType": "Diesel", "typicalDuty": "Industrial standby, sustained load", "availability": "sourced" },
-      { "label": "1250 kVA", "powerType": "Diesel", "typicalDuty": "Maximum output, prime or standby duty", "availability": "sourced" }
+      {
+        "label": "10 kVA",
+        "powerType": "Diesel",
+        "typicalDuty": "Site office, single container, tools",
+        "availability": "yard"
+      },
+      {
+        "label": "20 kVA",
+        "powerType": "Diesel",
+        "typicalDuty": "Two offices plus lighting",
+        "availability": "yard"
+      },
+      {
+        "label": "30 kVA",
+        "powerType": "Diesel",
+        "typicalDuty": "Small welding set, portable plant",
+        "availability": "yard"
+      },
+      {
+        "label": "50 kVA",
+        "powerType": "Diesel",
+        "typicalDuty": "Accommodation block, mixed small tools",
+        "availability": "yard"
+      },
+      {
+        "label": "100 kVA",
+        "powerType": "Diesel",
+        "typicalDuty": "Site cabins plus a tower crane on light duty",
+        "availability": "yard"
+      },
+      {
+        "label": "150 kVA",
+        "powerType": "Diesel",
+        "typicalDuty": "Batching support, multiple welders",
+        "availability": "yard"
+      },
+      {
+        "label": "250 kVA",
+        "powerType": "Diesel",
+        "typicalDuty": "Tower crane plus offices, no mains supply",
+        "availability": "yard"
+      },
+      {
+        "label": "400 kVA",
+        "powerType": "Diesel",
+        "typicalDuty": "Full site power, medium contractor",
+        "availability": "on_request"
+      },
+      {
+        "label": "500 kVA",
+        "powerType": "Diesel",
+        "typicalDuty": "Concrete plant, pumping, mixed loads",
+        "availability": "on_request"
+      },
+      {
+        "label": "750 kVA",
+        "powerType": "Diesel",
+        "typicalDuty": "Large site or standby for a facility",
+        "availability": "on_request"
+      },
+      {
+        "label": "1000 kVA",
+        "powerType": "Diesel",
+        "typicalDuty": "Industrial standby, sustained load",
+        "availability": "sourced"
+      },
+      {
+        "label": "1250 kVA",
+        "powerType": "Diesel",
+        "typicalDuty": "Maximum output, prime or standby duty",
+        "availability": "sourced"
+      }
     ],
     "dutyGuide": [
       {
@@ -70,15 +130,60 @@
     "featured": true,
     "sortOrder": 2,
     "ranges": [
-      { "label": "1.4 ton", "powerType": "Electric", "typicalDuty": "Indoor warehouse, clean floor", "availability": "yard" },
-      { "label": "1.8 ton", "powerType": "Electric", "typicalDuty": "Warehouse racking, cold store", "availability": "yard" },
-      { "label": "2.5 ton", "powerType": "Diesel", "typicalDuty": "General yard handling", "availability": "yard" },
-      { "label": "3 ton", "powerType": "Diesel", "typicalDuty": "Site material handling, pallets", "availability": "yard" },
-      { "label": "3 ton", "powerType": "Electric", "typicalDuty": "Indoor, low emission requirement", "availability": "yard" },
-      { "label": "5 ton", "powerType": "Diesel", "typicalDuty": "Heavier pallets, steel sections", "availability": "yard" },
-      { "label": "7 ton", "powerType": "Diesel", "typicalDuty": "Precast, plant components", "availability": "on_request" },
-      { "label": "10 ton", "powerType": "Diesel", "typicalDuty": "Containers, heavy fabrication", "availability": "on_request" },
-      { "label": "15 ton", "powerType": "Diesel", "typicalDuty": "Port and heavy industrial handling", "availability": "sourced" }
+      {
+        "label": "1.4 ton",
+        "powerType": "Electric",
+        "typicalDuty": "Indoor warehouse, clean floor",
+        "availability": "yard"
+      },
+      {
+        "label": "1.8 ton",
+        "powerType": "Electric",
+        "typicalDuty": "Warehouse racking, cold store",
+        "availability": "yard"
+      },
+      {
+        "label": "2.5 ton",
+        "powerType": "Diesel",
+        "typicalDuty": "General yard handling",
+        "availability": "yard"
+      },
+      {
+        "label": "3 ton",
+        "powerType": "Diesel",
+        "typicalDuty": "Site material handling, pallets",
+        "availability": "yard"
+      },
+      {
+        "label": "3 ton",
+        "powerType": "Electric",
+        "typicalDuty": "Indoor, low emission requirement",
+        "availability": "yard"
+      },
+      {
+        "label": "5 ton",
+        "powerType": "Diesel",
+        "typicalDuty": "Heavier pallets, steel sections",
+        "availability": "yard"
+      },
+      {
+        "label": "7 ton",
+        "powerType": "Diesel",
+        "typicalDuty": "Precast, plant components",
+        "availability": "on_request"
+      },
+      {
+        "label": "10 ton",
+        "powerType": "Diesel",
+        "typicalDuty": "Containers, heavy fabrication",
+        "availability": "on_request"
+      },
+      {
+        "label": "15 ton",
+        "powerType": "Diesel",
+        "typicalDuty": "Port and heavy industrial handling",
+        "availability": "sourced"
+      }
     ],
     "dutyGuide": [],
     "related": ["telehandlers", "skid-steer-loaders", "excavators"],
@@ -105,13 +210,48 @@
     "featured": true,
     "sortOrder": 3,
     "ranges": [
-      { "label": "50 ton", "powerType": "Mobile", "typicalDuty": "Steel erection, general lifting", "availability": "on_request" },
-      { "label": "80 ton", "powerType": "Mobile", "typicalDuty": "Mid-rise structural work", "availability": "on_request" },
-      { "label": "100 ton", "powerType": "Mobile", "typicalDuty": "Precast panels, plant placement", "availability": "on_request" },
-      { "label": "160 ton", "powerType": "Mobile", "typicalDuty": "Tower crane erection", "availability": "on_request" },
-      { "label": "250 ton", "powerType": "Mobile", "typicalDuty": "Heavy plant, bridge sections", "availability": "sourced" },
-      { "label": "400 ton", "powerType": "Mobile", "typicalDuty": "Industrial and refinery lifts", "availability": "sourced" },
-      { "label": "600 ton", "powerType": "Mobile", "typicalDuty": "Major project heavy lift", "availability": "sourced" }
+      {
+        "label": "50 ton",
+        "powerType": "Mobile",
+        "typicalDuty": "Steel erection, general lifting",
+        "availability": "on_request"
+      },
+      {
+        "label": "80 ton",
+        "powerType": "Mobile",
+        "typicalDuty": "Mid-rise structural work",
+        "availability": "on_request"
+      },
+      {
+        "label": "100 ton",
+        "powerType": "Mobile",
+        "typicalDuty": "Precast panels, plant placement",
+        "availability": "on_request"
+      },
+      {
+        "label": "160 ton",
+        "powerType": "Mobile",
+        "typicalDuty": "Tower crane erection",
+        "availability": "on_request"
+      },
+      {
+        "label": "250 ton",
+        "powerType": "Mobile",
+        "typicalDuty": "Heavy plant, bridge sections",
+        "availability": "sourced"
+      },
+      {
+        "label": "400 ton",
+        "powerType": "Mobile",
+        "typicalDuty": "Industrial and refinery lifts",
+        "availability": "sourced"
+      },
+      {
+        "label": "600 ton",
+        "powerType": "Mobile",
+        "typicalDuty": "Major project heavy lift",
+        "availability": "sourced"
+      }
     ],
     "dutyGuide": [],
     "related": ["crawler-cranes", "telehandlers", "boom-lifts"],
@@ -137,9 +277,21 @@
     "availableSale": true,
     "sortOrder": 4,
     "ranges": [
-      { "label": "200 ton", "typicalDuty": "Sustained lifting on soft or prepared ground", "availability": "sourced" },
-      { "label": "400 ton", "typicalDuty": "Heavy structural and plant work", "availability": "sourced" },
-      { "label": "600 ton", "typicalDuty": "Major project heavy lift, long duration", "availability": "sourced" }
+      {
+        "label": "200 ton",
+        "typicalDuty": "Sustained lifting on soft or prepared ground",
+        "availability": "sourced"
+      },
+      {
+        "label": "400 ton",
+        "typicalDuty": "Heavy structural and plant work",
+        "availability": "sourced"
+      },
+      {
+        "label": "600 ton",
+        "typicalDuty": "Major project heavy lift, long duration",
+        "availability": "sourced"
+      }
     ],
     "dutyGuide": [],
     "related": ["mobile-cranes", "excavators", "telehandlers"],
@@ -166,13 +318,41 @@
     "featured": true,
     "sortOrder": 5,
     "ranges": [
-      { "label": "135 CFM", "typicalDuty": "Breakers, small pneumatic tools", "availability": "yard" },
-      { "label": "185 CFM", "typicalDuty": "Two breakers, general site air", "availability": "yard" },
-      { "label": "250 CFM", "typicalDuty": "Sandblasting, multiple tools", "availability": "yard" },
-      { "label": "400 CFM", "typicalDuty": "Piling support, heavy pneumatics", "availability": "on_request" },
-      { "label": "750 CFM", "typicalDuty": "Drilling, sustained high demand", "availability": "on_request" },
-      { "label": "900 CFM", "typicalDuty": "Large blasting and drilling spreads", "availability": "sourced" },
-      { "label": "1050 CFM", "typicalDuty": "Maximum output, industrial duty", "availability": "sourced" }
+      {
+        "label": "135 CFM",
+        "typicalDuty": "Breakers, small pneumatic tools",
+        "availability": "yard"
+      },
+      {
+        "label": "185 CFM",
+        "typicalDuty": "Two breakers, general site air",
+        "availability": "yard"
+      },
+      {
+        "label": "250 CFM",
+        "typicalDuty": "Sandblasting, multiple tools",
+        "availability": "yard"
+      },
+      {
+        "label": "400 CFM",
+        "typicalDuty": "Piling support, heavy pneumatics",
+        "availability": "on_request"
+      },
+      {
+        "label": "750 CFM",
+        "typicalDuty": "Drilling, sustained high demand",
+        "availability": "on_request"
+      },
+      {
+        "label": "900 CFM",
+        "typicalDuty": "Large blasting and drilling spreads",
+        "availability": "sourced"
+      },
+      {
+        "label": "1050 CFM",
+        "typicalDuty": "Maximum output, industrial duty",
+        "availability": "sourced"
+      }
     ],
     "dutyGuide": [],
     "related": ["generators", "tower-lights", "excavators"],
@@ -198,12 +378,42 @@
     "availableSale": true,
     "sortOrder": 6,
     "ranges": [
-      { "label": "9 m", "powerType": "Electric", "typicalDuty": "Indoor fit-out, MEP first fix", "availability": "yard" },
-      { "label": "10 m", "powerType": "Electric", "typicalDuty": "Ceilings, ductwork, lighting", "availability": "yard" },
-      { "label": "12 m", "powerType": "Electric", "typicalDuty": "Warehouse and atrium work", "availability": "yard" },
-      { "label": "12 m", "powerType": "Rough terrain", "typicalDuty": "Outdoor, uneven ground", "availability": "on_request" },
-      { "label": "14 m", "powerType": "Rough terrain", "typicalDuty": "Facade and external work", "availability": "on_request" },
-      { "label": "16 m", "powerType": "Rough terrain", "typicalDuty": "Maximum reach, outdoor duty", "availability": "on_request" }
+      {
+        "label": "9 m",
+        "powerType": "Electric",
+        "typicalDuty": "Indoor fit-out, MEP first fix",
+        "availability": "yard"
+      },
+      {
+        "label": "10 m",
+        "powerType": "Electric",
+        "typicalDuty": "Ceilings, ductwork, lighting",
+        "availability": "yard"
+      },
+      {
+        "label": "12 m",
+        "powerType": "Electric",
+        "typicalDuty": "Warehouse and atrium work",
+        "availability": "yard"
+      },
+      {
+        "label": "12 m",
+        "powerType": "Rough terrain",
+        "typicalDuty": "Outdoor, uneven ground",
+        "availability": "on_request"
+      },
+      {
+        "label": "14 m",
+        "powerType": "Rough terrain",
+        "typicalDuty": "Facade and external work",
+        "availability": "on_request"
+      },
+      {
+        "label": "16 m",
+        "powerType": "Rough terrain",
+        "typicalDuty": "Maximum reach, outdoor duty",
+        "availability": "on_request"
+      }
     ],
     "dutyGuide": [],
     "related": ["boom-lifts", "telehandlers", "tower-lights"],
@@ -229,10 +439,26 @@
     "availableSale": true,
     "sortOrder": 7,
     "ranges": [
-      { "label": "7 m", "typicalDuty": "Loading and placing at low level", "availability": "yard" },
-      { "label": "13 m", "typicalDuty": "General site material handling", "availability": "yard" },
-      { "label": "17 m", "typicalDuty": "Placing on upper floors", "availability": "on_request" },
-      { "label": "20 m+", "typicalDuty": "Long reach placement", "availability": "sourced" }
+      {
+        "label": "7 m",
+        "typicalDuty": "Loading and placing at low level",
+        "availability": "yard"
+      },
+      {
+        "label": "13 m",
+        "typicalDuty": "General site material handling",
+        "availability": "yard"
+      },
+      {
+        "label": "17 m",
+        "typicalDuty": "Placing on upper floors",
+        "availability": "on_request"
+      },
+      {
+        "label": "20 m+",
+        "typicalDuty": "Long reach placement",
+        "availability": "sourced"
+      }
     ],
     "dutyGuide": [],
     "related": ["forklifts", "boom-lifts", "skid-steer-loaders"],
@@ -258,12 +484,42 @@
     "availableSale": true,
     "sortOrder": 8,
     "ranges": [
-      { "label": "12 m", "powerType": "Articulated", "typicalDuty": "Working over obstacles, tight access", "availability": "yard" },
-      { "label": "16 m", "powerType": "Articulated", "typicalDuty": "Steelwork and services at height", "availability": "on_request" },
-      { "label": "20 m", "powerType": "Articulated", "typicalDuty": "Facade access with obstructions", "availability": "on_request" },
-      { "label": "20 m", "powerType": "Telescopic", "typicalDuty": "Straight reach, open site", "availability": "on_request" },
-      { "label": "28 m", "powerType": "Telescopic", "typicalDuty": "High facade, tank and plant work", "availability": "sourced" },
-      { "label": "40 m", "powerType": "Telescopic", "typicalDuty": "Maximum reach, specialist access", "availability": "sourced" }
+      {
+        "label": "12 m",
+        "powerType": "Articulated",
+        "typicalDuty": "Working over obstacles, tight access",
+        "availability": "yard"
+      },
+      {
+        "label": "16 m",
+        "powerType": "Articulated",
+        "typicalDuty": "Steelwork and services at height",
+        "availability": "on_request"
+      },
+      {
+        "label": "20 m",
+        "powerType": "Articulated",
+        "typicalDuty": "Facade access with obstructions",
+        "availability": "on_request"
+      },
+      {
+        "label": "20 m",
+        "powerType": "Telescopic",
+        "typicalDuty": "Straight reach, open site",
+        "availability": "on_request"
+      },
+      {
+        "label": "28 m",
+        "powerType": "Telescopic",
+        "typicalDuty": "High facade, tank and plant work",
+        "availability": "sourced"
+      },
+      {
+        "label": "40 m",
+        "powerType": "Telescopic",
+        "typicalDuty": "Maximum reach, specialist access",
+        "availability": "sourced"
+      }
     ],
     "dutyGuide": [],
     "related": ["scissor-lifts", "telehandlers", "tower-lights"],
@@ -290,12 +546,42 @@
     "featured": true,
     "sortOrder": 9,
     "ranges": [
-      { "label": "1.5 ton", "powerType": "Tracked", "typicalDuty": "Confined trenching, indoor demolition", "availability": "yard" },
-      { "label": "5 ton", "powerType": "Tracked", "typicalDuty": "Service trenches, landscaping", "availability": "yard" },
-      { "label": "8 ton", "powerType": "Wheeled", "typicalDuty": "Roadworks, mobility between locations", "availability": "on_request" },
-      { "label": "13 ton", "powerType": "Tracked", "typicalDuty": "General earthmoving", "availability": "on_request" },
-      { "label": "20 ton", "powerType": "Tracked", "typicalDuty": "Bulk excavation, main site duty", "availability": "on_request" },
-      { "label": "30 ton+", "powerType": "Tracked", "typicalDuty": "Heavy bulk earthworks", "availability": "sourced" }
+      {
+        "label": "1.5 ton",
+        "powerType": "Tracked",
+        "typicalDuty": "Confined trenching, indoor demolition",
+        "availability": "yard"
+      },
+      {
+        "label": "5 ton",
+        "powerType": "Tracked",
+        "typicalDuty": "Service trenches, landscaping",
+        "availability": "yard"
+      },
+      {
+        "label": "8 ton",
+        "powerType": "Wheeled",
+        "typicalDuty": "Roadworks, mobility between locations",
+        "availability": "on_request"
+      },
+      {
+        "label": "13 ton",
+        "powerType": "Tracked",
+        "typicalDuty": "General earthmoving",
+        "availability": "on_request"
+      },
+      {
+        "label": "20 ton",
+        "powerType": "Tracked",
+        "typicalDuty": "Bulk excavation, main site duty",
+        "availability": "on_request"
+      },
+      {
+        "label": "30 ton+",
+        "powerType": "Tracked",
+        "typicalDuty": "Heavy bulk earthworks",
+        "availability": "sourced"
+      }
     ],
     "dutyGuide": [],
     "related": ["backhoe-loaders", "skid-steer-loaders", "telehandlers"],
@@ -322,9 +608,24 @@
     "featured": true,
     "sortOrder": 10,
     "ranges": [
-      { "label": "4-head mast", "powerType": "Diesel", "typicalDuty": "Night shift, general site lighting", "availability": "yard" },
-      { "label": "Solar mast", "powerType": "Solar", "typicalDuty": "No fuel logistics, low noise areas", "availability": "yard" },
-      { "label": "High mast", "powerType": "Diesel", "typicalDuty": "Wide area coverage, large sites", "availability": "on_request" }
+      {
+        "label": "4-head mast",
+        "powerType": "Diesel",
+        "typicalDuty": "Night shift, general site lighting",
+        "availability": "yard"
+      },
+      {
+        "label": "Solar mast",
+        "powerType": "Solar",
+        "typicalDuty": "No fuel logistics, low noise areas",
+        "availability": "yard"
+      },
+      {
+        "label": "High mast",
+        "powerType": "Diesel",
+        "typicalDuty": "Wide area coverage, large sites",
+        "availability": "on_request"
+      }
     ],
     "dutyGuide": [],
     "related": ["generators", "air-compressors", "scissor-lifts"],
@@ -350,8 +651,16 @@
     "availableSale": true,
     "sortOrder": 11,
     "ranges": [
-      { "label": "Standard", "typicalDuty": "Trenching, loading, general site work", "availability": "yard" },
-      { "label": "Site spec", "typicalDuty": "Site-specific attachments and configuration", "availability": "on_request" }
+      {
+        "label": "Standard",
+        "typicalDuty": "Trenching, loading, general site work",
+        "availability": "yard"
+      },
+      {
+        "label": "Site spec",
+        "typicalDuty": "Site-specific attachments and configuration",
+        "availability": "on_request"
+      }
     ],
     "dutyGuide": [],
     "related": ["excavators", "skid-steer-loaders", "telehandlers"],
@@ -377,9 +686,21 @@
     "availableSale": true,
     "sortOrder": 12,
     "ranges": [
-      { "label": "Compact frame", "typicalDuty": "Confined site clearance, indoor work", "availability": "yard" },
-      { "label": "Standard frame", "typicalDuty": "Loading, grading, general site duty", "availability": "yard" },
-      { "label": "Large frame", "typicalDuty": "Heavier attachments, sustained duty", "availability": "on_request" }
+      {
+        "label": "Compact frame",
+        "typicalDuty": "Confined site clearance, indoor work",
+        "availability": "yard"
+      },
+      {
+        "label": "Standard frame",
+        "typicalDuty": "Loading, grading, general site duty",
+        "availability": "yard"
+      },
+      {
+        "label": "Large frame",
+        "typicalDuty": "Heavier attachments, sustained duty",
+        "availability": "on_request"
+      }
     ],
     "dutyGuide": [],
     "related": ["backhoe-loaders", "telehandlers", "excavators"],

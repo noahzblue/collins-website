@@ -16,8 +16,16 @@ export const hero = {
   },
   sub: "Reliable, top-quality branded equipment — generators, forklifts, compressors and cranes — to buy or rent, delivered fast across the UAE.",
   ctas: [
-    { label: "Request a quote", href: "/#contact", variant: "primary" as const },
-    { label: "Explore equipment", href: "/#equipment", variant: "outline" as const },
+    {
+      label: "Request a quote",
+      href: "/#contact",
+      variant: "primary" as const,
+    },
+    {
+      label: "Explore equipment",
+      href: "/#equipment",
+      variant: "outline" as const,
+    },
   ],
 };
 
@@ -75,8 +83,7 @@ export const industriesSection = {
 /** Testimonials — split photo + rotating pull quote. */
 export const testimonialsSection = {
   eyebrow: "Case studies",
-  imageAlt:
-    "Generator and tower light running on a construction site at dawn",
+  imageAlt: "Generator and tower light running on a construction site at dawn",
 };
 
 /** About teaser — mission line, stats and head-office info. */

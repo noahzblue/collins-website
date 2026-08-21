@@ -1,0 +1,44 @@
+---
+/**
+ * Breadcrumb trail above a page heading.
+ * `trail` is the linked ancestors; `current` is the unlinked leaf.
+ *
+ *   <Breadcrumb trail={[{ label: "Equipment", href: "/equipment" }]}
+ *               current={name} tone="on-dark" />
+ */
+interface Props {
+  trail: { label: string; href: string }[];
+  current: string;
+  /** on-dark sits over a photo banner; light sits on a white page header. */
+  tone?: "light" | "on-dark";
+  class?: string;
+}
+
+const { trail, current, tone = "light", class: extra = "" } = Astro.props;
+const dark = tone === "on-dark";
+---
+
+<nav
+  class:list={["text-meta", dark ? "text-white/65" : "text-faint", extra]}
+  aria-label="Breadcrumb"
+>
+  {
+    trail.map((crumb) => (
+      <>
+        <a
+          href={crumb.href}
+          class:list={[
+            "transition-colors",
+            dark ? "hover:text-white" : "hover:text-brand",
+          ]}
+        >
+          {crumb.label}
+        </a>
+        <span class="mx-2" aria-hidden="true">
+          /
+        </span>
+      </>
+    ))
+  }
+  <span class={dark ? "text-white/90" : "text-muted"}>{current}</span>
+</nav>
