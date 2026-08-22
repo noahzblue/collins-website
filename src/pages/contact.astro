@@ -248,6 +248,28 @@ const { office, yard } = site.places;
     const root = document.querySelector<HTMLElement>(
       "[data-quote-root]:not(dialog [data-quote-root])",
     );
-    if (root) initQuoteForm(root, { signal: untilPageSwap() });
+    if (!root) return;
+    const quote = initQuoteForm(root, { signal: untilPageSwap() });
+
+    /**
+     * What the arriving link already answered.
+     *
+     * The homepage's closing band asks buy-or-hire and then sends people
+     * here rather than opening the dialog, so the answer arrives as `?mode=`
+     * — the same parameter name the dialog puts on the URL when it opens
+     * (`scripts/quote/dialog.ts`). Without this the three answers would land
+     * on one blank form and the question would have been for nothing.
+     *
+     * `prefill` drops anything it does not recognise in silence, so a hand-
+     * edited parameter is a no-op rather than an error state (docs 14 §9).
+     *
+     * Only `mode`. The other two parameters the dialog understands — the
+     * category and its rating — are never sent here: a link that knows the
+     * machine comes from a page that keeps you on it, and the dialog answers
+     * it in place. Reading them would also mean racing the dialog's own
+     * `?quote=` handling, which strips the URL as it scrolls to this form.
+     */
+    const mode = new URL(location.href).searchParams.get("mode");
+    if (mode) quote?.prefill({ mode });
   });
 </script>

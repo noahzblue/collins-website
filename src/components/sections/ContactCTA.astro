@@ -44,7 +44,6 @@ import Eyebrow from "@/components/ui/Eyebrow.astro";
 import Icon from "@/components/ui/Icon.astro";
 import { site } from "@/config/site";
 import { contactSection } from "@/data/content";
-import { quoteTrigger } from "@/lib/equipment";
 import { MODES } from "@/lib/quote/options";
 ---
 
@@ -78,21 +77,18 @@ import { MODES } from "@/lib/quote/options";
 
     {
       /* Links, not radios: choosing one is a navigation into the form, not an
-        answer held on this page. The `href` is what happens with no
-        JavaScript — /contact renders the same form inline. */
+        answer held on this page — and here it is a navigation in the plainest
+        sense. The homepage does not open the dialog (`scripts/quote/dialog.ts`
+        header), so these three are ordinary links to the page that is
+        entirely the form, and the answer travels in the URL for /contact to
+        pick up. No JavaScript is involved in any part of that, which is the
+        other reason it is the right shape for the closing band. */
     }
     <ul class="grid grid-cols-3 max-nav:grid-cols-1">
       {
         MODES.map((option) => (
           <li class="mode-item flex">
-            <a
-              href="/contact"
-              {...quoteTrigger(
-                undefined,
-                option.value as "buy" | "hire" | "unsure",
-              )}
-              class="mode-cell"
-            >
+            <a href={`/contact?mode=${option.value}#quote`} class="mode-cell">
               <span class="mode-top">
                 <span class="mode-face">{option.label}</span>
                 <span class="mode-arrow shrink-0">

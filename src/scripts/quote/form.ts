@@ -774,9 +774,15 @@ export function initQuoteForm(
     }
     show(chip, true);
 
-    // Two of the four sections are answered, so this is where the work
-    // actually starts. This is the single largest conversion lever here.
-    goTo(ORDER.indexOf("terms"));
+    // Where the work actually starts: the first section the link did *not*
+    // answer. This is the single largest conversion lever here, and it is
+    // also the one that has to be counted rather than assumed — a trigger
+    // that knew the machine has answered two of the four sections and lands
+    // on the terms, but the homepage's buy-or-hire answers one, and sending
+    // that to the terms steps straight over the machine picker. Below 900px
+    // it does worse than that: the picker is `hidden`, so the first thing
+    // the customer would learn about section 02 is a validation error.
+    goTo(ORDER.indexOf(item && known ? "terms" : "size"));
     if (live) live.textContent = PREFILL.announce;
   };
 

@@ -22,7 +22,8 @@
  *   they leave the site instead.
  * - **The page behind must not scroll, and must not lose its place.**
  *
- * And one rule that is easy to miss until it looks broken:
+ * And two rules that are easy to miss until they look broken. Both are a page
+ * saying its CTAs are not dialog triggers:
  *
  * > **If the page already has an inline instance, every CTA on that page
  * > scrolls to it instead of opening the dialog.**
@@ -30,6 +31,14 @@
  * Opening a modal containing an identical form on top of the form you are
  * looking at is the kind of thing that makes software feel unattended
  * (docs 14 §2).
+ *
+ * > **On the homepage, every CTA is a link to /contact and stays one.**
+ *
+ * The homepage's job is to hand over, not to interrupt: its CTAs are the
+ * header button, the footer link and the three answers in the closing band,
+ * and all three are the same short journey to a page that is entirely the
+ * form. Everywhere else the dialog is the point — it is what keeps someone on
+ * the category page they were reading.
  */
 
 import type { QuoteIntent } from "@/lib/quote/schema";
@@ -173,6 +182,21 @@ export function initQuoteDialog(
     document.querySelector<HTMLElement>(
       '[data-quote-form][data-variant="inline"]',
     );
+
+  /**
+   * Is this the homepage?
+   *
+   * Sibling rule to the inline one above, and the same shape: a page can say
+   * that its quote CTAs are not dialog triggers. The homepage says so because
+   * every one of its CTAs — the header button, the footer link, the three
+   * answers in the closing band — is a link to /contact, and the page reads
+   * better handing the visitor over than opening a fifteen-field form on top
+   * of the thing they were still reading.
+   *
+   * Read per call, not cached, for the reason `inlineForm()` is: the router
+   * swaps pages under this script and the answer changes when it does.
+   */
+  const isLanding = () => location.pathname.replace(/\/+$/, "") === "";
 
   /**
    * Take the customer to the form that is already on the page.
@@ -328,6 +352,13 @@ export function initQuoteDialog(
       if (!(node instanceof Element)) return;
       const target = node.closest<HTMLElement>(trigger);
       if (!target) return;
+
+      // The homepage does not open the dialog: its CTAs are links to
+      // /contact and they stay links. Returning before `preventDefault()` is
+      // the whole implementation — the anchor's own href takes over, and the
+      // router picks it up exactly as it would any other link on the page.
+      if (isLanding() && target.closest("a[href]")) return;
+
       // A trigger is usually a link to /contact, so the anchor still works
       // with no JavaScript — which is why the default has to be stopped here
       // rather than left off the markup.
@@ -340,7 +371,14 @@ export function initQuoteDialog(
       }
       open(target, intentOf(target));
     },
-    { signal },
+    // Capture, and this is load-bearing. The client router listens for clicks
+    // on `document` too, it registers at module-eval in `<head>` while this
+    // runs on `astro:page-load`, and it only stands down for an event that is
+    // *already* defaultPrevented. In the bubble phase it therefore navigates
+    // first and the panel opens over a page that is on its way out — the
+    // dialog flashes up and /contact loads underneath it. Claiming the event
+    // one phase earlier is what makes `preventDefault()` above mean anything.
+    { signal, capture: true },
   );
 
   window.addEventListener(
