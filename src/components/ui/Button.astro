@@ -41,7 +41,9 @@ const variants: Record<NonNullable<Props["variant"]>, string> = {
   primary:
     "bg-brand-bright text-white shadow-[0_1px_2px_rgba(10,14,23,0.10)] hover:bg-white hover:text-brand hover:shadow-[0_6px_18px_rgba(47,111,255,0.28)]",
   outline:
-    "bg-white border-t border-b border-line-strong text-ink hover:border-none hover:bg-none hover:bg-brand-tint rounded-none",
+    "hover:bg-white border-line-strong text-brand hover:border-none bg-brand-tint rounded-md",
+  // outline:
+  //   "bg-white border-t border-b border-line-strong text-ink hover:border-none hover:bg-none hover:bg-brand-tint rounded-none",
   "outline-white":
     "bg-transparent border border-white/40 text-white hover:bg-white hover:text-ink hover:border-white",
 };

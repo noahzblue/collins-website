@@ -30,11 +30,31 @@ export type { Option };
  * here on purpose: customers move between hire and purchase, and forcing an
  * undecided buyer to guess produces worse data than an honest "not sure"
  * (docs 14 §7).
+ *
+ * The hints are `services.ts` compressed to a line — equipment sales,
+ * equipment rental, and the sourcing service that answers the third. The form
+ * itself does not show them: `ui/ChipGroup.astro` renders one hint for the
+ * group, not one per option. `sections/ContactCTA.astro` does, because a cell
+ * on the homepage has room to say what the difference is and the chip at the
+ * top of the form does not. They live here rather than in `data/content.ts` so
+ * that what "Hire" means is written once, in the same object as the word.
  */
 export const MODES: Option[] = [
-  { value: "buy", label: "Buy outright" },
-  { value: "hire", label: "Hire" },
-  { value: "unsure", label: "Not sure yet" },
+  {
+    value: "buy",
+    label: "Buy outright",
+    hint: "New or inspected used, commissioned before handover.",
+  },
+  {
+    value: "hire",
+    label: "Hire",
+    hint: "Day, week, month or project duration — delivery included.",
+  },
+  {
+    value: "unsure",
+    label: "Not sure yet",
+    hint: "Describe the job and we'll specify it and price it both ways.",
+  },
 ];
 
 /**

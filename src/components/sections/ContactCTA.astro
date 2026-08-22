@@ -1,296 +1,254 @@
 ---
 /**
- * Contact CTA — contact methods beside a minimal quote form.
- * The form has no backend: submitting opens WhatsApp with the request
- * pre-filled (fields carry real name/required attrs so a POST endpoint
- * can be dropped in later without markup changes).
+ * Contact CTA — the quote form's opening question, asked on the homepage.
+ *
+ * **This band used to carry a form of its own, and it was the wrong form.** It
+ * asked for more and collected less: it required an email the real form
+ * deliberately makes optional, split the name in two, never asked the size —
+ * the single most useful fact for producing a quotation — and offered "Buy or
+ * rent" where the site says *hire* and the form offers a third answer, because
+ * customers move between the two. Its WhatsApp message was a different shape
+ * as well, so the yard read two lead formats. Removed 2026-08-22; the real
+ * form now lives in a dialog on every page and inline on /contact
+ * (docs/site-expansion/14 §2).
+ *
+ * What replaced it is the form's own opening question. Buy or hire is the
+ * site's core distinction and the cheapest possible thing to ask — one tap, no
+ * thinking — which is exactly why the form opens with it (§3). Putting it here
+ * means the closing band asks something rather than announcing something, and
+ * the tap arrives at the machine picker with section 01 already half answered.
+ *
+ * The three options are `MODES`, not literals: the homepage cannot word the
+ * question differently to the form it opens.
+ *
+ * **The band is written in the form's voice, not the homepage's.** Every other
+ * section here heads itself with `ui/SectionHeading.astro` — sentence case,
+ * display face, the editorial register. This one is the form's front door, so
+ * it borrows /contact's: the same split head, but mono and uppercase, over
+ * `.rule-brand` — the rule that starts brand and stops, which is what the
+ * dialog and the inline mount both draw under their titles.
+ *
+ * **The three answers are one row, not three links in a column.** A hairline
+ * between each is the whole separation — no surface, no lattice: they sit on
+ * the section's own ground, which is what keeps a closing band from reading as
+ * three cards bolted to the bottom of the page. (`.mesh` was tried and
+ * rejected on review — it paints white, and a white panel on the grey band
+ * turns three answers into three objects.)
+ *
+ * A column also has room for the line that says what the difference actually
+ * is, which a chip at the top of the form does not — the hints come from
+ * `MODES` so the two can't drift.
  */
 import Section from "@/components/ui/Section.astro";
 import Eyebrow from "@/components/ui/Eyebrow.astro";
-import Button from "@/components/ui/Button.astro";
 import Icon from "@/components/ui/Icon.astro";
-import { site, directionsHref } from "@/config/site";
+import { site } from "@/config/site";
 import { contactSection } from "@/data/content";
-import { getCollection } from "astro:content";
-
-/* The dropdown mirrors the catalogue — same collection as /equipment. */
-const equipmentCategoryNames = (await getCollection("equipment"))
-  .sort((a, b) => a.data.sortOrder - b.data.sortOrder)
-  .map((category) => category.data.name);
-
-const { office, yard } = site.places;
-
-/* Three numbers, not one. "Visit" offers both pins, because there are two
-   places doing two different jobs. */
-const methods = [
-  {
-    icon: "whatsapp" as const,
-    label: "WhatsApp",
-    value: "Chat with our team",
-    href: site.whatsapp.href,
-  },
-  {
-    icon: "mail" as const,
-    label: "Email",
-    value: site.email,
-    href: `mailto:${site.email}`,
-  },
-];
-
-const places = [office, yard];
+import { quoteTrigger } from "@/lib/equipment";
+import { MODES } from "@/lib/quote/options";
 ---
 
 <Section id="contact" tone="gray">
   <div class="wrap">
+    {
+      /* The head: `ui/SectionHeading.astro`'s split, redrawn here rather than
+        imported, because the whole point is that this one is set in the mono
+        structural face and that component is the editorial one. */
+    }
     <div
-      class="grid grid-cols-[0.9fr_1.1fr] items-start gap-16 max-nav:grid-cols-1 max-nav:gap-10"
+      class="rule-brand mb-10 flex flex-wrap items-end justify-between gap-x-10 gap-y-6 pb-9 max-mob:pb-7"
     >
-      <!-- Left: pitch + contact methods -->
       <div>
         <Eyebrow class="mb-4">{contactSection.eyebrow}</Eyebrow>
-        <h2
-          class="mb-5 text-h2 leading-[1.06]"
-          set:html={contactSection.title.join("<br>")}
-        />
-        <p class="mb-9 max-w-[440px] text-lead leading-relaxed text-muted">
-          {contactSection.body}
-        </p>
-
-        <div class="flex flex-col gap-3">
-          <!-- Three separate tel: rows. One number was three-thirds wrong. -->
-          <div class="rounded-md border border-line bg-white p-4">
-            <span class="flex items-center gap-4">
-              <span
-                class="flex h-[44px] w-[44px] shrink-0 items-center justify-center rounded-sm bg-brand-tint text-brand"
-              >
-                <Icon name="phone" size={20} />
-              </span>
-              <span class="text-caption text-faint">Call us</span>
-            </span>
-            <ul class="mt-3 flex flex-col">
-              {
-                site.phones.map((phone) => (
-                  <li>
-                    <a
-                      href={phone.href}
-                      class="block border-t border-line py-[9px] font-mono text-cell text-ink transition-colors hover:text-brand"
-                    >
-                      {phone.display}
-                    </a>
-                  </li>
-                ))
-              }
-            </ul>
-          </div>
-
-          {
-            methods.map((m) => (
-              <a
-                href={m.href}
-                target={m.href.startsWith("http") ? "_blank" : undefined}
-                rel={m.href.startsWith("http") ? "noopener" : undefined}
-                class="group flex items-center gap-4 rounded-md border border-line bg-white p-4 transition-all duration-200 hover:border-line-strong hover:shadow-[0_12px_30px_-20px_rgba(10,14,23,0.3)]"
-              >
-                <span class="flex h-[44px] w-[44px] shrink-0 items-center justify-center rounded-sm bg-brand-tint text-brand">
-                  <Icon name={m.icon} size={20} />
-                </span>
-                <span>
-                  <span class="block text-caption text-faint">{m.label}</span>
-                  <span class="block text-base font-medium text-ink">
-                    {m.value}
-                  </span>
-                </span>
-              </a>
-            ))
-          }
-
-          <!-- Visit: both pins. -->
-          <div class="rounded-md border border-line bg-white p-4">
-            <span class="flex items-center gap-4">
-              <span
-                class="flex h-[44px] w-[44px] shrink-0 items-center justify-center rounded-sm bg-brand-tint text-brand"
-              >
-                <Icon name="pin" size={20} />
-              </span>
-              <span class="text-caption text-faint">Visit</span>
-            </span>
-            <ul class="mt-3 flex flex-col">
-              {
-                places.map((place) => (
-                  <li>
-                    <a
-                      href={directionsHref(place)}
-                      target="_blank"
-                      rel="noopener"
-                      class="block border-t border-line py-[9px] transition-colors hover:text-brand"
-                    >
-                      <span class="font-mono text-micro tracking-[1.4px] text-faint uppercase">
-                        {place.tag}
-                      </span>
-                      <span class="mt-0.5 block text-base font-medium text-ink">
-                        {place.address}
-                      </span>
-                    </a>
-                  </li>
-                ))
-              }
-            </ul>
-          </div>
-
-          <p class="mt-1 mb-0 flex items-center gap-3 text-note text-muted">
-            <Icon name="clock" size={16} class="shrink-0 text-brand" />
-            {site.hoursLong}
-          </p>
-        </div>
+        <h2 class="cta-title" set:html={contactSection.title.join("<br>")} />
       </div>
-
-      <!-- Right: quote form -->
-      <form
-        id="quote-form"
-        data-wa={site.whatsapp.href}
-        class="card p-9 shadow-[0_24px_60px_-36px_rgba(10,14,23,0.4)] max-xs:p-6"
-      >
-        <p class="mb-5 text-meta font-medium text-ink">
-          Send us the machine, the duty and the dates — or just describe the job
-          and we'll specify it for you.
-        </p>
-        <div class="grid grid-cols-2 gap-3 max-cmp:grid-cols-1">
-          <input
-            class="q-field"
-            type="text"
-            name="first_name"
-            autocomplete="given-name"
-            placeholder="First name"
-            required
-          />
-          <input
-            class="q-field"
-            type="text"
-            name="last_name"
-            autocomplete="family-name"
-            placeholder="Last name"
-          />
-        </div>
-        <div class="grid grid-cols-2 gap-3 max-cmp:grid-cols-1">
-          <input
-            class="q-field"
-            type="email"
-            name="email"
-            autocomplete="email"
-            placeholder="Email"
-            required
-          />
-          <input
-            class="q-field"
-            type="tel"
-            name="phone"
-            autocomplete="tel"
-            placeholder="Phone"
-            required
-          />
-        </div>
-        <select class="q-field" name="category" required>
-          <option value="">Choose equipment category</option>
-          {
-            equipmentCategoryNames.map((category) => (
-              <option>{category}</option>
-            ))
-          }
-        </select>
-        <div class="grid grid-cols-2 gap-3 max-cmp:grid-cols-1">
-          <select class="q-field" name="mode">
-            <option value="">Buy or rent</option>
-            <option>Buy</option>
-            <option>Rent</option>
-          </select>
-          <input
-            class="q-field"
-            type="text"
-            name="duration"
-            placeholder="Duration (if renting)"
-          />
-        </div>
-        <textarea
-          class="q-field"
-          name="message"
-          rows="3"
-          placeholder="Tell us what you need"></textarea>
-        <Button variant="primary" type="submit" class="press mt-2 w-full">
-          Submit request
-        </Button>
-        <!-- A real commitment from the profile, and the single best thing
-             that could sit next to a submit button. -->
-        <p class="mt-4 mb-0 text-center text-base font-medium text-ink">
-          {site.quotePromise}
-        </p>
-        <p class="mt-2 mb-0 text-center text-caption text-faint">
-          Submitting opens WhatsApp with your request pre-filled. Need more
-          fields? <a href="/contact" class="underline hover:text-ink">
-            Use the full enquiry form
-          </a>.
-        </p>
-      </form>
+      <p class="mb-0 max-w-[430px] text-lead leading-relaxed text-muted">
+        {contactSection.body}
+      </p>
     </div>
+
+    <!-- Instruction left, promise right — the dialog head's own arrangement,
+         one scale down, sitting on the control it introduces. -->
+    <!-- <div
+      class="mt-9 mb-5 flex flex-wrap items-baseline justify-between gap-x-8 gap-y-2"
+    >
+      <Eyebrow>{contactSection.start}</Eyebrow>
+      <p class="mb-0 text-detail text-muted">{site.quotePromise}</p>
+    </div> -->
+
+    {
+      /* Links, not radios: choosing one is a navigation into the form, not an
+        answer held on this page. The `href` is what happens with no
+        JavaScript — /contact renders the same form inline. */
+    }
+    <ul class="grid grid-cols-3 max-nav:grid-cols-1">
+      {
+        MODES.map((option) => (
+          <li class="mode-item flex">
+            <a
+              href="/contact"
+              {...quoteTrigger(
+                undefined,
+                option.value as "buy" | "hire" | "unsure",
+              )}
+              class="mode-cell"
+            >
+              <span class="mode-top">
+                <span class="mode-face">{option.label}</span>
+                <span class="mode-arrow shrink-0">
+                  <Icon name="arrow-right" size={20} />
+                </span>
+              </span>
+              <span class="mode-hint">{option.hint}</span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
   </div>
 </Section>
 
 <style>
-  .q-field {
-    width: 100%;
-    background: #fff;
-    border: 1px solid var(--color-line-strong);
-    border-radius: var(--radius-sm);
+  /* /contact's headline treatment, on the homepage: mono, uppercase, tracked
+     tight — the structural rung `h1` and `h4` occupy everywhere else on the
+     site. It drops a rung on the smallest phones, where mono at 30px and a
+     seventeen-character line do not both fit. */
+  .cta-title {
+    font-family: var(--font-mono);
+    font-size: var(--text-h2);
+    line-height: 1.05;
+    text-transform: uppercase;
+    letter-spacing: -0.025em;
+  }
+  @media (max-width: 520px) {
+    .cta-title {
+      font-size: var(--text-h3);
+    }
+  }
+
+  /* One column of the row. The anchor fills its `<li>` rather than sitting
+     inside it, so the whole column is the target — on a phone these three are
+     the largest tap targets on the page and it would be a waste to make the
+     word the only live part of them.
+
+     The inset is asymmetric on purpose. It belongs *after* the separator, not
+     around the column, so the first label lines up with the eyebrow and the
+     headline above it and the last one ends on the same margin as the rule
+     over them both. A symmetric pad would push the whole row 40px in from a
+     page that is otherwise flush. */
+  .mode-item + .mode-item {
+    border-left: 1px solid var(--color-line-strong);
+  }
+  .mode-cell {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding-right: 40px;
+  }
+  .mode-item + .mode-item .mode-cell {
+    padding-left: 40px;
+  }
+  .mode-item:last-child .mode-cell {
+    padding-right: 0;
+  }
+
+  .mode-top {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  /* The `display` face of `ui/ChipGroup.astro`, rule and all — with nothing
+     filling behind it, that component's note applies exactly: at this size a
+     wash reads as highlighted text rather than as a chosen answer, so the rule
+     does all of it.
+
+     One departure: ink rather than faint at rest. Faint is that component's
+     "not yet answered" state, earned back by picking one; a link that never
+     gets picked would just sit there looking disabled. */
+  .mode-face {
+    display: block;
+    border-bottom: 2px solid transparent;
+    padding-bottom: 7px;
+    font-family: var(--font-display);
+    font-size: var(--text-h3);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
     color: var(--color-ink);
-    padding: 12px 14px;
-    font-size: 14px;
-    font-family: inherit;
-    margin-bottom: 12px;
     transition:
-      border-color 0.15s ease,
-      box-shadow 0.15s ease;
+      color 200ms var(--ease-out-expo),
+      border-color 200ms var(--ease-out-expo);
   }
-  .q-field::placeholder {
-    color: var(--color-faint);
+  .mode-hint {
+    font-size: var(--text-detail);
+    line-height: 1.55;
+    color: var(--color-muted);
   }
-  .q-field:focus {
-    outline: none;
-    border-color: var(--color-brand-bright);
-    box-shadow: 0 0 0 3px rgba(47, 111, 255, 0.15);
+
+  /* The arrow sits there rather than arriving. It was hidden until hover on
+     the first pass, on the argument that three permanent arrows read as a menu
+     — but the version that reveals on hover is invisible on every phone, where
+     nothing hovers, and that is most of the traffic. Drawn quietly at rest it
+     says "these three navigate" before anyone touches them, which the label
+     alone does not. */
+  .mode-arrow {
+    display: inline-flex;
+    color: var(--color-muted);
+    transition:
+      color 200ms var(--ease-out-expo),
+      translate 200ms var(--ease-out-expo);
   }
-  select.q-field:invalid {
-    color: var(--color-faint);
+
+  /* The two halves of the hover are not symmetrical, on purpose. The arrow is
+     drawn at rest because it says "this navigates" — a fact about the column
+     that is true before you touch it. The rule says "this one" and is only
+     ever true of one column at a time, so it stays transparent until the
+     pointer makes it true. Three rules drawn at once would say it of all
+     three. */
+  .mode-cell:hover .mode-face,
+  .mode-cell:focus-visible .mode-face {
+    color: var(--color-brand);
+    border-color: var(--color-brand);
+  }
+  .mode-cell:hover .mode-arrow,
+  .mode-cell:focus-visible .mode-arrow {
+    color: var(--color-brand);
+  }
+  /* The nudge is the only part that still needs a pointer to make sense, so it
+     keeps the guard `.press` uses in global.css. */
+  @media (hover: hover) and (pointer: fine) {
+    .mode-cell:hover .mode-arrow,
+    .mode-cell:focus-visible .mode-arrow {
+      translate: 3px 0;
+    }
+  }
+
+  /* Stacked, the separator turns with the layout: a rule between rows rather
+     than between columns, and the inset that was after the divider becomes the
+     space above it. */
+  @media (max-width: 980px) {
+    .mode-item + .mode-item {
+      border-left: 0;
+      border-top: 1px solid var(--color-line-strong);
+    }
+    .mode-cell,
+    .mode-item + .mode-item .mode-cell {
+      padding: 0 0 26px;
+    }
+    .mode-item + .mode-item .mode-cell {
+      padding-top: 26px;
+    }
+    .mode-item:last-child .mode-cell {
+      padding-bottom: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mode-face,
+    .mode-arrow {
+      transition-duration: 1ms;
+    }
   }
 </style>
-
-<script>
-  // Re-runs after every client-router navigation as well as on first load,
-  // so the swapped-in DOM gets wired up.
-  document.addEventListener("astro:page-load", () => {
-    const form = document.getElementById(
-      "quote-form",
-    ) as HTMLFormElement | null;
-    if (form) {
-      form.addEventListener("submit", (e) => {
-        e.preventDefault();
-        const data = new FormData(form);
-        const get = (key: string) => String(data.get(key) ?? "").trim();
-
-        const lines = [
-          "New quote request — collinscouae.com",
-          `Name: ${[get("first_name"), get("last_name")].filter(Boolean).join(" ")}`,
-          `Email: ${get("email")}`,
-          `Phone: ${get("phone")}`,
-          `Equipment: ${get("category")}`,
-          get("mode") &&
-            `Buy or rent: ${get("mode")}${get("duration") ? ` · ${get("duration")}` : ""}`,
-          get("message") && `Details: ${get("message")}`,
-        ].filter(Boolean);
-
-        window.open(
-          `${form.dataset.wa}?text=${encodeURIComponent(lines.join("\n"))}`,
-          "_blank",
-        );
-      });
-    }
-  });
-</script>

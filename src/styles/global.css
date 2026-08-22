@@ -332,6 +332,39 @@
     outline: 1px solid var(--color-line);
   }
 
+  /* Head rule: a hairline that starts brand and stops — the accent bar
+     `ui/Eyebrow.astro` draws before a label, stretched into the rule it sits
+     on. It marks the top of a block that ASKS something, and there are now
+     three of those: the dialog's head, /contact's form head, and the contact
+     band that closes the homepage. Copied twice was tolerable; a third copy
+     is what earns it a place here.
+
+     One variable tunes it and nothing else does: `--rule-run`, how far the
+     brand runs from the element's left edge before the hairline takes over.
+     It always starts at the edge — a head whose title is padded away from
+     that edge adds the padding to the run rather than shifting it, so the
+     brand still reaches 88px past where the title begins:
+
+       .dlg-head { --rule-run: calc(var(--dlg-gutter) + 88px); }
+
+     The gradient is drawn on an ::after that overlays the border rather than
+     replacing it, so the hairline stays continuous where the brand stops. */
+  .rule-brand {
+    position: relative;
+    border-bottom: 1px solid var(--color-line);
+  }
+  .rule-brand::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 -1px 0;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      var(--color-brand) 0 var(--rule-run, 88px),
+      transparent var(--rule-run, 88px)
+    );
+  }
+
   /* ---- On-scroll entrance ------------------------------------
      `reveal.ts` adds `.is-in`; everything below is CSS. The hidden state is
      SET BY THE SCRIPT (`.reveal-armed`), never authored here — so a page whose

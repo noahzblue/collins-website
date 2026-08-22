@@ -170,6 +170,10 @@ export const contactSection = {
   eyebrow: "Get in touch",
   title: ["Let's get your", "equipment moving."],
   body: "Send us the machine, the duty and the dates — or just describe the job and we'll specify it for you.",
+  /** Heads the three buy/hire links that open the quote form. The options
+   *  themselves are not here — they are `MODES` in `lib/quote/options.ts`, so
+   *  the homepage cannot word the question differently to the form. */
+  start: "Start here",
 };
 
 /** /contact page — no photo banner; this one opens straight into content. */

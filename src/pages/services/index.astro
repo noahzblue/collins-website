@@ -95,15 +95,15 @@ const enquire = (title: string) => {
 
                   <div class="max-w-[460px] max-nav:max-w-none">
                     <div class="flex items-center gap-[14px]">
-                      <span class="font-mono text-caption tracking-[0.5px] text-brand">
-                        {String(i + 1).padStart(2, "0")}
-                      </span>
-                      <span
+                      {/* <span
                         class="h-px w-[22px] bg-line-strong"
                         aria-hidden="true"
-                      />
+                        /> */}
                       <span class="flex h-[30px] w-[30px] items-center justify-center rounded-sm bg-brand-tint text-brand">
                         <Icon name={service.icon} size={16} />
+                      </span>
+                      <span class="font-mono text-caption tracking-[0.5px] text-brand">
+                        {String(i + 1).padStart(2, "0")}
                       </span>
                     </div>
 

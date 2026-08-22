@@ -9,33 +9,27 @@
       whether or not anything links to it; the `import.meta.env.DEV` guard
       hides the content but not the URL.
 
-- [ ] **Quote form prerequisites** — two small edits that block slice 3 of
-      `docs/site-expansion/14` and are cheapest done at the top of a session:
-      `attachments` needs adding to the Zod schema in `src/content.config.ts`
-      and to the four categories that have them in `categories.json` (or
-      deriving from `family`); and `src/components/equipment/DutyGuide.astro`
-      needs splitting into a presentational `DutyGuideList` plus its current
-      page-level wrapper, so the form can put the list inside a `<details>`
-      without its `<h2>` and eyebrow.
 - [ ] **Duplicate ids site-wide** — `src/components/ui/Logo.astro` hardcodes
       `id="wm"` and `id="wm-sub"`, and renders in both the header and the
       footer, so every page ships two of each. Pre-dates the quote form; the
       fix is the same `scopedId` pattern `lib/forms.ts` now provides.
-- [ ] **Contact form backend** — the quote form in
-      `src/components/sections/ContactCTA.astro` has no server endpoint. Its
-      submit handler calls `preventDefault()` and opens `wa.me` with the request
-      pre-filled. Fields already carry real `name` attributes (`first_name`,
-      `last_name`, `email`, `phone`, `category`, `mode`, `duration`, `message`),
-      so a real endpoint can be wired without touching the markup. Pick one: - **Hosted form service** — Formspree / Web3Forms (or Netlify Forms if
-      deploying there). Set `action` + `method="post"` and drop the JS handler,
-      or keep it as a fallback. Keeps the current static build as-is. - **Astro endpoint** (`src/pages/api/quote.ts`) — needs an SSR adapter and
+- [ ] **Quote form backend** — `src/lib/quote/submit.ts` is the only thing in
+      the feature that knows how a request leaves the browser, and it is built
+      against a stable contract: with `PUBLIC_QUOTE_ENDPOINT` unset it resolves
+      `{ ok: true }` without a request and the WhatsApp handoff carries the
+      enquiry, exactly as today. Setting the variable makes it POST and nothing
+      else in the feature changes (docs/site-expansion/14 §12). Pick one: - **Hosted form service** — Formspree / Web3Forms (or Netlify Forms if
+      deploying there). Pass `encoding: "form"` and `compose.ts`'s `flatten()`
+      already produces the flat key/values they want, with `toMessage()` as a
+      readable `message` field. Keeps the current static build as-is. - **Astro endpoint** (`src/pages/api/quote.ts`) — needs an SSR adapter and
       `output: "server"`/hybrid in `astro.config.mjs` (currently plain static,
       no adapter), plus a mail sender (Resend/SendGrid) and an env var for the
-      API key.
-      Either route still needs: honeypot or captcha for spam, inline
-      success/error states (the form has none today), and delivery to
-      `info@collinscouae.com`. Decide whether the WhatsApp prefill stays on as a
-      secondary path.
+      API key. Takes the nested JSON payload as-is.
+      Spam, validation and the success/error states are done — a honeypot plus
+      a minimum render-to-submit interval, `validate.ts`, and the panels in
+      `QuoteSuccess.astro`. What is left is the endpoint, delivery to
+      `info@collinscouae.com`, and deciding whether a returned `ref` is worth
+      showing (the success panel already renders one if the backend sends it).
 - [ ] **Hero video optimization** — `public/videos/hero-yard.mp4` is ~15 MB
       (Seedance 1080p / 10 s, standard bitrate). Re-encode to ~3–4 MB before any
       deploy: ffmpeg `-crf 28 -preset slow -movflags +faststart` (no ffmpeg on

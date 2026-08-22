@@ -145,7 +145,10 @@ export const groupByFamily = <T extends { family: string }>(categories: T[]) =>
  */
 export const quoteTrigger = (
   category?: string,
-  mode?: Mode,
+  /** `unsure` is here because the quote form's opening question has three
+   *  answers where the equipment slice only ever needs two — customers move
+   *  between hire and purchase (docs 14 §7). */
+  mode?: Mode | "unsure",
   range?: { label: string; powerType?: string },
 ) => ({
   "data-quote-open": true,

@@ -1425,13 +1425,36 @@ into answered questions.
   CTA does something useful with no JavaScript, and the dialog is the better
   answer when it can be.
 
-**Left open, and it needs a decision rather than a slice:** the homepage
-`sections/ContactCTA.astro` still carries a _third_ form — the boxed mini-form
-this document never accounted for, and the last thing on the site still using
-`.q-field`. §2 says there are two mounts. The band's own copy already points at
-"the full enquiry form", so the natural fix is to replace its fields with the
-pitch and a `data-quote-open` CTA — but that is a visible homepage change and
-belongs in a homepage review, not in this feature's tail.
+#### The third form, and why it went
+
+`sections/ContactCTA.astro` carried a mini-form this document never accounted
+for. It was removed on review (2026-08-22), and the reasoning is worth keeping
+because the same argument applies to the next one somebody is tempted to add:
+
+**It asked for more and collected less.** It required an email §8 deliberately
+makes optional, split the name in two where §7 asks for one and makes company
+optional, never asked the size — the single most useful fact for producing a
+quotation — and never asked the emirate. It offered "Buy or rent" as two
+options, where the site says _hire_ everywhere and §7 restores a third answer
+because customers move between the two. Its WhatsApp message was a different
+shape again, so the yard read two lead formats. It had no validation, no
+success and no error state.
+
+Against that, keeping it saved exactly one click — and not even a navigation,
+since the dialog opens in place. Its own submit opened WhatsApp in a new tab,
+so it did not complete on the page either.
+
+**What replaced it is the form's opening question, asked on the homepage.** Buy
+outright / Hire / Not sure yet as three links in the `display` face, which is
+the same device the form opens with, reading from the same `MODES` — the
+homepage cannot word the question differently to the form it opens. One tap
+arrives at the machine picker with section 01 already half answered. The
+alternative considered and rejected was a two-field name-and-phone teaser: it
+is a second lead shape with no machine and no size, which is the exact thing
+this document exists to prevent, and being the easy path it would have
+cannibalised the form built to stop it.
+
+`.q-field` is now gone from the codebase. There is one field style on the site.
 
 #### Two prerequisites that block later slices
 

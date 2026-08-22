@@ -161,7 +161,7 @@ const { office, yard } = site.places;
        instead of opening the dialog (docs 14 §2). -->
   <Section id="quote" class="pt-[72px] max-mob:pt-[48px]">
     <div class="wrap">
-      <div class="q-inline-head">
+      <div class="q-inline-head rule-brand">
         <h2 class="q-inline-title">{DIALOG.title}</h2>
       </div>
       <div class="border-b border-line-strong">
@@ -216,24 +216,12 @@ const { office, yard } = site.places;
 </Base>
 
 <style>
-  /* The same device the dialog's head draws: a rule that starts brand and
-     stops, so the inline mount and the modal read as one thing seen twice
-     rather than two arrangements of the same fields. */
+  /* `.rule-brand` (global.css) is the same device the dialog's head draws, so
+     the inline mount and the modal read as one thing seen twice rather than
+     two arrangements of the same fields. Nothing is inset here — there is no
+     panel, so the rule starts where the title does. */
   .q-inline-head {
-    position: relative;
     padding-bottom: 20px;
-    border-bottom: 1px solid var(--color-line);
-  }
-  .q-inline-head::after {
-    content: "";
-    position: absolute;
-    inset: auto 0 -1px 0;
-    height: 1px;
-    background: linear-gradient(
-      90deg,
-      var(--color-brand) 0 88px,
-      transparent 88px
-    );
   }
   .q-inline-title {
     font-family: var(--font-mono);

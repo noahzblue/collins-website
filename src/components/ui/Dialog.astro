@@ -91,7 +91,7 @@ const widths: Record<NonNullable<Props["width"]>, string> = {
       lattice is the language the rest of the panel already speaks. The note
       cell is the tinted one, the way a `.mesh` heading row is. */
   }
-  <header class="dlg-head">
+  <header class="dlg-head rule-brand">
     <div class="dlg-head-title">
       {
         /* `autofocus` puts the opening focus here rather than on the first
@@ -264,26 +264,15 @@ const widths: Record<NonNullable<Props["width"]>, string> = {
      Head and foot are fixed; only the body scrolls. That is what makes the
      mobile sheet's top bar and action row stay put. */
   /* ── The head ───────────────────────────────────────────────────
-     Cells on a shared hairline, and a rule beneath that starts brand and
-     becomes hairline — the same accent bar `ui/Eyebrow.astro` draws before a
-     label, stretched into the rule it sits on. */
+     Cells on a shared hairline, and `.rule-brand` beneath — the rule that
+     starts brand and becomes hairline (global.css). The run carries the panel
+     gutter, so the brand reaches 88px past where the title begins rather than
+     88px from the panel's edge. */
   .dlg-head {
     flex: 0 0 auto;
     display: flex;
     align-items: stretch;
-    position: relative;
-    border-bottom: 1px solid var(--color-line);
-  }
-  .dlg-head::after {
-    content: "";
-    position: absolute;
-    inset: auto 0 -1px 0;
-    height: 1px;
-    background: linear-gradient(
-      90deg,
-      var(--color-brand) 0 calc(var(--dlg-gutter) + 88px),
-      transparent calc(var(--dlg-gutter) + 88px)
-    );
+    --rule-run: calc(var(--dlg-gutter) + 88px);
   }
 
   .dlg-head-title {
@@ -389,12 +378,8 @@ const widths: Record<NonNullable<Props["width"]>, string> = {
     .dlg-head-note {
       display: none;
     }
-    .dlg-head::after {
-      background: linear-gradient(
-        90deg,
-        var(--color-brand) 0 calc(var(--dlg-gutter) + 40px),
-        transparent calc(var(--dlg-gutter) + 40px)
-      );
+    .dlg-head {
+      --rule-run: calc(var(--dlg-gutter) + 40px);
     }
     /* No dimmed layer behind something that covers the screen completely. */
     .dlg::backdrop {
