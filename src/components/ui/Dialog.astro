@@ -73,8 +73,13 @@ const widths: Record<NonNullable<Props["width"]>, string> = {
   md: "[--dlg-width:820px]",
   /* Wide enough that a 4K display gets a panel and not a postage stamp. The
      form is a four-column picker and a two-column rating list beside a
-     summary rail; below about 1400 those start fighting each other. */
-  lg: "[--dlg-width:1500px]",
+     summary rail; below about 1400 those start fighting each other.
+
+     The panel takes the viewport it is given — `width` below clamps it to
+     `100dvw - 48px` — so this is a ceiling, not a demand. Raised from 1500 so
+     the steps column gets the extra room rather than the rail, which is now
+     pinned to a fixed width (see QuoteForm's grid). */
+  lg: "[--dlg-width:1760px]",
 };
 ---
 

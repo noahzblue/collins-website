@@ -307,8 +307,15 @@ export const EMAIL_SUBJECT = "Quotation request";
 
 /** After a successful send. The panel body is replaced by this (docs 14 §12). */
 export const SUCCESS = {
+  /** The eyebrow over the confirmation. */
   title: "Request sent",
-  body: "We have your request. If WhatsApp opened in another tab, send the message there and we will pick it up straight away.",
+  /** The heading. Short, and about the customer rather than about us — the
+   *  promise is a supporting line underneath, not the headline it used to be
+   *  set as. */
+  heading: "We have your request.",
+  body: "If WhatsApp opened in another tab, send the message there and we will pick it up straight away.",
+  /** Heads the list of what was actually sent. */
+  recapTitle: "What you sent",
   refLabel: "Reference",
   again: "Send another request",
 };

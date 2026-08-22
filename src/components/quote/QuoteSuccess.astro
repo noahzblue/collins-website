@@ -10,11 +10,26 @@
  * The numbers are here because one of the three reply channels does not open
  * anything: "Call" is a promise that we will ring, and this is where the
  * customer gets to ring us instead if they would rather.
+ *
+ * ## Every recap row is rendered here, hidden
+ *
+ * The script used to build these rows with `document.createElement`, and they
+ * came out unstyled: Astro compiles a scoped selector to
+ * `.q-success-recap > div:where(.astro-cid-…)`, and an element made at runtime
+ * carries no cid, so every rule under `.q-success-recap` missed. The recap
+ * rendered as a flat stack of labels and values with no columns, no rules and
+ * no mono — the CSS below was correct the whole time and never applied to
+ * anything.
+ *
+ * So the rows exist at build time, one per summary slot, and
+ * `scripts/quote/form.ts` fills and unhides the ones that were answered. Same
+ * discipline as `QuoteSummary`, and the same lesson as the note at the top of
+ * `sections/TrustStrip.astro`.
  */
 import Button from "@/components/ui/Button.astro";
 import ContactRows from "@/components/ui/ContactRows.astro";
 import type { IconName } from "@/components/ui/icons";
-import { SUCCESS } from "@/lib/quote/options";
+import { SUCCESS, SUMMARY } from "@/lib/quote/options";
 
 interface Props {
   /** Per-instance id prefix — two forms on one page must not collide. */
@@ -27,6 +42,16 @@ interface Props {
 }
 
 const { instance, promise, rows, class: extra = "" } = Astro.props;
+
+/** The union of every mode's slots, in reading order — the same list the
+ *  summary rail renders, for the same reason.
+ *
+ *  Annotated rather than `Object.entries(…) as [string, string][]`: written
+ *  with the assertion, this file reported `ts(6196) 'Props' is declared but
+ *  never used`, the tell that the compiler has stopped linking `Props` to
+ *  `Astro.props` and every prop has silently degraded to `any` (see the note
+ *  in CLAUDE.md). The annotation types it identically and keeps the link. */
+const slots: [string, string][] = Object.entries(SUMMARY.labels);
 ---
 
 <div
@@ -43,10 +68,15 @@ const { instance, promise, rows, class: extra = "" } = Astro.props;
       {SUCCESS.title}
     </p>
 
-    <h3 class="q-success-title" data-success-title tabindex="-1">{promise}</h3>
+    <h3 class="q-success-title" data-success-title tabindex="-1">
+      {SUCCESS.heading}
+    </h3>
 
-    <p class="mt-6 mb-0 max-w-[54ch] text-lead leading-relaxed text-muted">
+    <p class="mt-5 mb-0 max-w-[54ch] text-lead leading-relaxed text-muted">
       {SUCCESS.body}
+    </p>
+    <p class="mt-3 mb-0 max-w-[54ch] text-base leading-relaxed text-faint">
+      {promise}
     </p>
 
     <p class="q-success-ref" data-success-ref hidden>
@@ -58,7 +88,17 @@ const { instance, promise, rows, class: extra = "" } = Astro.props;
       /* What was sent, so the confirmation confirms something. Filled from the
         same slots the summary rail uses. */
     }
-    <dl class="q-success-recap" data-success-recap></dl>
+    <p class="q-recap-title">{SUCCESS.recapTitle}</p>
+    <dl class="q-success-recap" data-success-recap>
+      {
+        slots.map(([key, label]) => (
+          <div data-recap-slot={key} hidden>
+            <dt>{label}</dt>
+            <dd data-recap-value={key} />
+          </div>
+        ))
+      }
+    </dl>
 
     <div class="mt-10 flex flex-wrap items-center gap-6">
       <Button variant="outline" size="lg" data-quote-restart>
@@ -87,12 +127,22 @@ const { instance, promise, rows, class: extra = "" } = Astro.props;
     text-transform: uppercase;
     color: var(--color-brand);
   }
+
+  /* The page's own heading treatment, not mono uppercase. This used to be set
+     in tracked caps at `--text-h3` and filled with `site.quotePromise`, which
+     made a sentence about turnaround times the loudest thing on the screen. */
   .q-success-title {
-    font-family: var(--font-mono);
-    font-size: var(--text-h3);
-    line-height: 1.08;
-    text-transform: uppercase;
-    letter-spacing: -0.03em;
+    font-size: var(--text-h2);
+    line-height: 1.06;
+    letter-spacing: -0.025em;
+    color: var(--color-ink);
+  }
+  /* The heading takes focus on send, so a screen reader lands on the
+     confirmation rather than on whatever the submit button became. That is a
+     programmatic focus and should not draw a ring — `:focus-visible` still
+     will, for anyone who arrived here on the keyboard. */
+  .q-success-title:focus {
+    outline: none;
   }
 
   .q-success-ref {
@@ -113,10 +163,24 @@ const { instance, promise, rows, class: extra = "" } = Astro.props;
     color: var(--color-muted);
   }
 
+  .q-recap-title {
+    margin: 44px 0 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-tag);
+    font-weight: 500;
+    letter-spacing: 1.6px;
+    text-transform: uppercase;
+    color: var(--color-faint);
+  }
+
+  /* A spec sheet: label column, value column, one hairline per row. Two
+     columns on anything but a phone, because fourteen rows in one column is a
+     scroll rather than a summary. */
   .q-success-recap {
-    display: flex;
-    flex-direction: column;
-    margin: 36px 0 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 48px;
+    margin: 14px 0 0;
     border-top: 1px solid var(--color-line);
   }
   .q-success-recap > div {
@@ -126,8 +190,11 @@ const { instance, promise, rows, class: extra = "" } = Astro.props;
     padding: 11px 0;
     border-bottom: 1px solid var(--color-line);
   }
+  .q-success-recap > div[hidden] {
+    display: none;
+  }
   .q-success-recap dt {
-    flex: 0 0 140px;
+    flex: 0 0 132px;
     font-family: var(--font-mono);
     font-size: var(--text-tag);
     letter-spacing: 0.9px;
@@ -135,8 +202,19 @@ const { instance, promise, rows, class: extra = "" } = Astro.props;
     color: var(--color-faint);
   }
   .q-success-recap dd {
+    flex: 1 1 auto;
     margin: 0;
+    text-align: right;
     font-size: var(--text-cell);
+    font-weight: 500;
     color: var(--color-ink);
+    overflow-wrap: anywhere;
+  }
+
+  @media (max-width: 600px) {
+    .q-success-recap {
+      grid-template-columns: 1fr;
+      column-gap: 0;
+    }
   }
 </style>

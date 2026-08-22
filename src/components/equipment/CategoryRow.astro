@@ -3,16 +3,17 @@
  * One equipment category as a full-width alternating row — the hub's primary
  * unit, replacing the card grid.
  *
- * Photo on one side, the pitch on the other: number and family, the name, the
- * spec line, four scannable capability lines, a short paragraph and the link
- * through to the category page. `flip` swaps the sides so consecutive rows
- * mirror each other; on mobile the row collapses and the photo always leads.
+ * The layout, the photograph's crop and the heading belong to
+ * `ui/AlternatingRow`, which /services builds its six blocks from too. What is
+ * left here is what only a category has: the number-and-family line, the spec
+ * line, four scannable capability lines, the summary, and the link through with
+ * its availability badges.
  */
 import type { CollectionEntry } from "astro:content";
 import Icon from "@/components/ui/Icon.astro";
 import Button from "@/components/ui/Button.astro";
 import Pill from "@/components/ui/Pill.astro";
-import ParallaxImage from "@/components/ui/ParallaxImage.astro";
+import AlternatingRow from "@/components/ui/AlternatingRow.astro";
 import { availabilityBadges } from "@/lib/equipment";
 
 interface Props {
@@ -30,34 +31,14 @@ const badges = availabilityBadges(category.data);
 const href = `/equipment/${category.id}`;
 ---
 
-<article
+<AlternatingRow
   id={category.id}
-  class="group grid scroll-mt-header-gap grid-cols-2 items-center gap-[72px] max-nav:grid-cols-1 max-nav:gap-9"
+  title={name}
+  image={heroImage}
+  href={href}
+  flip={flip}
 >
-  {
-    /* Media. Sources are 4:3 landscape; the 4:5 crop is what gives the row its
-      editorial column, so the photos are centred rather than fitted. */
-  }
-  <a
-    href={href}
-    aria-hidden="true"
-    tabindex="-1"
-    class:list={[
-      "block overflow-clip rounded-md bg-surface-2",
-      flip && "order-2 max-nav:order-none",
-    ]}
-  >
-    {
-      heroImage && (
-        <ParallaxImage
-          src={heroImage}
-          class="aspect-[4/5] w-full transition-transform duration-500 ease-out group-hover:scale-[1.03] max-nav:aspect-[16/10]"
-        />
-      )
-    }
-  </a>
-
-  <div class="max-w-[460px] max-nav:max-w-none">
+  <Fragment slot="meta">
     <div class="flex items-center gap-[14px]">
       <span class="font-mono text-caption tracking-[0.5px] text-brand">
         {String(sortOrder).padStart(2, "0")}
@@ -67,41 +48,38 @@ const href = `/equipment/${category.id}`;
         {family}
       </span>
     </div>
+  </Fragment>
 
-    <h2 class="mt-[18px] text-[clamp(28px,3.2vw,38px)] leading-[1.06]">
-      <a href={href} class="transition-colors hover:text-brand">{name}</a>
-    </h2>
-    <p class="mt-[10px] text-base text-muted">{rangeLabel}</p>
+  <p class="mt-[10px] text-base text-muted">{rangeLabel}</p>
 
-    <ul class="mt-7 flex flex-col gap-[9px]">
-      {
-        highlights.map((line) => (
-          <li class="flex gap-[11px] text-detail leading-[1.45] font-medium text-body">
-            <Icon
-              name="arrow-right"
-              size={15}
-              class="mt-[4px] shrink-0 text-brand"
-            />
-            <span>{line}</span>
-          </li>
-        ))
-      }
-    </ul>
+  <ul class="mt-7 flex flex-col gap-[9px]">
+    {
+      highlights.map((line) => (
+        <li class="flex gap-[11px] text-detail leading-[1.45] font-medium text-body">
+          <Icon
+            name="arrow-right"
+            size={15}
+            class="mt-[4px] shrink-0 text-brand"
+          />
+          <span>{line}</span>
+        </li>
+      ))
+    }
+  </ul>
 
-    <p class="mt-7 text-lead leading-relaxed text-muted">{summary}</p>
+  <p class="mt-7 text-lead leading-relaxed text-muted">{summary}</p>
 
-    <div class="mt-8 flex flex-wrap items-center gap-4">
-      <Button variant="outline" href={href} class="press">
-        View {name.toLowerCase()}
-        <Icon
-          name="arrow-right"
-          size={16}
-          class="transition-transform duration-200 group-hover:translate-x-[3px]"
-        />
-      </Button>
-      <div class="flex items-center gap-2">
-        {badges.map((badge) => <Pill size="md">{badge}</Pill>)}
-      </div>
+  <Fragment slot="actions">
+    <Button variant="outline" href={href} class="press">
+      View {name.toLowerCase()}
+      <Icon
+        name="arrow-right"
+        size={16}
+        class="transition-transform duration-200 group-hover:translate-x-[3px]"
+      />
+    </Button>
+    <div class="flex items-center gap-2">
+      {badges.map((badge) => <Pill size="md">{badge}</Pill>)}
     </div>
-  </div>
-</article>
+  </Fragment>
+</AlternatingRow>

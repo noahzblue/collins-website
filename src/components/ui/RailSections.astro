@@ -1,0 +1,137 @@
+---
+/**
+ * A column of long sections with the numbered index rail beside it — the shell
+ * `/equipment`, `/services`, `/yard` and `/about` all share.
+ *
+ *   <RailSections items={blocks} ariaLabel="On this page">
+ *     …the sections, in order…
+ *   </RailSections>
+ *
+ * Each item's `id` must match the `id` of the section it points at; the rail's
+ * scroll-spy observes those sections directly.
+ *
+ * ## Why the rail sits outside the text column
+ *
+ * The four pages used to hand-write `.wrap > .grid-cols-[180px_1fr]`, which
+ * charged the content 252px for the rail: the alternating photo/copy rows ran
+ * at 948px inside a 1200px page. Here the content column is **exactly** the
+ * `.wrap` content box — the same width, and the same left edge, as every other
+ * section on the page — and the rail is lifted out into the left margin where
+ * there is otherwise nothing.
+ *
+ * That only works while the margin is wide enough to hold it. Three modes:
+ *
+ *   ≥1520px   rail absolutely placed in the left margin, content at full
+ *             `.wrap` width and aligned with the sections above and below.
+ *   980–1520  not enough margin, so the rail comes back inside the column —
+ *             the old layout, but on a narrower rail than before.
+ *   <980      no rail: `ui/IndexRail` renders its chip strip instead and this
+ *             wrapper stops being a grid (see its note on `contents`).
+ *
+ * The alignment is the reason for the absolute placement rather than a third
+ * grid track. A three-track grid centres rail-plus-content as a group, which
+ * pushes the text column off the page's own gutter by half the rail — close
+ * enough to look like a mistake, far enough to be one.
+ */
+import IndexRail from "@/components/ui/IndexRail.astro";
+
+interface Props {
+  /** One per section, in page order. `id` must match the section's `id`. */
+  items: { id: string; label: string }[];
+  /** Names the rail's `nav` for assistive tech, e.g. "Equipment categories". */
+  ariaLabel: string;
+  /** Passthrough for the outer element — page rhythm belongs to the page. */
+  class?: string;
+}
+
+const { items, ariaLabel, class: extra = "" } = Astro.props;
+---
+
+<div class:list={["rail-wrap wrap", extra]}>
+  <div class="rail-slot">
+    <IndexRail items={items} ariaLabel={ariaLabel} />
+  </div>
+
+  <div class="rail-body flex min-w-0 flex-col">
+    <slot />
+  </div>
+</div>
+
+<style>
+  .rail-wrap {
+    /* Narrower than the 180px + 72px the pages used to hand-write. Two
+       reasons, and the second is the one that matters: the rail has to fit
+       inside the left margin in outside mode, and every pixel taken off it is
+       a pixel the content keeps in the fallback mode as well — 964px of row
+       instead of 884px. */
+    --rail-w: 140px;
+    --rail-gap: 32px;
+    position: relative;
+  }
+
+  /* A single-cell grid, in every mode, purely so the rail inside stretches to
+     the slot's full height. `position: sticky` is constrained by its PARENT's
+     box, not by the nearest scrollport, and `ui/IndexRail`'s own root is
+     shrink-to-fit — as a plain block child it gave the sticky nav a 180px cage
+     inside a 9000px column, and the rail scrolled away with the page. The
+     pages used to put IndexRail straight into the grid, where it stretched for
+     free; the moment it gained this wrapper it needed saying out loud. */
+  .rail-slot {
+    display: grid;
+    align-items: stretch;
+  }
+
+  /* ── 980–1520: the rail is a column again ─────────────────────── */
+  @media (min-width: 981px) {
+    .rail-wrap {
+      display: grid;
+      grid-template-columns: var(--rail-w) minmax(0, 1fr);
+      column-gap: var(--rail-gap);
+    }
+  }
+
+  /* ── ≥1520: out into the margin ────────────────────────────────
+     The threshold is geometry, not taste. The content column is the wrap's
+     1136px content box, so the margin beside it is `(100vw - 1136px) / 2`;
+     the rail and its gap have to fit in that with a little left over, and
+     below about 1520px they simply do not. Lowering it further would only
+     buy a rail too narrow to read a two-word label in.
+
+     `right` resolves against the wrap's padding box, so `100%` puts the
+     rail's right edge on the wrap's outer edge; the rest of the expression
+     walks it in past the 32px gutter and back out by the gap, landing it
+     exactly one gap left of where the text starts.
+
+     `top: 0; bottom: 0` is what gives the sticky `nav` inside somewhere to
+     travel — an absolutely positioned box with no height would pin the rail
+     to the top of the section and let it scroll away. */
+  @media (min-width: 1520px) {
+    .rail-wrap {
+      display: block;
+      /* Grows with the margin up to a limit, so a wide display gets a rail
+         that reads as a column rather than a sliver. */
+      --rail-w: clamp(140px, calc((100vw - 1136px) / 2 - 48px), 160px);
+    }
+    .rail-slot {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      right: calc(100% + var(--rail-gap) - 32px);
+      width: var(--rail-w);
+    }
+  }
+
+  /* ── <980: no grid at all ──────────────────────────────────────
+     IndexRail's own wrapper generates no box down here (`contents`) so its
+     chip strip can pin to a tall block container rather than to a grid cell —
+     and this slot has to get out of the way for the same reason, or the strip
+     is sticky inside a box its own height and scrolls away with the page. */
+  @media (max-width: 980px) {
+    .rail-wrap {
+      display: block;
+    }
+    .rail-slot {
+      display: contents;
+    }
+  }
+</style>

@@ -6,6 +6,10 @@
  * The consistency is doing real work: one CTA, the same shape everywhere,
  * means you always know where a page ends and what it wants. Don't give a
  * page its own bespoke ending.
+ *
+ * Light, not the ink band it used to be. An inverted block directly above the
+ * footer made every page end on two dark surfaces in a row, and the closer
+ * read as a second footer rather than as the last thing the page says.
  */
 import Section from "@/components/ui/Section.astro";
 import Button from "@/components/ui/Button.astro";
@@ -14,17 +18,17 @@ import { site } from "@/config/site";
 import { pageCta } from "@/data/content";
 ---
 
-<Section tone="dark">
+<Section>
   <div class="wrap">
     <div class="mx-auto max-w-[720px] text-center">
       <h2
-        class="text-h2 leading-[1.06] text-balance text-white"
+        class="text-h2 leading-[1.06] text-balance text-ink"
         data-reveal="lines"
       >
         {pageCta.title}
       </h2>
       <p
-        class="mx-auto mt-6 max-w-[560px] text-lead-lg leading-relaxed text-[#aab2c0]"
+        class="mx-auto mt-6 max-w-[560px] text-lead-lg leading-relaxed text-muted"
         data-reveal
       >
         {pageCta.body}
@@ -44,7 +48,7 @@ import { pageCta } from "@/data/content";
           Request a quote
         </Button>
         <Button
-          variant="outline-white"
+          variant="outline"
           href={site.whatsapp.href}
           target="_blank"
           rel="noopener"
@@ -57,19 +61,19 @@ import { pageCta } from "@/data/content";
       </div>
 
       <div
-        class="mt-8 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 font-mono text-caption tracking-[0.5px] text-white/50"
+        class="mt-8 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 font-mono text-caption tracking-[0.5px] text-faint"
         data-reveal
       >
         <a
           href={site.phone.href}
-          class="transition-colors hover:text-white"
+          class="transition-colors hover:text-brand"
           set:text={site.phone.display}
         />
         <span aria-hidden="true">·</span>
         <span>{site.hours}</span>
       </div>
 
-      <p class="mt-6 mb-0 text-note text-white/45" data-reveal>
+      <p class="mt-6 mb-0 text-note text-faint" data-reveal>
         {site.quotePromise}
       </p>
     </div>

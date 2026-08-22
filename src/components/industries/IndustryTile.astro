@@ -1,0 +1,74 @@
+---
+/**
+ * One industry as a photo tile: numbered image, name, tagline, and the
+ * categories that serve it as a mono line underneath.
+ *
+ * The hub stacks these two-up with an alternating vertical offset, so a column
+ * of them reads as a staggered run rather than as a grid. That offset belongs
+ * to the page — a tile should not know where it sits in a list — so it arrives
+ * through `class`.
+ */
+import Icon from "@/components/ui/Icon.astro";
+import ParallaxImage from "@/components/ui/ParallaxImage.astro";
+
+interface Props {
+  href: string;
+  name: string;
+  tagline: string;
+  image: string;
+  /** `01`–`08`. The page numbers them, not the tile. */
+  number: string;
+  /** Category names, already resolved and in catalogue order. */
+  categories: string[];
+  class?: string;
+}
+
+const {
+  href,
+  name,
+  tagline,
+  image,
+  number,
+  categories,
+  class: extra = "",
+} = Astro.props;
+---
+
+<a href={href} class:list={["group press block", extra]} data-reveal>
+  <div class="relative overflow-clip rounded-md bg-surface-2">
+    <ParallaxImage
+      src={image}
+      alt=""
+      shift="3%"
+      zoom={1.08}
+      class="aspect-[16/10] w-full"
+    />
+    <span
+      class="absolute top-4 left-5 font-mono text-caption tracking-[0.5px] text-white/85"
+      aria-hidden="true"
+    >
+      {number}
+    </span>
+    {
+      /* Same arrow chip as the homepage grid, on purpose — the two grids
+        should read as related. */
+    }
+    <span
+      class="absolute top-4 right-4 flex h-8 w-8 -translate-y-1 items-center justify-center rounded-full bg-white/15 text-white opacity-0 backdrop-blur-sm transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100"
+    >
+      <Icon name="arrow-up-right" size={15} />
+    </span>
+  </div>
+
+  <div class="pt-6">
+    <h3 class="text-h3 leading-[1.1] transition-colors group-hover:text-brand">
+      {name}
+    </h3>
+    <p class="mt-3 max-w-[440px] text-lead leading-relaxed text-muted">
+      {tagline}
+    </p>
+    <p class="mt-4 mb-0 font-mono text-caption tracking-[0.4px] text-faint">
+      {categories.join(" · ")}
+    </p>
+  </div>
+</a>

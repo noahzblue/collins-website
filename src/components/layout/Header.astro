@@ -4,11 +4,45 @@
  * Smoked glass over dark bands and photo banners, frosted white over light
  * ones. Tone lives on `data-tone` and is driven by whichever section is under
  * the bar (scripts/themeFlip.ts), not by any one page's hero height.
+ *
+ * Three of the six items have somewhere deeper to go, so they carry a
+ * sub-menu: twelve equipment categories, six services, eight industries. On
+ * the bar that is a panel on hover or focus; in the mobile sheet it is a
+ * `<details>` accordion, which is the same information with no second
+ * implementation and no JavaScript at all.
+ *
+ * Below the nav breakpoint the bar carries the logo and the hamburger and
+ * nothing else — "Get a quote" moves into the panel, where it gets a full
+ * width row instead of competing with the menu button for a phone's worth of
+ * space.
  */
+import { getCollection } from "astro:content";
 import Logo from "@/components/ui/Logo.astro";
 import Button from "@/components/ui/Button.astro";
 import Icon from "@/components/ui/Icon.astro";
-import { mainNav } from "@/data/navigation";
+import { mainNav, navChildren, type NavLink } from "@/data/navigation";
+
+/* The twelve, in catalogue order. The rest of the sub-menus are derived in
+   `data/navigation.ts`; this one cannot be, because only an `.astro` file can
+   read a content collection. */
+const categories = (await getCollection("equipment")).sort(
+  (a, b) => a.data.sortOrder - b.data.sortOrder,
+);
+
+const childrenFor = (href: string): NavLink[] | undefined => {
+  if (href === "/equipment") {
+    return categories.map((category) => ({
+      label: category.data.name,
+      href: `/equipment/${category.id}`,
+    }));
+  }
+  return navChildren[href];
+};
+
+const nav = mainNav.map((link) => ({
+  ...link,
+  children: childrenFor(link.href),
+}));
 
 /* "Current" matches by prefix so /equipment/generators lights Equipment.
    "/" is exact — otherwise it would light on every page. */
@@ -29,14 +63,35 @@ const isCurrent = (href: string) =>
 
     <nav class="flex items-center gap-[30px] max-nav:hidden">
       {
-        mainNav.map((link) => (
-          <a
-            href={link.href}
-            aria-current={isCurrent(link.href) ? "page" : undefined}
-            class="nav-link font-mono text-detail font-medium transition-colors duration-150"
-          >
-            {link.label}
-          </a>
+        nav.map((link) => (
+          <div class="nav-item relative">
+            <a
+              href={link.href}
+              aria-current={isCurrent(link.href) ? "page" : undefined}
+              aria-haspopup={link.children ? "true" : undefined}
+              class="nav-link flex items-center gap-[5px] py-[21px] font-mono text-detail font-medium transition-colors duration-150"
+            >
+              {link.label}
+              {link.children && (
+                <Icon name="chevron-down" size={13} class="nav-caret" />
+              )}
+            </a>
+
+            {link.children && (
+              <div class="nav-panel-desktop absolute top-full left-1/2 pt-[10px]">
+                <div class="card grid w-max grid-cols-2 gap-x-7 gap-y-[2px] p-[14px] shadow-[0_28px_60px_-30px_rgba(10,14,23,0.4)] max-cmp:grid-cols-1">
+                  {link.children.map((child) => (
+                    <a
+                      href={child.href}
+                      class="sub-link rounded-sm px-[10px] py-[7px] text-note whitespace-nowrap text-muted transition-colors"
+                    >
+                      {child.label}
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
         ))
       }
     </nav>
@@ -45,14 +100,15 @@ const isCurrent = (href: string) =>
       {
         /* Opens the quote dialog. The `href` is the no-JS fallback and the
           middle-click destination — /contact renders the same form inline
-          (docs/site-expansion/14 §2, §9a). */
+          (docs/site-expansion/14 §2, §9a). Hidden below the nav breakpoint,
+          where the same button lives at the foot of the menu panel. */
       }
       <Button
         size="xs"
         variant="primary"
         href="/contact"
         data-quote-open
-        class="press max-xs:px-4"
+        class="press max-nav:hidden"
       >
         Get a quote
       </Button>
@@ -71,7 +127,10 @@ const isCurrent = (href: string) =>
 
   {
     /* Below the nav breakpoint the six links live here. It shares the header's
-     glass so it reads as the bar growing rather than a second surface. */
+     glass so it reads as the bar growing rather than a second surface. The
+     panel scrolls on a short phone, hence its own `data-lenis-prevent` — Lenis
+     is stopped while the menu is open (body overflow), and without the
+     attribute it would swallow the wheel rather than let the panel move. */
   }
   <div
     id="nav-panel"
@@ -80,18 +139,57 @@ const isCurrent = (href: string) =>
     inert
   >
     <div class="overflow-hidden">
-      <nav class="flex flex-col px-7 py-4 max-mob:px-4" aria-label="Main">
+      <nav
+        class="flex max-h-[calc(100dvh-var(--spacing-header)-32px)] flex-col overflow-y-auto px-7 py-4 max-mob:px-4"
+        aria-label="Main"
+      >
         {
-          mainNav.map((link) => (
-            <a
-              href={link.href}
-              aria-current={isCurrent(link.href) ? "page" : undefined}
-              class="nav-link border-b py-[13px] font-mono text-base font-medium transition-colors last:border-0"
-            >
-              {link.label}
-            </a>
-          ))
+          nav.map((link) =>
+            link.children ? (
+              <details class="nav-acc border-b">
+                <summary class="nav-link flex cursor-pointer items-center justify-between py-[13px] font-mono text-base font-medium transition-colors">
+                  {link.label}
+                  <Icon name="chevron-down" size={15} class="nav-caret" />
+                </summary>
+                <div class="flex flex-col pb-3">
+                  <a
+                    href={link.href}
+                    aria-current={isCurrent(link.href) ? "page" : undefined}
+                    class="sub-link py-[9px] pl-4 text-note font-medium"
+                  >
+                    All {link.label.toLowerCase()}
+                  </a>
+                  {link.children.map((child) => (
+                    <a
+                      href={child.href}
+                      class="sub-link py-[9px] pl-4 text-note"
+                    >
+                      {child.label}
+                    </a>
+                  ))}
+                </div>
+              </details>
+            ) : (
+              <a
+                href={link.href}
+                aria-current={isCurrent(link.href) ? "page" : undefined}
+                class="nav-link border-b py-[13px] font-mono text-base font-medium transition-colors"
+              >
+                {link.label}
+              </a>
+            ),
+          )
         }
+
+        <Button
+          size="md"
+          variant="primary"
+          href="/contact"
+          data-quote-open
+          class="press mt-5 mb-2 w-full"
+        >
+          Get a quote
+        </Button>
       </nav>
     </div>
   </div>
@@ -142,6 +240,68 @@ const isCurrent = (href: string) =>
     color: var(--color-brand);
   }
 
+  /* ── The desktop sub-menus ──────────────────────────────────────
+     Hover OR focus-within, so a keyboard reaches them without a line of
+     JavaScript. The `pt-[10px]` on the positioner is a deliberate bridge: the
+     panel has to start under the bar with no gap the pointer can fall through
+     on its way down, or the menu closes while you are travelling to it. */
+  .nav-panel-desktop {
+    transform: translateX(-50%) translateY(-4px);
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity 0.18s ease,
+      transform 0.18s var(--ease-out-expo),
+      visibility 0.18s;
+  }
+  .nav-item:hover .nav-panel-desktop,
+  .nav-item:focus-within .nav-panel-desktop {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+    visibility: visible;
+  }
+  .nav-item:hover .nav-caret,
+  .nav-item:focus-within .nav-caret {
+    transform: rotate(180deg);
+  }
+  .nav-caret {
+    transition: transform 0.2s var(--ease-out-expo);
+  }
+
+  .sub-link:hover,
+  .sub-link:focus-visible {
+    background: var(--color-surface);
+    color: var(--color-ink);
+  }
+  .sub-link[aria-current="page"] {
+    color: var(--color-brand);
+  }
+
+  /* ── The mobile accordion ──────────────────────────────────────── */
+  .nav-acc {
+    border-color: inherit;
+  }
+  .nav-acc summary::-webkit-details-marker {
+    display: none;
+  }
+  .nav-acc summary {
+    list-style: none;
+  }
+  .nav-acc[open] .nav-caret {
+    transform: rotate(180deg);
+  }
+  #site-header[data-tone="glass"] .sub-link {
+    color: rgba(255, 255, 255, 0.62);
+  }
+  #site-header[data-tone="solid"] .sub-link {
+    color: var(--color-muted);
+  }
+  /* The desktop panel is its own white surface in both tones — it sits over
+     the page, not over whatever the bar is floating on. */
+  .nav-panel-desktop .sub-link {
+    color: var(--color-muted) !important;
+  }
+
   #nav-toggle {
     border-color: currentColor;
   }
@@ -164,7 +324,9 @@ const isCurrent = (href: string) =>
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .nav-panel {
+    .nav-panel,
+    .nav-panel-desktop,
+    .nav-caret {
       transition: none;
     }
   }
@@ -207,6 +369,13 @@ const isCurrent = (href: string) =>
       panel.toggleAttribute("inert", !open);
       // `autoToggle` on Lenis reads this and stands down while the menu is up.
       document.body.style.overflow = open ? "hidden" : "";
+      // Every accordion shuts with the sheet, so it reopens as a list of six
+      // rather than wherever it was left.
+      if (!open) {
+        for (const acc of panel.querySelectorAll("details[open]")) {
+          acc.removeAttribute("open");
+        }
+      }
     };
 
     toggle.addEventListener("click", () =>
@@ -219,7 +388,14 @@ const isCurrent = (href: string) =>
     document.addEventListener(
       "keydown",
       (e) => {
-        if (e.key === "Escape") setOpen(false);
+        if (e.key !== "Escape") return;
+        setOpen(false);
+        // A desktop sub-menu is held open by :focus-within, so Escape has to
+        // move the focus out of it — there is no state to clear.
+        const active = document.activeElement;
+        if (active instanceof HTMLElement && active.closest(".nav-item")) {
+          active.blur();
+        }
       },
       { signal: gone },
     );

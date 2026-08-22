@@ -474,19 +474,23 @@ export function initQuoteForm(
       "[data-success-recap]",
     );
     if (recap) {
-      recap.replaceChildren(
-        ...toSummary(state, buildContext(state))
+      /* Fill and unhide the rows the component already rendered — never build
+         them here. An element created at runtime carries no scoped-style class,
+         so `document.createElement("div")` came out of `QuoteSuccess`'s CSS
+         completely unstyled (see the note at the top of that file). */
+      const answered = new Map(
+        toSummary(state, buildContext(state))
           .filter((slot) => slot.value !== null)
-          .map((slot) => {
-            const row = document.createElement("div");
-            const term = document.createElement("dt");
-            const detail = document.createElement("dd");
-            term.textContent = slot.label;
-            detail.textContent = slot.value ?? "";
-            row.append(term, detail);
-            return row;
-          }),
+          .map((slot) => [slot.key, slot.value as string]),
       );
+      for (const row of recap.querySelectorAll<HTMLElement>(
+        "[data-recap-slot]",
+      )) {
+        const value = answered.get(row.dataset.recapSlot as never);
+        row.hidden = value === undefined;
+        const cell = row.querySelector<HTMLElement>("[data-recap-value]");
+        if (cell) cell.textContent = value ?? "";
+      }
     }
 
     const refRow =

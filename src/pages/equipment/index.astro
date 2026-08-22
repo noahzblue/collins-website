@@ -15,7 +15,8 @@ import Eyebrow from "@/components/ui/Eyebrow.astro";
 import Breadcrumb from "@/components/ui/Breadcrumb.astro";
 import Button from "@/components/ui/Button.astro";
 import CategoryRow from "@/components/equipment/CategoryRow.astro";
-import CategoryIndex from "@/components/equipment/CategoryIndex.astro";
+import RailSections from "@/components/ui/RailSections.astro";
+import ClosingNote from "@/components/sections/ClosingNote.astro";
 import { equipmentHub } from "@/data/content";
 import { site } from "@/config/site";
 
@@ -47,38 +48,40 @@ const all = (await getCollection("equipment")).sort(
 
   <!-- The twelve -->
   <Section class="pt-0">
+    <RailSections
+      items={all.map((c) => ({ id: c.id, label: c.data.name }))}
+      ariaLabel="Equipment categories"
+    >
+      {
+        all.map((category, i) => (
+          <>
+            {i > 0 && (
+              <hr class="my-[80px] border-0 border-t border-line max-mob:my-[56px]" />
+            )}
+            <CategoryRow category={category} flip={i % 2 === 1} />
+          </>
+        ))
+      }
+    </RailSections>
+
+    {
+      /* Closing enquiry. This is the only CTA the hub has — there is no
+        `PageCTA` under it — so it keeps real buttons rather than the band's
+        default arrow link. */
+    }
     <div class="wrap">
-      <div class="grid grid-cols-[180px_1fr] gap-[72px] max-nav:block">
-        <CategoryIndex categories={all} />
-
-        <div class="flex flex-col">
-          {
-            all.map((category, i) => (
-              <>
-                {i > 0 && (
-                  <hr class="my-[80px] border-0 border-t border-line max-mob:my-[56px]" />
-                )}
-                <CategoryRow category={category} flip={i % 2 === 1} />
-              </>
-            ))
-          }
-        </div>
-      </div>
-
-      <!-- Closing enquiry -->
-      <div
-        class="card mt-[96px] flex flex-wrap items-center justify-between gap-8 p-9 max-mob:mt-[64px] max-xs:p-7"
+      <ClosingNote
+        title={equipmentHub.closing.title}
+        body={equipmentHub.closing.body}
+        class="mt-[96px] max-mob:mt-[64px]"
       >
-        <div>
-          <h2 class="mb-2 text-[22px]">
-            {equipmentHub.closing.title}
-          </h2>
-          <p class="max-w-[520px] text-base leading-relaxed text-muted">
-            {equipmentHub.closing.body}
-          </p>
-        </div>
-        <div class="flex flex-wrap gap-3">
-          <Button variant="primary" href="/contact" data-quote-open>
+        <Fragment slot="actions">
+          <Button
+            variant="primary"
+            href="/contact"
+            data-quote-open
+            class="press"
+          >
             Request a quote
           </Button>
           <Button
@@ -86,11 +89,12 @@ const all = (await getCollection("equipment")).sort(
             href={site.whatsapp.href}
             target="_blank"
             rel="noopener"
+            class="press"
           >
             WhatsApp us
           </Button>
-        </div>
-      </div>
+        </Fragment>
+      </ClosingNote>
     </div>
   </Section>
 </Base>

@@ -1,0 +1,144 @@
+---
+/**
+ * The coverage matrix: which equipment categories serve which industries.
+ *
+ * A plant supplier's credibility is in coverage, and a table proves it in a
+ * way eight photo tiles cannot — it also generates thirty-odd links between
+ * the two hubs in one block.
+ *
+ * **Two renderings of the same data, and they belong in one file.** Below
+ * 980px a nine-column table is unreadable, so the same rows become stacked
+ * chip lists; keeping them together is what stops one of them being updated
+ * and the other quietly going stale.
+ *
+ * The wheel behaviour is deliberate and easy to get wrong: the scroller is
+ * `overflow-x-auto` with `overscroll-x-contain` and **no** `data-lenis-prevent`.
+ * That attribute makes Lenis stand down entirely, and because `overflow-x: auto`
+ * computes `overflow-y` to `auto` as well, a vertical wheel then died inside
+ * the table and the page stopped scrolling until the cursor was moved off it by
+ * hand. Contain the x axis only; y must stay `auto` so the page keeps the
+ * vertical delta.
+ */
+import Pill from "@/components/ui/Pill.astro";
+
+interface Column {
+  id: string;
+  name: string;
+  href: string;
+}
+
+interface Row {
+  name: string;
+  href: string;
+  /** Ids of the columns this row is covered by. */
+  covered: Set<string>;
+  /** The same coverage as display names, for the stacked fallback. */
+  categories: { name: string; href: string }[];
+}
+
+interface Props {
+  columns: Column[];
+  rows: Row[];
+  /** Column head for the first column, e.g. "Industry". */
+  rowLabel: string;
+  class?: string;
+}
+
+const { columns, rows, rowLabel, class: extra = "" } = Astro.props;
+---
+
+<div class:list={[extra]}>
+  <div class="overflow-x-auto overscroll-x-contain max-nav:hidden">
+    <table class="w-full min-w-[900px] border-collapse text-left">
+      <thead>
+        <tr class="border-b border-line-strong">
+          <th
+            scope="col"
+            class="py-[12px] pr-6 font-mono text-tag font-medium tracking-[1.4px] text-faint uppercase"
+          >
+            {rowLabel}
+          </th>
+          {
+            columns.map((column) => (
+              <th
+                scope="col"
+                class="px-2 py-[12px] text-center font-mono text-tag font-medium tracking-[0.6px] text-faint"
+              >
+                <a
+                  href={column.href}
+                  class="transition-colors hover:text-brand"
+                >
+                  {column.name}
+                </a>
+              </th>
+            ))
+          }
+        </tr>
+      </thead>
+      <tbody>
+        {
+          rows.map((row) => (
+            <tr class="border-b border-line">
+              <th scope="row" class="py-[14px] pr-6 text-cell font-normal">
+                <a
+                  href={row.href}
+                  class="text-ink transition-colors hover:text-brand"
+                >
+                  {row.name}
+                </a>
+              </th>
+              {columns.map((column) => (
+                <td class="px-2 py-[14px] text-center">
+                  {row.covered.has(column.id) ? (
+                    <a
+                      href={column.href}
+                      class="dot inline-flex h-[26px] w-[26px] items-center justify-center rounded-full transition-colors"
+                      aria-label={`${column.name} for ${row.name}`}
+                    >
+                      <span
+                        class="block h-[7px] w-[7px] rounded-full bg-brand"
+                        aria-hidden="true"
+                      />
+                    </a>
+                  ) : (
+                    <span class="block text-faint" aria-hidden="true">
+                      ·
+                    </span>
+                  )}
+                </td>
+              ))}
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <ul class="hidden flex-col gap-7 max-nav:flex">
+    {
+      rows.map((row) => (
+        <li class="border-b border-line pb-6 last:border-0">
+          <a
+            href={row.href}
+            class="text-subhead font-medium text-ink transition-colors hover:text-brand"
+          >
+            {row.name}
+          </a>
+          <div class="mt-3 flex flex-wrap gap-2">
+            {row.categories.map((category) => (
+              <a href={category.href}>
+                <Pill size="md">{category.name}</Pill>
+              </a>
+            ))}
+          </div>
+        </li>
+      ))
+    }
+  </ul>
+</div>
+
+<style>
+  .dot:hover {
+    background: var(--color-brand-tint);
+  }
+</style>

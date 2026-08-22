@@ -214,7 +214,12 @@ const contactRows = [
      column can never slide under it. */
   .q-layout {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) clamp(300px, 24%, 400px);
+    /* The rail is a fixed column, not a percentage. At 24% every pixel added
+       to the panel gave a quarter of itself back to a summary that has nothing
+       more to say at 400px than it does at 320 — so the form, which is a
+       four-column picker and a two-column rating table, never actually got
+       wider. Pinning it sends the whole of the extra width to the steps. */
+    grid-template-columns: minmax(0, 1fr) 340px;
     align-items: start;
   }
   .q-steps {

@@ -40,14 +40,14 @@ const num = (i: number) => String(i + 1).padStart(2, "0");
 }
 <div class:list={["index-rail max-nav:contents", extra]} data-index-rail>
   <nav class="sticky top-header-gap max-nav:hidden" aria-label={ariaLabel}>
-    <ul class="flex flex-col border-l border-line">
+    <ul class="flex flex-col gap-[2px]">
       {
         items.map((item, i) => (
           <li>
             <a
               href={`#${item.id}`}
               data-index-link={item.id}
-              class="idx -ml-px flex items-center gap-[10px] border-l border-transparent py-[6px] pl-[13px] transition-colors duration-200"
+              class="idx flex items-start gap-[11px] rounded-sm px-[11px] py-[7px] transition-colors duration-200"
             >
               <span class="idx-num font-mono text-micro tracking-[0.5px] text-faint transition-colors duration-200">
                 {num(i)}
@@ -65,7 +65,6 @@ const num = (i: number) => String(i + 1).padStart(2, "0");
   <!-- Mobile chip strip -->
   <div
     class="chip-strip sticky top-[calc(var(--spacing-header)+6px)] z-20 mb-8 hidden overflow-x-auto rounded-full border border-line bg-white/92 px-[10px] py-[8px] backdrop-blur-md max-nav:block"
-    data-lenis-prevent
   >
     <ul class="flex w-max items-center gap-2" aria-label={ariaLabel}>
       {
@@ -89,37 +88,57 @@ const num = (i: number) => String(i + 1).padStart(2, "0");
 </div>
 
 <style>
-  /* The strip is its own scroller (hence `data-lenis-prevent`); its scrollbar
-     would sit across the chips, so it is hidden and the overflow itself is the
-     affordance. */
+  /* Its scrollbar would sit across the chips, so it is hidden and the overflow
+     itself is the affordance.
+
+     `overscroll-behavior-x`, and ONLY the x axis. Lenis reads this property to
+     decide whether to stand off a nested scroller: `contain` on x stops the
+     page rubber-banding when the strip hits its end, while y stays `auto` so a
+     vertical wheel over the strip still scrolls the page. Setting the shorthand
+     — `overscroll-behavior: contain` — makes Lenis stand down on the vertical
+     axis too and the page dies under the cursor, which is the bug this file
+     used to have via `data-lenis-prevent`. */
   .chip-strip {
     scrollbar-width: none;
+    overscroll-behavior-x: contain;
   }
   .chip-strip::-webkit-scrollbar {
     display: none;
   }
 
+  .idx:hover {
+    background: var(--color-surface);
+  }
   .idx:hover .idx-label,
   .idx:hover .idx-num {
     color: var(--color-ink);
   }
-  .idx.is-active {
-    border-left-color: var(--color-brand);
+
+  /* The selected item is a filled block, not a tick in the margin: at a glance
+     you are looking for a solid shape, and a 1px accent rule beside 13px grey
+     type was not one. The fill is the brand, so it reads as the site's own
+     highlight rather than a generic dark band. */
+  .idx.is-active,
+  .idx.is-active:hover {
+    background: var(--color-brand);
   }
   .idx.is-active .idx-num {
-    color: var(--color-brand);
+    color: rgb(255 255 255 / 0.65);
   }
   .idx.is-active .idx-label {
-    color: var(--color-ink);
-    font-weight: 600;
+    color: #fff;
+    font-weight: 500;
   }
 
   .chip.is-active {
     border-color: var(--color-brand);
-    background: var(--color-brand-tint);
+    background: var(--color-brand);
   }
   .chip.is-active :global(span) {
-    color: var(--color-brand);
+    color: #fff;
+  }
+  .chip.is-active :global(span:first-child) {
+    color: rgb(255 255 255 / 0.65);
   }
 </style>
 

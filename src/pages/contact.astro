@@ -158,9 +158,15 @@ const { office, yard } = site.places;
   </div>
 
   <!-- 3. The form. `id` is what every quote CTA on this page scrolls to
-       instead of opening the dialog (docs 14 §2). -->
+       instead of opening the dialog (docs 14 §2).
+
+       The wide band, not the 1200px text column: the form is a four-column
+       picker and a two-column rating table beside a 340px summary rail, and
+       inside `.wrap` the steps column was left with about 750px of that. On
+       `wrap-wide` the steps get more room than a full-width page section
+       would give them, and the rail stops eating the difference. -->
   <Section id="quote" class="pt-[72px] max-mob:pt-[48px]">
-    <div class="wrap">
+    <div class="wrap wrap-wide">
       <div class="q-inline-head rule-brand">
         <h2 class="q-inline-title">{DIALOG.title}</h2>
       </div>

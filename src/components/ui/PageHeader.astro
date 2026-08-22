@@ -1,0 +1,75 @@
+---
+/**
+ * How a hub page opens: breadcrumb, one wide photograph, then the heading.
+ *
+ *   <PageHeader image={…} trail={[…]} current="Services" title="Services"
+ *               intro={…}>
+ *     …anything else under the intro…
+ *   </PageHeader>
+ *
+ * The photograph carries **nothing**: no scrim, no heading over it, no list.
+ * It is the same wide panel `sections/TrustStrip` opens with, and it works for
+ * the same reason — a machine photographed at size says what the business is
+ * faster than a line of type over the top of it, and type over a photo is
+ * always the compromise of the two.
+ *
+ * The heading then sits below on white, at the page's own text size and in the
+ * page's own colours, where it can be read rather than fought for. That also
+ * puts the header bar over white from the first pixel, which is why this
+ * declares `light` where the old full-bleed banner declared `glass`.
+ *
+ * Detail pages — `/equipment/<slug>`, `/industries/<slug>` — keep
+ * `ui/PageBanner`: a specific machine or sector wants its name **on** its
+ * photograph, and those pages open on a subject rather than on a section.
+ */
+import ParallaxImage from "./ParallaxImage.astro";
+import Breadcrumb from "./Breadcrumb.astro";
+
+interface Props {
+  /** Omit and the panel falls back to flat ink — no broken-image gap. */
+  image?: string;
+  trail: { label: string; href: string }[];
+  current: string;
+  title: string;
+  /** The paragraph under the heading. Anything further goes in the slot. */
+  intro?: string;
+  class?: string;
+}
+
+const { image, trail, current, title, intro, class: extra = "" } = Astro.props;
+---
+
+<section
+  data-next-theme="light"
+  class:list={["pt-header-gap pb-[64px] max-mob:pb-[48px]", extra]}
+>
+  <div class="wrap wrap-wide">
+    <Breadcrumb trail={trail} current={current} class="mb-5" />
+
+    <div
+      class="relative aspect-[2.6/1] overflow-clip rounded-md bg-ink max-nav:aspect-[16/9] max-mob:aspect-[3/2]"
+    >
+      {
+        image && (
+          <ParallaxImage src={image} loading="eager" class="absolute inset-0" />
+        )
+      }
+    </div>
+  </div>
+
+  <div class="wrap mt-[52px] max-mob:mt-[36px]">
+    <h1 class="max-w-[900px] text-h1 leading-[1.05] tracking-[-0.025em]">
+      {title}
+    </h1>
+
+    {
+      intro && (
+        <p class="mt-6 max-w-[680px] text-intro leading-relaxed text-muted">
+          {intro}
+        </p>
+      )
+    }
+
+    <slot />
+  </div>
+</section>

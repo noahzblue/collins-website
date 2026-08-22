@@ -1,0 +1,74 @@
+---
+/**
+ * The one-line closing band: a sentence on the left, the way onward on the
+ * right, hairlines above and below.
+ *
+ *   <ClosingNote body={…} cta={{ label: "View the equipment", href: "/equipment" }} />
+ *
+ * It started as the cross-sell at the foot of /services and turned out to be
+ * the shape three other blocks wanted: the "not seeing the machine you need?"
+ * closer on /equipment and the "one point of contact" note on /about were both
+ * filled cards, and a filled card in the middle of a page of hairlines reads as
+ * a widget that wandered in from another site.
+ *
+ * The rules are the point of the component. They are what separates the band
+ * from the section above without giving it a background, a border box or a
+ * corner radius — the site closes sections with a line, not with a panel.
+ *
+ * `title` is optional: with one the band is a small closing statement, without
+ * one it is a single sentence and a link. Anything more than a link goes in the
+ * `actions` slot, which replaces the arrow entirely.
+ */
+import Icon from "@/components/ui/Icon.astro";
+
+interface Props {
+  /** Optional heading above the body copy. Omit for a one-sentence band. */
+  title?: string;
+  /** The sentence. Kept to one or two lines — this is a signpost, not a beat. */
+  body: string;
+  /** The arrow link on the right. Ignored when the `actions` slot is filled. */
+  cta?: { label: string; href: string };
+  class?: string;
+}
+
+const { title, body, cta, class: extra = "" } = Astro.props;
+
+const hasActions = Astro.slots.has("actions");
+---
+
+<div
+  class:list={[
+    "flex flex-wrap items-center justify-between gap-8 border-y border-line py-10 max-mob:py-8",
+    extra,
+  ]}
+  data-reveal
+>
+  <div class="max-w-[620px]">
+    {
+      title && (
+        <h2 class="mb-3 text-h3 leading-[1.12] text-ink max-mob:mb-2">
+          {title}
+        </h2>
+      )
+    }
+    <p class="mb-0 text-lead-lg leading-relaxed text-body">{body}</p>
+  </div>
+
+  {
+    hasActions ? (
+      <div class="flex flex-wrap items-center gap-3">
+        <slot name="actions" />
+      </div>
+    ) : (
+      cta && (
+        <a
+          href={cta.href}
+          class="press inline-flex shrink-0 items-center gap-2 text-base font-medium text-ink transition-colors hover:text-brand"
+        >
+          {cta.label}
+          <Icon name="arrow-right" size={17} />
+        </a>
+      )
+    )
+  }
+</div>

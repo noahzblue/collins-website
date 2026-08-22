@@ -10,16 +10,19 @@
  * because the sector photo communicates faster than the sector name, and its
  * real payload is the coverage matrix: one table that answers "do you cover
  * me?" at a glance and generates 30+ links between two hubs.
+ *
+ * This file binds data and nothing else. The tile and the matrix are
+ * components — the matrix in particular ships two renderings of the same rows
+ * and was far too much markup to keep inline.
  */
 import { getCollection } from "astro:content";
 import Base from "@/layouts/Base.astro";
 import Section from "@/components/ui/Section.astro";
 import Eyebrow from "@/components/ui/Eyebrow.astro";
-import Pill from "@/components/ui/Pill.astro";
-import Icon from "@/components/ui/Icon.astro";
-import PageBanner from "@/components/ui/PageBanner.astro";
-import ParallaxImage from "@/components/ui/ParallaxImage.astro";
+import PageHeader from "@/components/ui/PageHeader.astro";
 import SectionHeading from "@/components/ui/SectionHeading.astro";
+import IndustryTile from "@/components/industries/IndustryTile.astro";
+import CoverageMatrix from "@/components/industries/CoverageMatrix.astro";
 import PageCTA from "@/components/sections/PageCTA.astro";
 import { industries, matrixCategoryIds } from "@/data/industries";
 import { industriesSection } from "@/data/content";
@@ -47,16 +50,13 @@ const rows = industries.map((industry) => ({
   title={industriesSection.seoTitle}
   description={industriesSection.seoDescription}
 >
-  <PageBanner
+  <PageHeader
     image="/images/industry-infrastructure.jpg"
     trail={[{ label: "Home", href: "/" }]}
     current="Industries"
     title="Industries"
-  >
-    <p class="mt-4 max-w-[600px] text-intro leading-relaxed text-white/80">
-      {industriesSection.intro}
-    </p>
-  </PageBanner>
+    intro={industriesSection.intro}
+  />
 
   <!-- Beat 2 — the statement -->
   <Section class="pb-[70px] max-mob:pb-[48px]">
@@ -77,47 +77,15 @@ const rows = industries.map((industry) => ({
       <div class="grid grid-cols-2 gap-8 max-nav:grid-cols-1 max-nav:gap-6">
         {
           rows.map(({ industry, categories }, i) => (
-            <a
+            <IndustryTile
               href={`/industries/${industry.slug}`}
-              class:list={[
-                "group press block",
-                i % 2 === 1 && "mt-[80px] max-nav:mt-0",
-              ]}
-              data-reveal
-            >
-              <div class="relative overflow-clip rounded-md bg-surface-2">
-                <ParallaxImage
-                  src={industry.image}
-                  alt=""
-                  shift="3%"
-                  zoom={1.08}
-                  class="aspect-[16/10] w-full"
-                />
-                <span
-                  class="absolute top-4 left-5 font-mono text-caption tracking-[0.5px] text-white/85"
-                  aria-hidden="true"
-                >
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                {/* Same arrow chip as the homepage grid, on purpose — the two
-                   grids should read as related. */}
-                <span class="absolute top-4 right-4 flex h-8 w-8 -translate-y-1 items-center justify-center rounded-full bg-white/15 text-white opacity-0 backdrop-blur-sm transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
-                  <Icon name="arrow-up-right" size={15} />
-                </span>
-              </div>
-
-              <div class="pt-6">
-                <h3 class="text-h3 leading-[1.1] transition-colors group-hover:text-brand">
-                  {industry.name}
-                </h3>
-                <p class="mt-3 max-w-[440px] text-lead leading-relaxed text-muted">
-                  {industry.tagline}
-                </p>
-                <p class="mt-4 mb-0 font-mono text-caption tracking-[0.4px] text-faint">
-                  {categories.map((c) => c.name).join(" · ")}
-                </p>
-              </div>
-            </a>
+              name={industry.name}
+              tagline={industry.tagline}
+              image={industry.image}
+              number={String(i + 1).padStart(2, "0")}
+              categories={categories.map((c) => c.name)}
+              class={i % 2 === 1 ? "mt-[80px] max-nav:mt-0" : ""}
+            />
           ))
         }
       </div>
@@ -134,105 +102,18 @@ const rows = industries.map((industry) => ({
         intro={industriesSection.matrix.intro}
       />
 
-      <div class="overflow-x-auto max-nav:hidden" data-lenis-prevent>
-        <table class="w-full min-w-[900px] border-collapse text-left">
-          <thead>
-            <tr class="border-b border-line-strong">
-              <th
-                scope="col"
-                class="py-[12px] pr-6 font-mono text-tag font-medium tracking-[1.4px] text-faint uppercase"
-              >
-                Industry
-              </th>
-              {
-                columns.map((column) => (
-                  <th
-                    scope="col"
-                    class="px-2 py-[12px] text-center font-mono text-tag font-medium tracking-[0.6px] text-faint"
-                  >
-                    <a
-                      href={column.href}
-                      class="transition-colors hover:text-brand"
-                    >
-                      {column.name}
-                    </a>
-                  </th>
-                ))
-              }
-            </tr>
-          </thead>
-          <tbody>
-            {
-              rows.map(({ industry, covered }) => (
-                <tr class="border-b border-line">
-                  <th scope="row" class="py-[14px] pr-6 text-cell font-normal">
-                    <a
-                      href={`/industries/${industry.slug}`}
-                      class="text-ink transition-colors hover:text-brand"
-                    >
-                      {industry.name}
-                    </a>
-                  </th>
-                  {columns.map((column) => (
-                    <td class="px-2 py-[14px] text-center">
-                      {covered.has(column.id) ? (
-                        <a
-                          href={column.href}
-                          class="dot inline-flex h-[26px] w-[26px] items-center justify-center rounded-full transition-colors"
-                          aria-label={`${column.name} for ${industry.name}`}
-                        >
-                          <span
-                            class="block h-[7px] w-[7px] rounded-full bg-brand"
-                            aria-hidden="true"
-                          />
-                        </a>
-                      ) : (
-                        <span class="block text-faint" aria-hidden="true">
-                          ·
-                        </span>
-                      )}
-                    </td>
-                  ))}
-                </tr>
-              ))
-            }
-          </tbody>
-        </table>
-      </div>
-
-      {
-        /* Below 980px a 9-column table is unreadable — the same data becomes
-          eight stacked chip rows. */
-      }
-      <ul class="hidden flex-col gap-7 max-nav:flex">
-        {
-          rows.map(({ industry, categories }) => (
-            <li class="border-b border-line pb-6 last:border-0">
-              <a
-                href={`/industries/${industry.slug}`}
-                class="text-subhead font-medium text-ink transition-colors hover:text-brand"
-              >
-                {industry.name}
-              </a>
-              <div class="mt-3 flex flex-wrap gap-2">
-                {categories.map((category) => (
-                  <a href={category.href}>
-                    <Pill size="md">{category.name}</Pill>
-                  </a>
-                ))}
-              </div>
-            </li>
-          ))
-        }
-      </ul>
+      <CoverageMatrix
+        rowLabel="Industry"
+        columns={columns}
+        rows={rows.map(({ industry, covered, categories }) => ({
+          name: industry.name,
+          href: `/industries/${industry.slug}`,
+          covered,
+          categories,
+        }))}
+      />
     </div>
   </Section>
 
   <PageCTA />
 </Base>
-
-<style>
-  .dot:hover {
-    background: var(--color-brand-tint);
-  }
-</style>

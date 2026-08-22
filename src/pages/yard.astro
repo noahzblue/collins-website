@@ -14,12 +14,11 @@ import Base from "@/layouts/Base.astro";
 import Section from "@/components/ui/Section.astro";
 import Eyebrow from "@/components/ui/Eyebrow.astro";
 import Icon from "@/components/ui/Icon.astro";
-import PageBanner from "@/components/ui/PageBanner.astro";
-import IndexRail from "@/components/ui/IndexRail.astro";
+import PageHeader from "@/components/ui/PageHeader.astro";
+import RailSections from "@/components/ui/RailSections.astro";
 import StickyPoints from "@/components/ui/StickyPoints.astro";
 import ParallaxImage from "@/components/ui/ParallaxImage.astro";
 import PageCTA from "@/components/sections/PageCTA.astro";
-import { stats } from "@/data/proof";
 import {
   fleetGroups,
   galleryIntro,
@@ -31,221 +30,139 @@ import {
 ---
 
 <Base title={yardPage.seoTitle} description={yardPage.seoDescription}>
-  <PageBanner
+  <PageHeader
     image={yardPage.banner}
     trail={[{ label: "Home", href: "/" }]}
     current="The yard"
     title={yardPage.title}
   >
     <p
-      class="mt-5 font-mono text-caption tracking-[1.6px] text-white/60 uppercase"
+      class="mt-5 font-mono text-caption tracking-[1.6px] text-faint uppercase"
     >
       {yardPage.kicker}
     </p>
-  </PageBanner>
-
-  <!-- Stat strip — the four real numbers, sitting directly under the banner. -->
-  <div class="wrap">
-    <div
-      id="yard-stats"
-      class="grid grid-cols-4 border-b border-line max-cmp:grid-cols-2"
-    >
-      {
-        stats.map((stat, i) => {
-          /* "1250 kVA" splits into an animatable number and its suffix; the
-             number is formatted with thousands so it reads 1,250. */
-          const match = stat.value.match(/^(\d+)(.*)$/);
-          const target = match ? Number(match[1]) : 0;
-          const suffix = match ? match[2] : stat.value;
-          return (
-            <div
-              class:list={[
-                "px-8 py-10 max-cmp:px-5 max-cmp:py-7 max-xs:px-3",
-                i > 0 && "border-l border-line",
-                i === 2 && "max-cmp:border-t max-cmp:border-l-0",
-                i === 3 && "max-cmp:border-t",
-              ]}
-            >
-              <div class="font-mono text-[clamp(30px,3.6vw,48px)] leading-none text-ink">
-                <span class="stat-num" data-target={target}>
-                  {target.toLocaleString("en-US")}
-                </span>
-                {suffix}
-              </div>
-              <div class="mt-3 font-mono text-micro tracking-[1.4px] text-faint uppercase">
-                {stat.label}
-              </div>
-            </div>
-          );
-        })
-      }
-    </div>
-  </div>
+  </PageHeader>
 
   <Section>
-    <div class="wrap">
-      <div class="grid grid-cols-[180px_1fr] gap-[72px] max-nav:block">
-        <IndexRail items={yardBlocks} ariaLabel="On this page" />
+    {
+      /* `RailSections` gives the body `min-w-0`, which is load-bearing here: a
+        grid item defaults to `min-width: auto`, so the horizontal fleet rail
+        below (4 × 380px of snap cards) would otherwise set the column's
+        minimum to its own content width and blow the page past the container. */
+    }
+    <RailSections items={yardBlocks} ariaLabel="On this page">
+      <!-- 01 — the five points against one pinned photograph -->
+      <article id="the-yard">
+        <Eyebrow class="mb-[16px]">The yard</Eyebrow>
+        <h2 class="mb-14 max-w-[640px] text-h2 leading-[1.06]" data-reveal>
+          What happens here before anything leaves.
+        </h2>
+        <StickyPoints points={yardPoints} />
+      </article>
+
+      <hr class="my-[96px] border-0 border-t border-line max-mob:my-[64px]" />
+
+      <!-- 02 — the fleet, feeding the catalogue rather than dead-ending -->
+      <article id="the-fleet">
+        <Eyebrow class="mb-[16px]">The fleet</Eyebrow>
+        <h2 class="max-w-[560px] text-h2 leading-[1.06]" data-reveal>
+          Leaving the Sajjah yard.
+        </h2>
+        <p
+          class="mt-6 max-w-[620px] text-lead leading-relaxed text-muted"
+          data-reveal
+        >
+          {galleryIntro}
+        </p>
 
         {
-          /* `min-w-0` is load-bearing: a grid item defaults to `min-width:auto`,
-           so the horizontal fleet rail below (4 × 380px of snap cards) would
-           otherwise set this column's minimum to its own content width and
-           blow the whole page past the container. */
+          /* Snap rail on desktop; no arrows — the overflow itself is the
+                affordance. `overscroll-x-contain` and nothing else: Lenis reads
+                it to stand off the rail on the horizontal axis while a vertical
+                wheel over it still scrolls the page (see IndexRail's note). */
         }
-        <div class="flex min-w-0 flex-col">
-          <!-- 01 — the five points against one pinned photograph -->
-          <article id="the-yard" class="scroll-mt-header-gap">
-            <Eyebrow class="mb-[16px]">The yard</Eyebrow>
-            <h2 class="mb-14 max-w-[640px] text-h2 leading-[1.06]" data-reveal>
-              What happens here before anything leaves.
-            </h2>
-            <StickyPoints points={yardPoints} />
-          </article>
-
-          <hr
-            class="my-[96px] border-0 border-t border-line max-mob:my-[64px]"
-          />
-
-          <!-- 02 — the fleet, feeding the catalogue rather than dead-ending -->
-          <article id="the-fleet" class="scroll-mt-header-gap">
-            <Eyebrow class="mb-[16px]">The fleet</Eyebrow>
-            <h2 class="max-w-[560px] text-h2 leading-[1.06]" data-reveal>
-              Leaving the Sajjah yard.
-            </h2>
-            <p
-              class="mt-6 max-w-[620px] text-lead leading-relaxed text-muted"
-              data-reveal
-            >
-              {galleryIntro}
-            </p>
-
-            {
-              /* Snap rail on desktop; no arrows — the overflow itself is the
-                affordance. Its own scroller, so Lenis stands off it. */
-            }
-            <div
-              class="-mx-1 mt-11 flex snap-x snap-mandatory gap-5 overflow-x-auto px-1 pb-4 max-nav:grid max-nav:grid-cols-2 max-nav:gap-4 max-nav:overflow-visible max-xs:grid-cols-1"
-              data-lenis-prevent
-            >
-              {
-                fleetGroups.map((group, i) => (
-                  <a
-                    href={group.href}
-                    class="group press w-[380px] shrink-0 snap-start max-nav:w-auto"
-                  >
-                    <div class="relative overflow-clip rounded-md bg-surface-2">
-                      {/* The strip scrolls sideways, so the drift rides its
+        <div
+          class="-mx-1 mt-11 flex snap-x snap-mandatory gap-5 overflow-x-auto overscroll-x-contain px-1 pb-4 max-nav:grid max-nav:grid-cols-2 max-nav:gap-4 max-nav:overflow-visible max-xs:grid-cols-1"
+        >
+          {
+            fleetGroups.map((group, i) => (
+              <a
+                href={group.href}
+                class="group press w-[380px] shrink-0 snap-start max-nav:w-auto"
+              >
+                <div class="relative overflow-clip rounded-md bg-surface-2">
+                  {/* The strip scrolls sideways, so the drift rides its
                           axis rather than the page's — see ParallaxImage's
                           note on `axis`. */}
-                      <ParallaxImage
-                        src={group.image}
-                        alt={`${group.label} standing in the Collins yard at Sajjah, ${group.range}.`}
-                        loading={i === 0 ? "eager" : "lazy"}
-                        axis="inline"
-                        class="aspect-[4/3] w-full transition-transform duration-500 ease-out group-hover:scale-[1.04]"
-                      />
-                      <span class="absolute top-4 left-4 font-mono text-caption tracking-[0.5px] text-white/85">
-                        {String(i + 1).padStart(2, "0")}
-                      </span>
-                    </div>
-                    <span class="mt-4 flex items-baseline justify-between gap-4">
-                      <span class="text-subhead font-medium text-ink transition-colors group-hover:text-brand">
-                        {group.label}
-                      </span>
-                      <Icon
-                        name="arrow-up-right"
-                        size={15}
-                        class="shrink-0 text-faint transition-colors group-hover:text-brand"
-                      />
-                    </span>
-                    <span class="mt-1 block font-mono text-caption tracking-[0.4px] text-muted">
-                      {group.range}
-                    </span>
-                  </a>
-                ))
-              }
-            </div>
-          </article>
-
-          <hr
-            class="my-[96px] border-0 border-t border-line max-mob:my-[64px]"
-          />
-
-          <!-- 03 — what happens when you call -->
-          <article id="mobilisation" class="scroll-mt-header-gap">
-            <Eyebrow class="mb-[16px]">Mobilisation</Eyebrow>
-            <h2 class="max-w-[560px] text-h2 leading-[1.06]" data-reveal>
-              From your call to the gate.
-            </h2>
-
-            <ol
-              class="mt-12 grid grid-cols-4 border-t border-line-strong max-nav:grid-cols-2 max-xs:grid-cols-1"
-              data-reveal
-              data-reveal-stagger
-            >
-              {
-                mobilisation.map((step, i) => (
-                  <li
-                    class:list={[
-                      "pt-7 pr-6 max-xs:pr-0",
-                      i > 0 &&
-                        "border-l border-line pl-6 max-xs:border-l-0 max-xs:pl-0",
-                    ]}
-                  >
-                    <span class="font-mono text-caption tracking-[0.5px] text-brand">
-                      {String(i + 1).padStart(2, "0")}
-                    </span>
-                    <h3 class="mt-3 font-mono text-tag tracking-[1.6px] text-ink uppercase">
-                      {step.label}
-                    </h3>
-                    <p class="mt-3 mb-8 text-detail leading-relaxed text-muted">
-                      {step.body}
-                    </p>
-                  </li>
-                ))
-              }
-            </ol>
-          </article>
+                  <ParallaxImage
+                    src={group.image}
+                    alt={`${group.label} standing in the Collins yard at Sajjah, ${group.range}.`}
+                    loading={i === 0 ? "eager" : "lazy"}
+                    axis="inline"
+                    class="aspect-[4/3] w-full transition-transform duration-500 ease-out group-hover:scale-[1.04]"
+                  />
+                  <span class="absolute top-4 left-4 font-mono text-caption tracking-[0.5px] text-white/85">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                </div>
+                <span class="mt-4 flex items-baseline justify-between gap-4">
+                  <span class="text-subhead font-medium text-ink transition-colors group-hover:text-brand">
+                    {group.label}
+                  </span>
+                  <Icon
+                    name="arrow-up-right"
+                    size={15}
+                    class="shrink-0 text-faint transition-colors group-hover:text-brand"
+                  />
+                </span>
+                <span class="mt-1 block font-mono text-caption tracking-[0.4px] text-muted">
+                  {group.range}
+                </span>
+              </a>
+            ))
+          }
         </div>
-      </div>
-    </div>
+      </article>
+
+      <hr class="my-[96px] border-0 border-t border-line max-mob:my-[64px]" />
+
+      <!-- 03 — what happens when you call -->
+      <article id="mobilisation">
+        <Eyebrow class="mb-[16px]">Mobilisation</Eyebrow>
+        <h2 class="max-w-[560px] text-h2 leading-[1.06]" data-reveal>
+          From your call to the gate.
+        </h2>
+
+        <ol
+          class="mt-12 grid grid-cols-4 border-t border-line-strong max-nav:grid-cols-2 max-xs:grid-cols-1"
+          data-reveal
+          data-reveal-stagger
+        >
+          {
+            mobilisation.map((step, i) => (
+              <li
+                class:list={[
+                  "pt-7 pr-6 max-xs:pr-0",
+                  i > 0 &&
+                    "border-l border-line pl-6 max-xs:border-l-0 max-xs:pl-0",
+                ]}
+              >
+                <span class="font-mono text-caption tracking-[0.5px] text-brand">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <h3 class="mt-3 font-mono text-tag tracking-[1.6px] text-ink uppercase">
+                  {step.label}
+                </h3>
+                <p class="mt-3 mb-8 text-detail leading-relaxed text-muted">
+                  {step.body}
+                </p>
+              </li>
+            ))
+          }
+        </ol>
+      </article>
+    </RailSections>
   </Section>
 
   <PageCTA />
 </Base>
-
-<script>
-  // Count-up on the stat strip. Same treatment as the homepage's about band,
-  // and the same numbers — /yard, /about and the homepage must never disagree.
-  document.addEventListener("astro:page-load", () => {
-    const band = document.getElementById("yard-stats");
-    if (!band) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-
-    const nums = [...band.querySelectorAll<HTMLElement>(".stat-num")];
-    const DURATION = 1200;
-
-    const run = (el: HTMLElement) => {
-      const target = Number(el.dataset.target ?? "0");
-      const start = performance.now();
-      const tick = (now: number) => {
-        const t = Math.min((now - start) / DURATION, 1);
-        const eased = 1 - Math.pow(1 - t, 3);
-        el.textContent = Math.round(target * eased).toLocaleString("en-US");
-        if (t < 1) requestAnimationFrame(tick);
-      };
-      requestAnimationFrame(tick);
-    };
-
-    const io = new IntersectionObserver(
-      (entries) => {
-        if (!entries.some((e) => e.isIntersecting)) return;
-        nums.forEach(run);
-        io.disconnect();
-      },
-      { threshold: 0.4 },
-    );
-    io.observe(band);
-  });
-</script>
