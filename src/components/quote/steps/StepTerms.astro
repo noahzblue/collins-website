@@ -1,0 +1,154 @@
+---
+/**
+ * Section 03 — the terms. Three panels, one per mode, only one ever visible.
+ *
+ * This is what asking buy or hire first buys us: **nobody is ever shown a
+ * field that turns out to be irrelevant to them.** A hirer needs dates, a
+ * duration, a site and transport; a buyer needs condition, a timeframe, a
+ * destination and documentation. Asked third, as the prototype did, both sets
+ * have to exist at once and half of them are noise (docs/site-expansion/14 §3,
+ * §7).
+ *
+ * "Not sure yet" gets the smallest honest set rather than nothing, so the
+ * choice is not a dead end — when and where, and a line promising both prices.
+ *
+ * `startDate` carries no `min` from here. A static build would bake the build
+ * date into it, and a page served three weeks later would happily accept
+ * yesterday — which is the prototype's bug with a longer fuse.
+ * `scripts/quote/form.ts` sets it at runtime and `validate.ts` checks it again
+ * on submit.
+ */
+import QuoteSection from "@/components/quote/QuoteSection.astro";
+import ChipGroup from "@/components/ui/ChipGroup.astro";
+import Checkbox from "@/components/ui/Checkbox.astro";
+import Field from "@/components/ui/Field.astro";
+import {
+  CONDITIONS,
+  DESTINATIONS,
+  DURATIONS,
+  EMIRATES,
+  EXPORT_NOTE,
+  FIELD_COPY,
+  SECTION_EMPTY,
+  TIMEFRAMES,
+  TRANSPORT,
+  UNSURE_NOTE,
+} from "@/lib/quote/options";
+
+interface Props {
+  /** Per-instance id prefix — two forms on one page must not collide. */
+  instance: string;
+  number?: string;
+  class?: string;
+}
+
+const { instance, number = "03", class: extra = "" } = Astro.props;
+
+const stack = "flex flex-col gap-14 max-cmp:gap-10";
+const note =
+  "mb-0 flex items-start gap-3 border-l-2 border-brand pl-4 text-note leading-relaxed text-muted";
+---
+
+<QuoteSection id="terms" instance={instance} number={number} class={extra}>
+  <p data-terms-empty class="mb-0 max-w-[46ch] text-lead text-faint">
+    {SECTION_EMPTY.terms}
+  </p>
+
+  {/* ── Hire ─────────────────────────────────────────────────── */}
+  <div data-mode-panel="hire" hidden class={stack}>
+    <div class="grid grid-cols-2 gap-12 max-cmp:grid-cols-1 max-cmp:gap-10">
+      <Field
+        instance={instance}
+        name="startDate"
+        label={FIELD_COPY.startDate.label}
+        type="date"
+        hint={FIELD_COPY.startDate.hint}
+        data-min-today
+      />
+    </div>
+    <ChipGroup
+      instance={instance}
+      name="duration"
+      legend={FIELD_COPY.duration.label}
+      options={DURATIONS}
+      required
+    />
+    <ChipGroup
+      instance={instance}
+      name="emirate"
+      legend={FIELD_COPY.emirate.label}
+      options={EMIRATES}
+      required
+    />
+    <ChipGroup
+      instance={instance}
+      name="transport"
+      legend={FIELD_COPY.transport.label}
+      options={TRANSPORT}
+      variant="segment"
+      value="deliver"
+    />
+  </div>
+
+  {/* ── Buy ──────────────────────────────────────────────────── */}
+  <div data-mode-panel="buy" hidden class={stack}>
+    <ChipGroup
+      instance={instance}
+      name="condition"
+      legend={FIELD_COPY.condition.label}
+      options={CONDITIONS}
+      variant="segment"
+      required
+    />
+    <ChipGroup
+      instance={instance}
+      name="timeframe"
+      legend={FIELD_COPY.timeframe.label}
+      options={TIMEFRAMES}
+      required
+    />
+    <div class="flex flex-col gap-5">
+      <ChipGroup
+        instance={instance}
+        name="destination"
+        legend={FIELD_COPY.destination.label}
+        options={DESTINATIONS}
+        value="uae"
+      />
+      {
+        /* Every destination but the first is an export, and export handling
+          is a service Collins sells — so choosing one is an answer, not an
+          obstacle. */
+      }
+      <p data-export-note hidden class={note}>{EXPORT_NOTE}</p>
+    </div>
+    <Checkbox instance={instance} name="docs" label={FIELD_COPY.docs.label} />
+  </div>
+
+  {/* ── Not sure yet ─────────────────────────────────────────── */}
+  <div data-mode-panel="unsure" hidden class={stack}>
+    {
+      /* Same `name` as the buy and hire panels — `timeframe` and `emirate` are
+        one field each, whatever the mode, and one field is one radio group. A
+        second instance prefix is what keeps the ids unique, because two
+        controls with the same id is the collision §2 is about. The script
+        re-checks the visible copy after a mode switch, so an answer given
+        under one mode is still visibly the answer under another. */
+    }
+    <ChipGroup
+      instance={`${instance}-unsure`}
+      name="timeframe"
+      legend={FIELD_COPY.timeframe.label}
+      options={TIMEFRAMES}
+      required
+    />
+    <ChipGroup
+      instance={`${instance}-unsure`}
+      name="emirate"
+      legend={FIELD_COPY.emirate.label}
+      options={EMIRATES}
+      required
+    />
+    <p class={note}>{UNSURE_NOTE}</p>
+  </div>
+</QuoteSection>

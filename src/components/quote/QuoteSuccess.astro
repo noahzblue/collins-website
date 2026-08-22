@@ -1,0 +1,142 @@
+---
+/**
+ * What the panel becomes after a successful send.
+ *
+ * The body is **replaced**, not annotated: a confirmation sitting above a form
+ * still full of answers reads as "did that work?". The dialog does not
+ * auto-close either — the customer decides when they are done reading
+ * (docs/site-expansion/14 §12).
+ *
+ * The numbers are here because one of the three reply channels does not open
+ * anything: "Call" is a promise that we will ring, and this is where the
+ * customer gets to ring us instead if they would rather.
+ */
+import Button from "@/components/ui/Button.astro";
+import ContactRows from "@/components/ui/ContactRows.astro";
+import type { IconName } from "@/components/ui/icons";
+import { SUCCESS } from "@/lib/quote/options";
+
+interface Props {
+  /** Per-instance id prefix — two forms on one page must not collide. */
+  instance: string;
+  /** Read from `config/site.ts` by the composition layer. */
+  promise: string;
+  /** The ways to reach us that do not depend on this form having worked. */
+  rows: { icon: IconName; text: string; href?: string }[];
+  class?: string;
+}
+
+const { instance, promise, rows, class: extra = "" } = Astro.props;
+---
+
+<div
+  class:list={["q-success", extra]}
+  data-quote-success
+  hidden
+  role="status"
+  aria-live="polite"
+  id={`${instance}-success`}
+>
+  <div class="q-success-inner">
+    <p class="q-success-eyebrow">
+      <span class="h-2 w-2 shrink-0 bg-brand" aria-hidden="true"></span>
+      {SUCCESS.title}
+    </p>
+
+    <h3 class="q-success-title" data-success-title tabindex="-1">{promise}</h3>
+
+    <p class="mt-6 mb-0 max-w-[54ch] text-lead leading-relaxed text-muted">
+      {SUCCESS.body}
+    </p>
+
+    <p class="q-success-ref" data-success-ref hidden>
+      <span class="q-success-ref-label">{SUCCESS.refLabel}</span>
+      <span data-success-ref-value></span>
+    </p>
+
+    {
+      /* What was sent, so the confirmation confirms something. Filled from the
+        same slots the summary rail uses. */
+    }
+    <dl class="q-success-recap" data-success-recap></dl>
+
+    <div class="mt-10 flex flex-wrap items-center gap-6">
+      <Button variant="outline" size="lg" data-quote-restart>
+        {SUCCESS.again}
+      </Button>
+      <ContactRows rows={rows} />
+    </div>
+  </div>
+</div>
+
+<style>
+  .q-success-inner {
+    padding: clamp(56px, 6vw, 104px) var(--dlg-gutter, 36px);
+    max-width: 900px;
+  }
+
+  .q-success-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0 0 22px;
+    font-family: var(--font-mono);
+    font-size: var(--text-label);
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--color-brand);
+  }
+  .q-success-title {
+    font-family: var(--font-mono);
+    font-size: var(--text-h3);
+    line-height: 1.08;
+    text-transform: uppercase;
+    letter-spacing: -0.03em;
+  }
+
+  .q-success-ref {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 12px;
+    margin: 28px 0 0;
+    padding: 10px 18px;
+    background: var(--color-brand-tint);
+    font-family: var(--font-mono);
+    font-size: var(--text-detail);
+    color: var(--color-brand);
+  }
+  .q-success-ref-label {
+    font-size: var(--text-tag);
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+
+  .q-success-recap {
+    display: flex;
+    flex-direction: column;
+    margin: 36px 0 0;
+    border-top: 1px solid var(--color-line);
+  }
+  .q-success-recap > div {
+    display: flex;
+    align-items: baseline;
+    gap: 20px;
+    padding: 11px 0;
+    border-bottom: 1px solid var(--color-line);
+  }
+  .q-success-recap dt {
+    flex: 0 0 140px;
+    font-family: var(--font-mono);
+    font-size: var(--text-tag);
+    letter-spacing: 0.9px;
+    text-transform: uppercase;
+    color: var(--color-faint);
+  }
+  .q-success-recap dd {
+    margin: 0;
+    font-size: var(--text-cell);
+    color: var(--color-ink);
+  }
+</style>

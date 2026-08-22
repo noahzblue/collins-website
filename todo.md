@@ -1,5 +1,26 @@
 # TODO
 
+- [ ] **Delete the preview harness before launch** — `src/pages/lab/quote.astro`
+      is the dev-only component preview for the quote request form
+      (docs/site-expansion/14 §15.7). Removing it means deleting the page, the
+      `/lab/` filter passed to `sitemap()` in `astro.config.mjs`, and — if
+      nothing else has taken it up — the `noindex` prop on
+      `src/layouts/Base.astro`. The build is static, so the route emits HTML
+      whether or not anything links to it; the `import.meta.env.DEV` guard
+      hides the content but not the URL.
+
+- [ ] **Quote form prerequisites** — two small edits that block slice 3 of
+      `docs/site-expansion/14` and are cheapest done at the top of a session:
+      `attachments` needs adding to the Zod schema in `src/content.config.ts`
+      and to the four categories that have them in `categories.json` (or
+      deriving from `family`); and `src/components/equipment/DutyGuide.astro`
+      needs splitting into a presentational `DutyGuideList` plus its current
+      page-level wrapper, so the form can put the list inside a `<details>`
+      without its `<h2>` and eyebrow.
+- [ ] **Duplicate ids site-wide** — `src/components/ui/Logo.astro` hardcodes
+      `id="wm"` and `id="wm-sub"`, and renders in both the header and the
+      footer, so every page ships two of each. Pre-dates the quote form; the
+      fix is the same `scopedId` pattern `lib/forms.ts` now provides.
 - [ ] **Contact form backend** — the quote form in
       `src/components/sections/ContactCTA.astro` has no server endpoint. Its
       submit handler calls `preventDefault()` and opens `wa.me` with the request

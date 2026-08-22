@@ -42,10 +42,16 @@ const isCurrent = (href: string) =>
     </nav>
 
     <div class="flex items-center gap-2">
+      {
+        /* Opens the quote dialog. The `href` is the no-JS fallback and the
+          middle-click destination — /contact renders the same form inline
+          (docs/site-expansion/14 §2, §9a). */
+      }
       <Button
         size="xs"
         variant="primary"
         href="/contact"
+        data-quote-open
         class="press max-xs:px-4"
       >
         Get a quote

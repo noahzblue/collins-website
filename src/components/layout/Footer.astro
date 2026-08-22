@@ -21,7 +21,9 @@ const { office, yard } = site.places;
       <!-- Brand -->
       <div>
         <Logo />
-        <p class="mt-5 mb-6 max-w-[280px] text-label leading-relaxed text-muted">
+        <p
+          class="mt-5 mb-6 max-w-[280px] text-label leading-relaxed text-muted"
+        >
           {site.blurb}
         </p>
 
@@ -30,7 +32,7 @@ const { office, yard } = site.places;
           {
             [office, yard].map((place) => (
               <li class="flex items-center gap-[14px]">
-                <span class="shrink-0 font-medium text-tag text-faint ">
+                <span class="shrink-0 text-tag font-medium text-faint">
                   {place.tag}
                 </span>
                 <span class="text-tag">{place.address}</span>
@@ -93,7 +95,11 @@ const { office, yard } = site.places;
         </h5>
         <ul class="flex flex-col gap-[11px] text-label">
           <li>
-            <a href="/contact" class="transition-colors hover:text-ink">
+            <a
+              href="/contact"
+              data-quote-open
+              class="transition-colors hover:text-ink"
+            >
               Request a quote
             </a>
           </li>

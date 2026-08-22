@@ -1,0 +1,75 @@
+---
+/**
+ * The quote form's global mount — one per document, beside `FloatingButtons`
+ * in `Base.astro`.
+ *
+ * **A dialog rather than a route**, because the CTA is on every page: twelve
+ * category pages, twelve hub rows, six homepage tiles, the services blocks and
+ * the industry pages all end in "Request a quotation". A route makes every one
+ * of those a navigation — a veil transition, a fresh document, a lost scroll
+ * position and a back button that returns you to the top of where you were.
+ * For a form whose entire job is to catch someone at the moment of intent,
+ * that difference is the whole game (docs/site-expansion/14 §2).
+ *
+ * Two files, two jobs, and the split is the point: `ui/Dialog.astro` is a
+ * modal and knows nothing about quotations; `QuoteForm.astro` is the form and
+ * knows nothing about being in one. This is the fifteen lines that put one
+ * inside the other.
+ */
+import Dialog from "@/components/ui/Dialog.astro";
+import QuoteForm from "@/components/quote/QuoteForm.astro";
+import { DIALOG } from "@/lib/quote/options";
+import { site } from "@/config/site";
+
+interface Props {
+  /** Element id — what `data-quote-open` triggers open. */
+  id?: string;
+  /** Per-instance id prefix for every control inside. */
+  instance?: string;
+}
+
+const { id = "quote-dialog", instance = "q-dialog" } = Astro.props;
+---
+
+<Dialog
+  id={id}
+  data-quote-dialog
+  title={DIALOG.title}
+  subtitle={site.quotePromise}
+  closeLabel={DIALOG.close}
+  discard={DIALOG.discard}
+>
+  <QuoteForm instance={instance} variant="dialog" />
+</Dialog>
+
+<script>
+  import { untilPageSwap } from "@/scripts/untilPageSwap";
+  import { initQuoteDialog } from "@/scripts/quote/dialog";
+  import { initQuoteForm } from "@/scripts/quote/form";
+
+  // Re-runs after every client-router navigation as well as on first load, so
+  // the swapped-in dialog gets wired up. Same discipline as Header.astro.
+  document.addEventListener("astro:page-load", () => {
+    const dialogs = document.querySelectorAll<HTMLDialogElement>(
+      "dialog[data-quote-dialog]",
+    );
+
+    for (const dialog of dialogs) {
+      const signal = untilPageSwap();
+      const root = dialog.querySelector<HTMLElement>("[data-quote-root]");
+      // The form answers "is there anything worth keeping?" properly — it
+      // compares against a blank form rather than counting keystrokes — so
+      // the dialog's dismissal guard defers to it (docs 14 §4).
+      const quote = root ? initQuoteForm(root, { signal }) : null;
+
+      initQuoteDialog(dialog, {
+        signal,
+        dirty: quote ? quote.isDirty : undefined,
+        onDiscard: quote ? quote.reset : undefined,
+        // Someone who clicked "Check availability" on a category page has
+        // already answered two of the four sections (docs 14 §9a).
+        onOpen: quote ? quote.prefill : undefined,
+      });
+    }
+  });
+</script>

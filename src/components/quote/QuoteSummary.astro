@@ -1,0 +1,240 @@
+---
+/**
+ * The running spec line — what we understood, kept on screen.
+ *
+ *   1240px and up   a sticky rail beside the steps
+ *   900 to 1240     a sticky bar across the top of the panel's scroll area
+ *   under 900       not rendered; the step bar and sticky footer do this job
+ *
+ * It earns its place for one reason: **this form collects about fifteen facts,
+ * and the customer needs to see that we understood them before they send.** It
+ * also gives the submit button a home that is always on screen, which is what
+ * stops "Send" from being something you have to scroll to find
+ * (docs/site-expansion/14 §6, §14.1c).
+ *
+ * Every slot is rendered and the script hides the ones the current mode does
+ * not use, so the rail fills rather than reflows — a summary that changes
+ * height as you answer it is a summary you stop reading. An unanswered slot is
+ * greyed, an answered one is inked.
+ *
+ * It sticks to the **panel's** scroll container, not the page's. Inside the
+ * dialog `top: 0` is right; the inline variant on /contact has to clear the
+ * fixed site header instead, which is what `--q-sticky-top` is for — the
+ * prototype used `0` in both places and would have slid under the header.
+ */
+import Button from "@/components/ui/Button.astro";
+import { SUMMARY } from "@/lib/quote/options";
+
+interface Props {
+  /** Per-instance id prefix — two forms on one page must not collide. */
+  instance: string;
+  /** Sits under the submit button, where the promise belongs. */
+  promise: string;
+  class?: string;
+}
+
+const { instance, promise, class: extra = "" } = Astro.props;
+
+/* The union of every mode's slots, in reading order. Which of them apply is
+   `lib/quote/compose.ts`'s answer, not this file's — it renders what it is
+   told to show. */
+const slots = Object.entries(SUMMARY.labels) as [string, string][];
+---
+
+<aside
+  class:list={["q-rail", extra]}
+  data-quote-summary
+  aria-label={SUMMARY.title}
+>
+  <div class="q-rail-inner">
+    <p class="q-rail-title">
+      <span class="h-2 w-2 shrink-0 bg-brand" aria-hidden="true"></span>
+      {SUMMARY.title}
+    </p>
+
+    <dl class="q-slots" data-summary-slots>
+      {
+        slots.map(([key, label]) => (
+          <div class="q-slot" data-summary-slot={key} hidden>
+            <dt class="q-slot-label">{label}</dt>
+            <dd class="q-slot-value" data-summary-value={key}>
+              {SUMMARY.pending}
+            </dd>
+          </div>
+        ))
+      }
+    </dl>
+
+    <div class="q-rail-actions">
+      {
+        /* Never disabled for being incomplete — a disabled button with no
+          explanation is worse than an error message. The in-flight busy state
+          is the one legitimate reason to disable it (docs 14 §11, §12). */
+      }
+      <Button
+        type="submit"
+        variant="primary"
+        size="lg"
+        class="press w-full max-nav:w-auto"
+        data-quote-submit
+        id={`${instance}-submit`}
+      >
+        <span data-submit-label>{SUMMARY.submit}</span>
+      </Button>
+      <p class="q-rail-promise">{promise}</p>
+    </div>
+  </div>
+</aside>
+
+<style>
+  .q-rail {
+    position: sticky;
+    top: var(--q-sticky-top, 0px);
+    align-self: start;
+    background: #ffffff;
+    border-left: 1px solid var(--color-line);
+    z-index: 4;
+  }
+  .q-rail-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding: clamp(40px, 4vw, 64px) clamp(24px, 2.2vw, 40px);
+  }
+
+  .q-rail-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-label);
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--color-brand);
+  }
+
+  .q-slots {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    border-top: 1px solid var(--color-line);
+  }
+  .q-slot {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    padding: 11px 0;
+    border-bottom: 1px solid var(--color-line);
+  }
+  .q-slot[hidden] {
+    display: none;
+  }
+  .q-slot-label {
+    flex: 0 0 auto;
+    font-family: var(--font-mono);
+    font-size: var(--text-tag);
+    letter-spacing: 0.9px;
+    text-transform: uppercase;
+    color: var(--color-faint);
+  }
+  .q-slot-value {
+    flex: 1 1 auto;
+    margin: 0;
+    text-align: right;
+    font-size: var(--text-detail);
+    line-height: 1.35;
+    color: var(--color-faint);
+    overflow-wrap: anywhere;
+    transition: color 200ms var(--ease-out-expo);
+  }
+  /* Greyed until answered, inked once set — the whole point of the device. */
+  .q-slot-value[data-answered] {
+    color: var(--color-ink);
+    font-weight: 500;
+  }
+
+  .q-rail-promise {
+    margin: 0;
+    font-size: var(--text-caption);
+    line-height: 1.5;
+    color: var(--color-faint);
+  }
+
+  /* ── 900–1240: the rail flattens ────────────────────────────────
+     No room for a 300px column beside a two-column rating table, so it
+     becomes a bar across the top of the scroll area. Same component, same
+     slots — they lie down. */
+  @media (max-width: 1240px) {
+    .q-rail {
+      order: -1;
+      border-left: 0;
+      border-bottom: 1px solid var(--color-line);
+    }
+    .q-rail-inner {
+      flex-direction: row;
+      align-items: center;
+      gap: 20px;
+      padding: 12px var(--dlg-gutter, 36px);
+    }
+    .q-rail-title {
+      flex: 0 0 auto;
+    }
+    .q-slots {
+      flex: 1 1 auto;
+      flex-direction: row;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 0 6px;
+      border: 0;
+      min-width: 0;
+    }
+    /* The slash-separated spec line: Generators / 250 kVA / Hire / Dubai. */
+    .q-slot {
+      padding: 0;
+      border: 0;
+    }
+    /* `~`, not `+`: a slot is hidden when the current mode has no use for it,
+       and `+` would put a leading slash on whatever followed one. The general
+       sibling combinator asks "is any visible slot before me?", which is the
+       actual question. */
+    .q-slot:not([hidden]) ~ .q-slot:not([hidden])::before {
+      content: "/";
+      color: var(--color-line-strong);
+      margin-right: 6px;
+    }
+    .q-slot-label {
+      display: none;
+    }
+    .q-slot-value {
+      font-family: var(--font-mono);
+      font-size: var(--text-note);
+      text-align: left;
+      white-space: nowrap;
+    }
+    .q-rail-actions {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .q-rail-promise {
+      display: none;
+    }
+  }
+
+  /* Below 900 the sticky footer carries the action and the step bar carries
+     the progress — two summaries of the same thing is one too many. */
+  @media (max-width: 900px) {
+    .q-rail {
+      display: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .q-slot-value {
+      transition-duration: 1ms;
+    }
+  }
+</style>

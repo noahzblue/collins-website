@@ -1,0 +1,103 @@
+---
+/**
+ * One of the form's four numbered sections: `01` beside a title, a supporting
+ * line, and the controls beneath.
+ *
+ *   <QuoteSection id="need" number="01">…controls…</QuoteSection>
+ *
+ * It exists because all four steps want the same three things — the number,
+ * the rhythm and the hairline between them — and because below 900px this
+ * element is what becomes a *step*: `data-section` is the handle
+ * `scripts/quote/form.ts` will show and hide one at a time, and having it in
+ * one place is what stops four step components each growing their own.
+ *
+ * Not in the file tree §15.2 planned; it turned up the moment step 01 was
+ * assembled, the same way `ui/Dropdown.astro` did in slice 1.
+ *
+ * The number is a prop rather than derived, because the order of the four
+ * steps is `QuoteForm`'s decision and no step should be able to contradict it
+ * (docs/site-expansion/14 §15.6).
+ */
+import { SECTIONS } from "@/lib/quote/options";
+import { scopedId } from "@/lib/forms";
+import type { SectionId } from "@/lib/quote/schema";
+
+interface Props {
+  id: SectionId;
+  /** Per-instance id prefix — two forms on one page must not collide. */
+  instance: string;
+  /** `01`–`04`, as the form orders them. */
+  number: string;
+  class?: string;
+}
+
+const { id, instance, number, class: extra = "" } = Astro.props;
+
+const { title, hint } = SECTIONS[id];
+const titleId = scopedId(instance, "section", id);
+---
+
+<section
+  class:list={["q-section", extra]}
+  data-section={id}
+  aria-labelledby={titleId}
+>
+  <div class="flex items-baseline gap-6 max-cmp:gap-4">
+    {
+      /* The number is set at the title's size, not as a small superscript —
+        `01` and `WHAT YOU NEED` are one line of a spec sheet, which is the
+        same structural rung `h1`/`h4` occupy everywhere else on the site
+        (mono, uppercase, tracked tight). See docs 14 §14.1b. */
+    }
+    <span class="q-number" aria-hidden="true">{number}</span>
+    <div class="min-w-0">
+      <h3 id={titleId} class="q-title">{title}</h3>
+      <p class="mt-4 mb-0 max-w-[52ch] text-lead leading-relaxed text-muted">
+        {hint}
+      </p>
+    </div>
+  </div>
+
+  <div class="mt-12 max-cmp:mt-9">
+    <slot />
+  </div>
+</section>
+
+<style>
+  /* The site's roomy section rhythm rather than a compressed form's, and the
+     hairline that separates one step from the next. Padding is on the section
+     and the rule is its border, so the rule runs edge to edge of the panel
+     while the content stays inset (docs 14 §14.1e). */
+  .q-section {
+    /* The horizontal gutter is the panel's, inherited — head, sections and
+       foot line up down the whole dialog from one number. The fallback is
+       what the inline variant on /contact will use, where there is no panel
+       (docs 14 §6). */
+    padding: clamp(48px, 5vw, 88px) var(--dlg-gutter, 36px);
+  }
+  .q-section + .q-section {
+    border-top: 1px solid var(--color-line);
+  }
+
+  .q-number {
+    flex-shrink: 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-h3);
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    color: var(--color-brand);
+  }
+  .q-title {
+    font-family: var(--font-mono);
+    font-size: var(--text-h3);
+    line-height: 1.05;
+    text-transform: uppercase;
+    letter-spacing: -0.03em;
+  }
+
+  @media (max-width: 900px) {
+    .q-section {
+      padding: 34px var(--dlg-gutter, 20px) 44px;
+    }
+  }
+</style>

@@ -1,0 +1,337 @@
+---
+/**
+ * The form itself — the feature root, and the only file in it that reads data.
+ *
+ * One form, four sections. **At ≥900px all four are laid out together and the
+ * customer scrolls; below 900px they become four steps.** Same DOM, same field
+ * names, one presentation layer — because fewer steps does not mean less work,
+ * it is the same questions either way. What changes is whether the customer
+ * can see how much is left (docs/site-expansion/14 §1).
+ *
+ * Both mounts use this: the dialog wraps it in `ui/Dialog.astro`, and
+ * `/contact` will render it inline. `variant` is the only thing that differs,
+ * and it decides exactly one thing — what the sticky things stick to. Inside
+ * the dialog the panel scrolls and `top: 0` is right; inline, the fixed site
+ * header is in the way and they have to clear it. The prototype used `0` in
+ * both places and would have slid under the header (§6).
+ *
+ * The `<form>` element is load-bearing, not decoration: a radio group's `name`
+ * is scoped to its form, so without one the dialog's "Buy / Hire" and the
+ * inline copy's would be a single group and the second would silently win
+ * (§2).
+ */
+import { getCollection } from "astro:content";
+import { rangeKey } from "@/lib/equipment";
+import Button from "@/components/ui/Button.astro";
+import QuoteProgress from "@/components/quote/QuoteProgress.astro";
+import QuoteSummary from "@/components/quote/QuoteSummary.astro";
+import QuoteSuccess from "@/components/quote/QuoteSuccess.astro";
+import StepNeed from "@/components/quote/steps/StepNeed.astro";
+import StepSize from "@/components/quote/steps/StepSize.astro";
+import StepTerms from "@/components/quote/steps/StepTerms.astro";
+import StepContact from "@/components/quote/steps/StepContact.astro";
+import { NAV, PREFILL, SUBMIT_ERROR, SUMMARY } from "@/lib/quote/options";
+import type { QuoteVariant } from "@/lib/quote/schema";
+import { site } from "@/config/site";
+
+interface Props {
+  /** Per-instance id prefix for every control inside. */
+  instance: string;
+  /** dialog = the global mount · inline = /contact (docs 14 §2). */
+  variant?: QuoteVariant;
+  class?: string;
+}
+
+const { instance, variant = "dialog", class: extra = "" } = Astro.props;
+
+/* The catalogue, in its own order. Read once here and handed down: no
+   component below this line imports `astro:content`, which is what lets the
+   same picker and the same rating list render in the dialog and inline
+   without branching (docs 14 §15.3b). A hand-copied list is what drifted in
+   the prototype before anyone reviewed it (§13). */
+const entries = (await getCollection("equipment")).sort(
+  (a, b) => a.data.sortOrder - b.data.sortOrder,
+);
+
+const categories = entries.map((entry) => ({
+  id: entry.id,
+  name: entry.data.name,
+  family: entry.data.family,
+  rangeLabel: entry.data.rangeLabel,
+  heroImage: entry.data.heroImage,
+  ranges: entry.data.ranges,
+  dutyGuide: entry.data.dutyGuide,
+  attachments: entry.data.attachments,
+}));
+
+/* Families in the catalogue's own order, derived rather than listed — a
+   second copy is a second thing to keep in step (docs 14 §15.3b). */
+const families = [...new Set(categories.map((c) => c.family))].map(
+  (family) => ({ value: family, label: family }),
+);
+
+/* What `scripts/quote/form.ts` needs that the DOM does not carry: a category's
+   name, and a range's power type and availability. Emitted once as JSON
+   rather than fetched or hand-written a second time (docs 14 §13). */
+const catalogue = Object.fromEntries(
+  categories.map((category) => [
+    category.id,
+    {
+      name: category.name,
+      ranges: Object.fromEntries(
+        category.ranges.map((range) => [
+          rangeKey(range),
+          {
+            label: range.label,
+            powerType: range.powerType ?? null,
+            availability: range.availability,
+          },
+        ]),
+      ),
+    },
+  ]),
+);
+
+const contactRows = [
+  {
+    icon: "whatsapp" as const,
+    text: site.whatsapp.display,
+    href: site.whatsapp.href,
+  },
+  { icon: "phone" as const, text: site.phone.display, href: site.phone.href },
+  { icon: "mail" as const, text: site.email, href: `mailto:${site.email}` },
+];
+---
+
+<div class:list={["q-root", `q-${variant}`, extra]} data-quote-root>
+  <form
+    class="q-form"
+    data-quote-form
+    data-instance={instance}
+    data-variant={variant}
+    data-whatsapp={site.whatsapp.href}
+    data-email={site.email}
+    id={`${instance}-form`}
+    novalidate
+  >
+    <QuoteProgress instance={instance} />
+
+    {
+      /* Shown only when a trigger answered sections 01 and 02 — and only below
+        900px, because above it the summary rail already says exactly this and
+        two summaries of one request is one too many (docs 14 §9a). */
+    }
+    <div class="q-prefill" data-quote-prefill hidden>
+      <span class="q-prefill-line" data-prefill-line></span>
+      <button type="button" class="q-prefill-change" data-prefill-change>
+        {PREFILL.change}
+      </button>
+    </div>
+
+    <div class="q-layout">
+      <div class="q-steps">
+        <StepNeed instance={instance} categories={categories} number="01" />
+        <StepSize
+          instance={instance}
+          categories={categories}
+          families={families}
+          number="02"
+        />
+        <StepTerms instance={instance} number="03" />
+        <StepContact instance={instance} number="04" />
+      </div>
+
+      <QuoteSummary instance={instance} promise={site.quotePromise} />
+    </div>
+
+    {
+      /* Below 900px only. One CTA per screen: step 04 shows *Send request*
+        and nothing else — the prototype left "Continue" beside it, and
+        `[hidden]` loses to `.btn { display: inline-flex }`, so the rule that
+        takes it away has to be written explicitly (docs 14 §6). */
+    }
+    <div class="q-nav" data-quote-nav>
+      <Button variant="outline" size="md" class="q-nav-back" data-quote-back>
+        {NAV.back}
+      </Button>
+      <Button
+        variant="primary"
+        size="md"
+        class="press q-nav-next"
+        data-quote-next
+      >
+        {NAV.next}
+      </Button>
+      <Button
+        type="submit"
+        variant="primary"
+        size="md"
+        class="press q-nav-send"
+        data-quote-submit
+      >
+        <span data-submit-label>{SUMMARY.submit}</span>
+      </Button>
+    </div>
+
+    {
+      /* Surfaced only when nothing else carried the enquiry — a failed POST
+        behind a successful WhatsApp handoff is logged, not shown (§12). */
+    }
+    <div class="q-error" data-quote-error hidden>
+      <p class="q-error-title">{SUBMIT_ERROR.title}</p>
+      <p class="q-error-body">{SUBMIT_ERROR.body}</p>
+    </div>
+
+    <p class="sr-only" role="status" aria-live="polite" data-quote-live></p>
+  </form>
+
+  <QuoteSuccess
+    instance={instance}
+    promise={site.quotePromise}
+    rows={contactRows}
+  />
+
+  <script
+    type="application/json"
+    data-quote-catalogue
+    is:inline
+    set:html={JSON.stringify(catalogue)}
+  />
+</div>
+
+<style>
+  /* Inside the dialog the panel is the scroll container and its top edge is
+     the right anchor. Inline, the fixed site header is in the way. */
+  .q-dialog {
+    --q-sticky-top: 0px;
+  }
+  .q-inline {
+    --q-sticky-top: var(--spacing-header-gap);
+  }
+
+  /* ── ≥1240: two columns ─────────────────────────────────────────
+     The rail is a real grid column rather than a floated aside, so the steps
+     column can never slide under it. */
+  .q-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) clamp(300px, 24%, 400px);
+    align-items: start;
+  }
+  .q-steps {
+    min-width: 0;
+  }
+
+  @media (max-width: 1240px) {
+    .q-layout {
+      display: flex;
+      flex-direction: column;
+    }
+  }
+
+  /* ── <900: the sticky footer ────────────────────────────────────
+     `display: none` on the whole bar above the breakpoint, and per-button
+     rules inside it — a `[hidden]` attribute alone loses to the button's own
+     `display: inline-flex`. */
+  .q-nav {
+    display: none;
+  }
+
+  @media (max-width: 900px) {
+    .q-nav {
+      position: sticky;
+      bottom: 0;
+      z-index: 6;
+      display: flex;
+      gap: 12px;
+      padding: 12px var(--dlg-gutter, 20px);
+      background: #ffffff;
+      border-top: 1px solid var(--color-line);
+    }
+    /* `:global` because these classes are passed into `ui/Button.astro` and
+       land on an element this component's scope does not own. */
+    .q-nav :global(.q-nav-back),
+    .q-nav :global(.q-nav-next),
+    .q-nav :global(.q-nav-send) {
+      flex: 1 1 auto;
+      min-height: 46px;
+    }
+    /* Step 01 has nothing to go back to, and steps 01–03 have nothing to
+       send. Written as explicit `display: none` for the reason above. */
+    [data-step="need"] :global(.q-nav-back),
+    [data-step]:not([data-step="contact"]) :global(.q-nav-send) {
+      display: none;
+    }
+    [data-step="contact"] :global(.q-nav-next) {
+      display: none;
+    }
+    /* The last field of a step must not sit under the bar. */
+    .q-steps {
+      padding-bottom: 8px;
+    }
+  }
+
+  /* ── The pre-answered chip ──────────────────────────────────────
+     `display: none` above the breakpoint rather than `[hidden]` alone, so the
+     two conditions — "was it pre-answered?" and "is this a phone?" — stay
+     independent of each other. */
+  .q-prefill {
+    display: none;
+  }
+
+  @media (max-width: 900px) {
+    .q-prefill:not([hidden]) {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 16px;
+      margin: 12px var(--dlg-gutter, 20px) 0;
+      padding: 10px 14px;
+      background: var(--color-brand-tint);
+      border-left: 2px solid var(--color-brand);
+    }
+    .q-prefill-line {
+      min-width: 0;
+      font-family: var(--font-mono);
+      font-size: var(--text-note);
+      color: var(--color-brand);
+      overflow-wrap: anywhere;
+    }
+    .q-prefill-change {
+      flex: 0 0 auto;
+      cursor: pointer;
+      border: 0;
+      background: none;
+      padding: 0;
+      font-family: var(--font-mono);
+      font-size: var(--text-caption);
+      text-decoration: underline;
+      color: var(--color-muted);
+    }
+    .q-prefill-change:hover {
+      color: var(--color-ink);
+    }
+  }
+
+  .q-error {
+    margin: 0 var(--dlg-gutter, 36px) clamp(32px, 4vw, 56px);
+    padding: 20px 24px;
+    border-left: 2px solid var(--color-error);
+    background: var(--color-surface);
+  }
+  .q-error[hidden] {
+    display: none;
+  }
+  .q-error-title {
+    margin: 0 0 6px;
+    font-family: var(--font-mono);
+    font-size: var(--text-detail);
+    font-weight: 500;
+    color: var(--color-error);
+  }
+  .q-error-body {
+    margin: 0;
+    font-size: var(--text-note);
+    line-height: 1.6;
+    color: var(--color-muted);
+  }
+</style>

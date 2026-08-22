@@ -118,7 +118,12 @@ const enquiryHref = `${site.whatsapp.href}?text=${encodeURIComponent(enquiryText
             }
           </ul>
           <div class="flex flex-wrap gap-3">
-            <Button variant="primary" href="/contact" class="press">
+            <Button
+              variant="primary"
+              href="/contact"
+              data-quote-open
+              class="press"
+            >
               Request a quote
             </Button>
             <Button

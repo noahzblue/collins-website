@@ -1,0 +1,122 @@
+---
+/**
+ * Section 04 — where to send it.
+ *
+ * **Friction on the final step is where enquiries die**, so this asks for four
+ * things and only two of them are required. Company is optional because a
+ * one-person contractor is a real customer. Email is optional because this
+ * trade runs on phone and WhatsApp — it becomes required only when email is
+ * the chosen reply channel, which is the one case where it is the only way we
+ * can answer (docs/site-expansion/14 §7, §8).
+ *
+ * `channel` is the field the prototype had no equivalent of, and it decides
+ * the handoff: WhatsApp opens a chat, email opens a composed message, call
+ * shows the numbers. One tap (§12).
+ *
+ * The honeypot is the whole spam defence here, alongside a minimum
+ * render-to-submit interval the script keeps. No CAPTCHA: at this volume it
+ * would tax every real customer to inconvenience a bot (§8).
+ */
+import QuoteSection from "@/components/quote/QuoteSection.astro";
+import ChipGroup from "@/components/ui/ChipGroup.astro";
+import Field from "@/components/ui/Field.astro";
+import { CHANNELS, FIELD_COPY, HONEYPOT } from "@/lib/quote/options";
+
+interface Props {
+  /** Per-instance id prefix — two forms on one page must not collide. */
+  instance: string;
+  number?: string;
+  class?: string;
+}
+
+const { instance, number = "04", class: extra = "" } = Astro.props;
+
+const pair = "grid grid-cols-2 gap-12 max-cmp:grid-cols-1 max-cmp:gap-10";
+---
+
+<QuoteSection id="contact" instance={instance} number={number} class={extra}>
+  <div class="flex flex-col gap-14 max-cmp:gap-10">
+    <div class={pair}>
+      <Field
+        instance={instance}
+        name="name"
+        label={FIELD_COPY.name.label}
+        placeholder={FIELD_COPY.name.placeholder}
+        autocomplete="name"
+        required
+      />
+      <Field
+        instance={instance}
+        name="company"
+        label={FIELD_COPY.company.label}
+        hint={FIELD_COPY.company.hint}
+        autocomplete="organization"
+      />
+    </div>
+
+    <div class={pair}>
+      <Field
+        instance={instance}
+        name="phone"
+        label={FIELD_COPY.phone.label}
+        type="tel"
+        placeholder={FIELD_COPY.phone.placeholder}
+        autocomplete="tel"
+        inputmode="tel"
+        required
+      />
+      <Field
+        instance={instance}
+        name="email"
+        label={FIELD_COPY.email.label}
+        type="email"
+        placeholder={FIELD_COPY.email.placeholder}
+        autocomplete="email"
+      />
+    </div>
+
+    <ChipGroup
+      instance={instance}
+      name="channel"
+      legend={FIELD_COPY.channel.label}
+      options={CHANNELS}
+      variant="segment"
+      value="whatsapp"
+    />
+
+    <Field
+      instance={instance}
+      name="notes"
+      label={FIELD_COPY.notes.label}
+      element="textarea"
+      rows={4}
+      placeholder={FIELD_COPY.notes.placeholder}
+    />
+
+    {
+      /* Off-screen rather than `display: none` or `hidden` — a bot that skips
+        hidden inputs would step around a honeypot it can see is hidden. Never
+        `autocomplete="off"`: the browser must not offer to fill it either. */
+    }
+    <div class="hp" aria-hidden="true">
+      <label for={`${instance}-${HONEYPOT}`}>Company website</label>
+      <input
+        type="text"
+        id={`${instance}-${HONEYPOT}`}
+        name={HONEYPOT}
+        tabindex="-1"
+        autocomplete="off"
+      />
+    </div>
+  </div>
+</QuoteSection>
+
+<style>
+  .hp {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+</style>

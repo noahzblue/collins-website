@@ -1,0 +1,283 @@
+---
+/**
+ * One selectable choice with a photo — the category picker's cell, and the
+ * text row it becomes on a phone.
+ *
+ *   <ChoiceTile instance={id} name="category" value="generators"
+ *               label="Generators" meta="10 kVA to 1,250 kVA, diesel"
+ *               image="/images/equipment/generators-hero.jpg" />
+ *
+ * Designed to sit inside a `.mesh` grid (global.css): no border and no radius
+ * of its own, because the grid draws one continuous hairline lattice and each
+ * cell simply paints white over it (docs/site-expansion/14 §14.1a).
+ *
+ * Three things carry selection, not one: the tint fill, the filled radio mark
+ * and the photo turning from grey to colour. The colour shift is the most
+ * visible of them and the least useful — nobody who cannot see it is left
+ * without a signal (docs 14 §14.1d).
+ *
+ * `ParallaxImage` is deliberately not used here, and this is the site's one
+ * genuine exception to "every photo drifts": a selection control that moves
+ * while you are trying to click it is a bug, not a detail. The images are
+ * `loading="lazy"` so twelve of them cannot compete with the host page's LCP
+ * when the dialog is closed (docs 14 §5).
+ *
+ * `layout="responsive"` and `ratio="step"` were added in slice 2, when the
+ * category picker turned out to need one tile that is a photo above 600px and
+ * a text row below it — the same control, not two of them. Two copies of the
+ * markup would mean two radios sharing one `name`, so the change had to be
+ * CSS. The breakpoints are the site's shared ones (`cmp`, `nav`) rather than
+ * the picker's own, which is the same thing `RatingList` does with its column
+ * counts; a component that steps down at the site's widths is still
+ * page-agnostic, one that steps down at a caller's widths is not.
+ */
+import Icon from "@/components/ui/Icon.astro";
+import { scopedId } from "@/lib/forms";
+import type { IconName } from "@/components/ui/icons";
+
+interface Props {
+  /** The radio group's `name` — shared by every tile in one picker. */
+  name: string;
+  /** Per-instance id prefix — two forms on one page must not collide. */
+  instance: string;
+  value: string;
+  label: string;
+  /** The disambiguating spec line. On a phone this replaces the photo. */
+  meta?: string;
+  /** A further line, for a tile that has to explain itself. */
+  note?: string;
+  /** tile = photo above the label · row = a single text line ·
+   *  responsive = a tile at 600px and up, a row below it. */
+  layout?: "tile" | "row" | "responsive";
+  /** Row layout only: keep the photo, collapsed, and reveal it under the name
+   *  when the row is chosen. Lets a dropdown stay a scannable list of names
+   *  and still show the machine once you have picked one. */
+  expand?: boolean;
+  image?: string;
+  /** Alt text. Empty by default — the visible label already names the machine,
+   *  so repeating it only makes a screen reader say it twice. */
+  alt?: string;
+  /** Shown instead of a photo. The "something else" tile's `+`. */
+  icon?: IconName;
+  /** Dashed outline — marks a tile that is an escape, not a machine. */
+  dashed?: boolean;
+  /** Photo aspect ratio. `step` is the picker's: 4:3 at four across, 16:9 at
+   *  three (docs 14 §5). */
+  ratio?: "4/3" | "16/9" | "step";
+  checked?: boolean;
+  required?: boolean;
+  class?: string;
+}
+
+const {
+  name,
+  instance,
+  value,
+  label,
+  meta,
+  note,
+  layout = "tile",
+  expand = false,
+  image,
+  alt = "",
+  icon,
+  dashed = false,
+  ratio = "4/3",
+  checked = false,
+  required = false,
+  class: extra = "",
+} = Astro.props;
+
+const id = scopedId(instance, name, value);
+
+const ratios: Record<NonNullable<Props["ratio"]>, string> = {
+  "4/3": "aspect-[4/3]",
+  "16/9": "aspect-[16/9]",
+  step: "aspect-[4/3] max-nav:aspect-[16/9]",
+};
+
+/* A row normally drops the photo entirely — at ~160px wide a machine photo is
+   decorative, not informative (docs 14 §5). `expand` is the exception: the
+   photo is worth its bytes once it is the answer to "is this the one?", which
+   is only true after the row has been chosen. */
+const showMedia = layout !== "row" || (expand && (!!image || !!icon));
+
+/* Where the photo is shown. `responsive` keeps it in the markup and takes it
+   away below 600px, so the row and the tile are one control and one radio. */
+const media: Record<NonNullable<Props["layout"]>, string> = {
+  tile: "",
+  row: "",
+  responsive: "max-cmp:hidden",
+};
+
+/* The glyph beside the label — what a row shows instead of a media box. */
+const inlineIcon: Record<NonNullable<Props["layout"]>, string> = {
+  tile: "hidden",
+  row: "",
+  responsive: "hidden max-cmp:block",
+};
+---
+
+<label
+  for={id}
+  class:list={[
+    "tile relative flex cursor-pointer flex-col",
+    expand && layout === "row" && "tile-expand",
+    dashed && "tile-dashed",
+    extra,
+  ]}
+  data-choice-tile={value}
+>
+  <input
+    type="radio"
+    class="sr-only"
+    id={id}
+    name={name}
+    value={value}
+    checked={checked}
+    required={required}
+  />
+
+  {
+    showMedia && (
+      <span class:list={["media-slot block", media[layout]]}>
+        <span class="media-clip block">
+          <span
+            class:list={[
+              "media relative block overflow-clip bg-surface-2",
+              ratios[ratio],
+            ]}
+            data-choice-media
+          >
+            {image && (
+              <img
+                src={image}
+                alt={alt}
+                loading="lazy"
+                decoding="async"
+                class="tile-photo absolute inset-0 h-full w-full object-cover"
+              />
+            )}
+            {icon && (
+              <span class="absolute inset-0 flex items-center justify-center text-faint">
+                <Icon name={icon} size={26} />
+              </span>
+            )}
+          </span>
+        </span>
+      </span>
+    )
+  }
+
+  <span class="flex flex-1 items-center gap-3 px-5 py-4">
+    {
+      icon && (
+        <span class:list={["text-faint", inlineIcon[layout]]}>
+          <Icon name={icon} size={18} />
+        </span>
+      )
+    }
+
+    <span class="flex min-w-0 flex-1 flex-col">
+      <span class="text-detail leading-snug font-medium text-ink">{label}</span>
+      {
+        meta && (
+          <span class="mt-[3px] text-note leading-snug text-muted">{meta}</span>
+        )
+      }
+      {
+        note && (
+          <span class="mt-[3px] text-caption leading-snug text-faint">
+            {note}
+          </span>
+        )
+      }
+    </span>
+
+    {/* Selection mark — one of three signals, never the only one. */}
+    <span
+      class="mark block h-[18px] w-[18px] shrink-0 rounded-full border border-line-strong bg-white"
+      aria-hidden="true"></span>
+  </span>
+</label>
+
+<style>
+  /* The photo is rendered once and its position is a `order` swap, not a
+     second copy of the markup: above the name on a tile, below it on an
+     expanding row. */
+  .tile-expand .media-slot {
+    order: 1;
+    /* The 0fr/1fr grid is what makes a height transition possible at all —
+       `height: auto` is not animatable, a grid track is. */
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 320ms var(--ease-out-expo);
+  }
+  /* The clip has to sit on its own element between the grid track and the
+     photo. Put it on the photo box itself and `aspect-ratio` gives that box an
+     intrinsic height, which is not something a 0fr track can take away — the
+     row simply never collapses. `min-height: 0` is the other half: a grid item
+     refuses to shrink below its content without it. */
+  .tile-expand .media-clip {
+    overflow: clip;
+    min-height: 0;
+  }
+  /* Hover opens it too, so the list can be browsed without committing —
+     picking a machine you have never seen is what the photo is there for. */
+  .tile-expand:hover .media-slot,
+  .tile-expand:has(input:checked) .media-slot {
+    grid-template-rows: 1fr;
+  }
+
+  /* Grey until you engage with it — the grid stays calm, and the machine you
+     are hovering is the only one in colour. */
+  .tile-photo {
+    filter: grayscale(1);
+    transition: filter 350ms var(--ease-out-expo);
+  }
+  .tile:hover .tile-photo,
+  .tile:has(input:checked) .tile-photo {
+    filter: grayscale(0);
+  }
+
+  .tile:hover .mark {
+    border-color: var(--color-ink);
+  }
+
+  .tile:has(input:checked) {
+    background: var(--color-brand-tint);
+    /* An inset ring rather than a border: inside a `.mesh` grid a border would
+       shift the cell by a pixel and push the whole lattice out of true. */
+    box-shadow: inset 0 0 0 1px var(--color-brand);
+    z-index: 1;
+  }
+  .tile:has(input:checked) .mark {
+    border-color: var(--color-brand);
+    background: var(--color-brand);
+    /* The filled dot, drawn as an inset ring so nothing is nested inside. */
+    box-shadow: inset 0 0 0 3px #ffffff;
+  }
+
+  .tile:has(input:focus-visible) {
+    outline: 2px solid var(--color-brand-bright);
+    outline-offset: -2px;
+    z-index: 1;
+  }
+
+  /* The escape tile — "something else". Drawn with a pseudo-element rather
+     than an outline, so it does not fight the focus ring above. */
+  .tile-dashed::after {
+    content: "";
+    position: absolute;
+    inset: 5px;
+    border: 1px dashed var(--color-line-strong);
+    pointer-events: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tile-photo,
+    .tile-expand .media-slot {
+      transition-duration: 1ms;
+    }
+  }
+</style>

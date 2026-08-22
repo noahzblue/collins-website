@@ -6,6 +6,7 @@
  */
 
 import { site } from "@/config/site";
+import { slug } from "@/lib/forms";
 
 export type Mode = "hire" | "buy";
 export type Availability = "yard" | "on_request" | "sourced";
@@ -94,6 +95,64 @@ export const enquireHref = (name: string, mode: Mode, rangeLabel?: string) => {
   const text = `Hi Collins, I'm interested in ${verb} ${item}.`;
   return `${site.whatsapp.href}?text=${encodeURIComponent(text)}`;
 };
+
+/**
+ * A stable key for one size within its category.
+ *
+ * **`label` alone is not unique.** Forklifts list "3 ton" twice — diesel and
+ * electric — and scissor lifts and boom lifts do the same at "12 m" and
+ * "20 m". Keying a radio on the label gives two controls the same id and the
+ * same value, so `<label for>` binds to the wrong row and the payload cannot
+ * say which of the two was asked for. The power type is what separates them,
+ * and it is the only thing that ever does.
+ *
+ * The label still travels in the payload beside this — it is the quotable
+ * string, and "250 kVA" is what goes on the quotation (docs 14 §12).
+ */
+export const rangeKey = (range: { label: string; powerType?: string }) =>
+  slug([range.label, range.powerType].filter(Boolean).join(" "));
+
+/**
+ * Group categories under their family, preserving the order they arrive in.
+ *
+ * Families come out in the order they first appear, so a list already sorted
+ * by `sortOrder` produces Power & air, Material handling, Lifting, Access,
+ * Earthmoving — the catalogue's own order, with no second list to keep in
+ * step with it. Used by the quote form's picker, which groups under five
+ * headings on a phone (docs/site-expansion/14 §5).
+ */
+export const groupByFamily = <T extends { family: string }>(categories: T[]) =>
+  categories.reduce<{ family: string; items: T[] }[]>((groups, category) => {
+    const group = groups.find((g) => g.family === category.family);
+    if (group) group.items.push(category);
+    else groups.push({ family: category.family, items: [category] });
+    return groups;
+  }, []);
+
+/**
+ * The attributes any "Request a quotation" control carries.
+ *
+ *   <Button {...quoteTrigger(id, "hire", range)}>Check availability</Button>
+ *
+ * The dialog reads them, pre-answers sections 01 and 02 and opens on 03. Call
+ * it with nothing and the control simply opens the form at the start
+ * (docs/site-expansion/14 §9a).
+ *
+ * `enquireHref()` below is still the `href` on most of these, and stays: it is
+ * what happens when the script has not run, and what a control rendered
+ * outside the dialog's reach falls back to. One control, two behaviours, and
+ * the better one wins when it can.
+ */
+export const quoteTrigger = (
+  category?: string,
+  mode?: Mode,
+  range?: { label: string; powerType?: string },
+) => ({
+  "data-quote-open": true,
+  ...(category ? { "data-quote-item": category } : {}),
+  ...(mode ? { "data-quote-mode": mode } : {}),
+  ...(range ? { "data-quote-rating": rangeKey(range) } : {}),
+});
 
 /**
  * Resolve equipment category ids to `{ id, name, href }`, throwing on an id

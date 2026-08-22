@@ -86,16 +86,30 @@ src/
 ├── content.config.ts      Zod schema for the above. A typo fails the build.
 ├── lib/equipment.ts       Equipment display strings + helpers (availability
 │                          labels, badges, WhatsApp enquiry links).
+├── lib/forms.ts           `Option` + `scopedId` — what every input primitive
+│                          needs. Generic; no feature knows about it.
+├── lib/quote/             The quote form's contract: schema, options (every
+│                          chip list + all its copy), compose, validate, submit.
+│                          `submit.ts` is the only fetch and the only env read.
 ├── scripts/rotator.ts     Shared client behaviour for rotating panels.
+├── scripts/quote/         The quote form's behaviour. `dialog.ts` owns
+│                          open/close; `form.ts` owns state, steps,
+│                          conditionals, validation and submit;
+│                          `draft.ts` owns sessionStorage.
 ├── styles/global.css      The ENTIRE design system: @theme tokens, base layer,
-│                          and four component classes. Nothing else.
+│                          and its component classes. Nothing else.
 ├── layouts/Base.astro     <head>, Header, <main><slot/></main>, Footer,
-│                          FloatingButtons. Every page renders inside it.
+│                          FloatingButtons, QuoteDialog. Every page renders
+│                          inside it.
 ├── components/
 │   ├── layout/            Header, Footer, FloatingButtons. Used by Base only.
 │   ├── ui/                Design-system primitives. Reusable, page-agnostic.
 │   ├── sections/          One component per homepage section.
-│   └── equipment/         Components for the equipment slice only.
+│   ├── equipment/         Components for the equipment slice only.
+│   └── quote/             The quote request form (see docs/site-expansion/14).
+│                          Mounted once, in Base — anything carrying
+│                          `data-quote-open`, and `?quote=1` on any URL,
+│                          opens it.
 └── pages/
     ├── index.astro        Composes the homepage sections. Nothing else.
     ├── equipment/         index.astro (hub) + [slug].astro (category page)
@@ -151,7 +165,9 @@ Rules:
   becomes a token.
 - Anything that must clear the fixed header uses `--spacing-header` /
   `--spacing-header-gap`, never a raw px.
-- `.wrap` (max-width container), `.card`, `.scrim-banner` are the only component
+- `.wrap` (max-width container), `.card`, `.mesh` (the hairline lattice a dense
+  selection grid draws — a deliberate alternative to `.card`, not a variant of
+  it), `.scrim-banner` are the only component
   classes. Anything with markup belongs in an `.astro` file, not a CSS class.
 
 ## Reuse before you write markup
@@ -169,17 +185,101 @@ duplicated:
 | `SectionHeading` | eyebrow + heading + optional intro                                       |
 | `Breadcrumb`     | the trail above any subpage heading                                      |
 | `PageBanner`     | the full-bleed photo banner opening a subpage                            |
-| `ParallaxImage`  | every photo — it drifts as the page scrolls; no still variant exists     |
+| `ParallaxImage`  | every photo — it drifts as the page scrolls; one exception, below        |
 | `ContactRows`    | icon + line lists of contact details                                     |
 | `Logo`           | the wordmark                                                             |
 
+Form controls — all take an `instance` prop and generate every id through
+`scopedId`, because two copies of a form can share one document:
+
+| Component    | Use for                                                                   |
+| ------------ | ------------------------------------------------------------------------- |
+| `Field`      | label + control + hint + error. Underline only — there is one field style |
+| `ChipGroup`  | any radio group as chips: `rule` / `bar` / `segment` / `display`          |
+| `ChoiceTile` | photo + radio selection cell; `layout="responsive"` steps tile → row      |
+| `Dropdown`   | `<details>` shell, underline trigger, panel is a slot                     |
+| `Checkbox`   | one square box and a label — the form's only non-radio choice             |
+
+And one that is not a form control but belongs to the same reserve:
+
+| Component | Use for                                                                 |
+| --------- | ----------------------------------------------------------------------- |
+| `Dialog`  | every modal — native `<dialog>`, centred panel ≥900px, full sheet below |
+
+`Dialog` is presentation only: open, close, history, focus and the body scroll
+lock live in a script that takes the element as its root
+(`scripts/quote/dialog.ts` today). Never hand-roll a second overlay — the top
+layer, the focus trap, Escape and `inert` are all things the native element
+already gets right.
+
+**A rating's `label` is not unique inside its category** — forklifts list
+"3 ton" twice, diesel and electric. Anything that keys, ids or stores a range
+uses `rangeKey()` from `lib/equipment.ts`; the label is for display and for the
+quotation, never for identity.
+
+**Nothing in a form is rounded.** `rounded-full` still means a badge or a dot
+(`Pill`), never a control — see `docs/site-expansion/14 §14.3`.
+
+**The one photo that does not drift** is `ChoiceTile`'s: a selection control
+that moves while you are trying to click it is a bug, not a detail. It uses a
+plain lazy `<img>`. That is the only sanctioned exception to `ParallaxImage`;
+anything else that wants a still photo should say why here first.
+
 Client-side rotating panels (tab cards, accordions, sliders) use
 `@/scripts/rotator.ts` — do not hand-roll another timer/hover/reduced-motion loop.
+
+## Component contracts: keep them dumb
+
+Five layers, and **only the composition layer may read data**:
+
+| Layer            | Where                             | May contain                            | May **not** contain         |
+| ---------------- | --------------------------------- | -------------------------------------- | --------------------------- |
+| **Facts**        | `content/`, `data/`, `config/`    | plain data                             | markup, logic               |
+| **Logic**        | `lib/`                            | pure functions, types, derived strings | DOM, markup                 |
+| **Presentation** | `components/ui/`, feature folders | markup, styling, props                 | data imports, copy literals |
+| **Composition**  | `pages/`, `components/sections/`  | reads data, binds it to components     | markup beyond layout        |
+| **Behaviour**    | `scripts/`                        | event wiring, state, a root element    | `document.*` queries, copy  |
+
+`components/equipment/` is the exemplar — all six take everything through
+props and import nothing from `data/` or `config/`, which is why `RangeTable`
+renders on a category page, a hub row and inside the quote form untouched.
+Every file in `sections/` imports data, because binding data is their job.
+
+The rules that keep a component reusable:
+
+- **No copy literals in a leaf component.** Labels, legends, placeholders and
+  option lists arrive as props or come from `data/`. A component containing the
+  string `"Under a week"` can't be reused, and the person who needs to change
+  it has to go looking.
+- **Options are data, not markup.** Six hand-written `<input type="radio">`
+  blocks become one `options={DURATIONS}` prop. Adding one is then a one-line
+  data edit that can't break markup.
+- **Values are stable keys, not display strings.** `"1-3-months"`, not
+  `"1–3 months"` — display text belongs in the label.
+- **Variants are lookup maps, not conditionals** — see `Pill.astro`'s `tones`.
+- **Every component declares a documented `Props` interface**, defaults in the
+  destructure, `class: extra = ""` passthrough. See `Section.astro`.
+- **Scripts take a root element and never touch `document`.** Query through
+  `root`, so two instances of a component on one page can't collide. Generate
+  ids from an instance prefix for the same reason.
+- **A file earns its existence when it has a name someone would search for.**
+  Past ~150 lines a component is usually doing two jobs; under ~20 it usually
+  belongs inline.
+
+The test for all of it: **for any change someone might want to make, there
+should be exactly one obvious file to open.** If a change needs two files open
+at once, the boundary is in the wrong place.
 
 ## Common tasks
 
 - **Change a phone number, address, hours, social link** → `src/config/site.ts`.
 - **Change section copy** → `src/data/content.ts`.
+- **Change a quote-form option, label or hint** → `src/lib/quote/options.ts`.
+  Every chip list and every string the form shows is there.
+- **Make a button open the quote form** → `{...quoteTrigger(categoryId, mode, range)}`
+  from `lib/equipment.ts`, or a bare `data-quote-open` where nothing is known
+  yet. Keep the `href` — it is the no-JS fallback. On `/contact` the same
+  attribute scrolls to the inline form instead of opening a second copy.
 - **Add an equipment category** → one object in `src/content/equipment/categories.json`.
   The homepage grid (`featured: true`), the `/equipment` hub, its own page, the
   quote-form dropdown and the index rail all pick it up. The Zod schema in
@@ -191,6 +291,24 @@ Client-side rotating panels (tab cards, accordions, sliders) use
 - **Add an icon** → a new entry in `src/components/ui/icons.ts`, then
   `<Icon name="…" />`. Keep bodies free of hardcoded `fill`/`stroke` so
   `currentColor` theming keeps working.
+
+## Two ways an `.astro` file breaks silently
+
+Both sever `interface Props` from `Astro.props`. Every prop then degrades to
+`any`, the component still builds and still renders, and the only trace is a
+soft `ts(6196) 'Props' is declared but never used` hint — which reads like dead
+code, so the instinct is to delete the interface rather than fix the cause.
+
+1. **A bare `<` in a frontmatter comment.** The compiler's scanner reads it as
+   the start of markup. Write comparisons in words ("fits inside", "at most"),
+   and never write an unclosed tag name in prose — `<select>` in a comment
+   costs an hour.
+2. **A prop named `as`.** It becomes a destructuring binding named `as`, which
+   defeats the detection. Name it `element` — see `ui/Field.astro`.
+
+Both can be present at once and each is independently sufficient, so fixing one
+leaves the file broken. If `bun run check` reports ts(6196) on a `Props`
+interface, check for both before touching the interface.
 
 ## Accessibility & motion
 

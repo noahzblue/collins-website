@@ -1,0 +1,163 @@
+---
+/**
+ * A dropdown in the underline language: a label, the chosen value sitting on a
+ * rule, a chevron, and a panel of whatever you put in it.
+ *
+ *   <Dropdown instance={id} name="category" label="Which machine"
+ *             placeholder="Pick a machine" valueLabel="Generators">
+ *     …rows…
+ *   </Dropdown>
+ *
+ * **Built on the `details` element, not a `select` and not a hand-rolled
+ * listbox.**
+ * A native select's popup cannot be styled at all — it is drawn by the
+ * operating system — so it can never match the rest of the form. A hand-rolled
+ * `role="listbox"` can, but it means owning focus, roving tabindex, type-ahead
+ * and Escape before it is even correct. `details` is the middle: real
+ * disclosure semantics, keyboard operable and closable with no script at all,
+ * and the panel is ordinary markup we style like everything else.
+ *
+ * The panel is **in flow** — it pushes the content beneath it rather than
+ * floating over it. Inside a scrolling dialog panel an overlay has to be
+ * positioned against a container that clips and scrolls, which is where
+ * dropdowns break; pushing cannot clip and cannot end up off-screen. The cost
+ * is movement, which is why the panel is the form's own mesh rather than a
+ * floating card — it reads as the page opening up, not as a layer arriving.
+ *
+ * Content is a slot, so the same shell holds a list of plain options, the
+ * category rows, or a whole `RatingList`. What goes in decides what it is.
+ *
+ * Still to come (slice 2, `scripts/quote/dialog.ts`'s sibling): closing on
+ * selection, writing the chosen label into the trigger, and Escape. Until then
+ * `valueLabel` is passed in — the trigger has no way to read a radio's label
+ * in CSS.
+ */
+import Icon from "@/components/ui/Icon.astro";
+import { scopedId } from "@/lib/forms";
+
+interface Props {
+  /** Names the data hook; the controls inside carry their own `name`. */
+  name: string;
+  /** Per-instance id prefix — two forms on one page must not collide. */
+  instance: string;
+  label: string;
+  /** What the trigger reads before anything is chosen. */
+  placeholder: string;
+  /** The chosen option's display text. Replaces the placeholder when set. */
+  valueLabel?: string;
+  /** Start open. */
+  open?: boolean;
+  hint?: string;
+  error?: string;
+  required?: boolean;
+  class?: string;
+}
+
+const {
+  name,
+  instance,
+  label,
+  placeholder,
+  valueLabel,
+  open = false,
+  hint,
+  error,
+  required = false,
+  class: extra = "",
+} = Astro.props;
+
+const id = scopedId(instance, name, "dropdown");
+const hintId = hint ? `${id}-hint` : undefined;
+const errorId = error ? `${id}-error` : undefined;
+const describedBy = [hintId, errorId].filter(Boolean).join(" ") || undefined;
+---
+
+<details
+  id={id}
+  class:list={["dd", extra]}
+  open={open}
+  data-dropdown={name}
+  aria-describedby={describedBy}
+>
+  <summary class:list={["dd-trigger", error && "dd-error"]}>
+    <span class="mb-[6px] block text-caption text-faint">
+      {label}{required && " *"}
+    </span>
+    <span class="flex items-center gap-4 py-[14px]">
+      <span
+        class:list={[
+          "flex-1 truncate text-intro",
+          valueLabel ? "text-ink" : "text-faint",
+        ]}
+      >
+        {valueLabel ?? placeholder}
+      </span>
+      <Icon name="chevron-down" size={18} class="dd-chevron text-muted" />
+    </span>
+  </summary>
+
+  <div class="dd-panel pt-4">
+    <slot />
+  </div>
+</details>
+
+{
+  hint && (
+    <p id={hintId} class="mt-[6px] mb-0 text-caption text-faint">
+      {hint}
+    </p>
+  )
+}
+{
+  error && (
+    <p id={errorId} class="mt-[6px] mb-0 text-caption text-error">
+      {error}
+    </p>
+  )
+}
+
+<style>
+  /* The rule under the value is the whole affordance — the same one every
+     field in this form uses, so a dropdown does not read as a different
+     species of control. */
+  .dd-trigger {
+    display: block;
+    cursor: pointer;
+    border-bottom: 1px solid var(--color-line-strong);
+    transition: border-color 200ms var(--ease-out-expo);
+    /* The default disclosure triangle; the chevron replaces it. */
+    list-style: none;
+  }
+  .dd-trigger::-webkit-details-marker {
+    display: none;
+  }
+  .dd-trigger:hover {
+    border-color: var(--color-ink);
+  }
+  .dd[open] > .dd-trigger {
+    border-color: var(--color-brand-bright);
+    box-shadow: 0 1px 0 0 var(--color-brand-bright);
+  }
+  .dd-error,
+  .dd[open] > .dd-error {
+    border-color: var(--color-error);
+    box-shadow: none;
+  }
+  .dd-trigger:focus-visible {
+    outline: 2px solid var(--color-brand-bright);
+    outline-offset: 3px;
+  }
+
+  .dd-chevron {
+    transition: rotate 240ms var(--ease-out-expo);
+  }
+  .dd[open] .dd-chevron {
+    rotate: 180deg;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .dd-chevron {
+      transition-duration: 1ms;
+    }
+  }
+</style>

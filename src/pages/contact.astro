@@ -1,49 +1,48 @@
 ---
 /**
- * /contact — the full version of the homepage CTA band: three numbers, two
- * locations, real hours, and a form that asks the right question.
+ * /contact — three numbers, two locations, real hours, and the quote form.
  *
  * Deliberately NO PageBanner. Every other new page opens on a full-bleed
  * photo; opening straight into content signals "this is the functional one"
- * and puts the form ~400px higher up the page. It should feel like a desk,
- * not a brochure.
+ * and puts the form higher up the page. It should feel like a desk, not a
+ * brochure.
  *
- * Almost no motion, on purpose: one reveal on the header, a sticky left
- * column, and that is it. A contact page that animates while you fill it in is
- * a contact page that annoys people.
+ * **The form here is the same component the dialog mounts** — one form, two
+ * mounts (docs/site-expansion/14 §2). A form that only exists behind a click
+ * is invisible to search and to anyone who arrived specifically to enquire,
+ * and this page is where that person lands.
+ *
+ * The consequence the doc named has landed with it: `.q-field` is gone. Two
+ * visually different forms on one site is worse than either style, so the
+ * boxed 14px fields retire in favour of the underline ones every other part of
+ * the form uses (§14.3a).
+ *
+ * The contact methods moved from a sticky left column to a band across the
+ * top, because the form now needs the full width — below 1240px its summary
+ * flattens into a bar, and above it the rail is a real second column that
+ * cannot share the page with a sidebar.
+ *
+ * Almost no motion, on purpose: one reveal on the header and that is it. A
+ * contact page that animates while you fill it in is a contact page that
+ * annoys people.
  */
-import { getCollection } from "astro:content";
 import Base from "@/layouts/Base.astro";
 import Section from "@/components/ui/Section.astro";
 import Eyebrow from "@/components/ui/Eyebrow.astro";
 import Button from "@/components/ui/Button.astro";
 import Icon from "@/components/ui/Icon.astro";
 import Breadcrumb from "@/components/ui/Breadcrumb.astro";
+import QuoteForm from "@/components/quote/QuoteForm.astro";
 import { site, directionsHref } from "@/config/site";
 import { contactPage } from "@/data/content";
+import { DIALOG } from "@/lib/quote/options";
 
 const { office, yard } = site.places;
-
-/* The dropdown mirrors the catalogue — same collection as /equipment, so it
-   can't drift from what we actually supply. */
-const categoryNames = (await getCollection("equipment"))
-  .sort((a, b) => a.data.sortOrder - b.data.sortOrder)
-  .map((category) => category.data.name);
-
-const emirates = [
-  "Dubai",
-  "Sharjah",
-  "Abu Dhabi",
-  "Ajman",
-  "Ras Al Khaimah",
-  "Fujairah",
-  "Umm Al Quwain",
-];
 ---
 
 <Base title={contactPage.seoTitle} description={contactPage.seoDescription}>
   <!-- 1. Header — straight into content -->
-  <header class="pt-[150px] pb-[56px] max-mob:pt-[120px] max-mob:pb-[40px]">
+  <header class="pt-[150px] pb-[48px] max-mob:pt-[120px] max-mob:pb-[36px]">
     <div class="wrap">
       <Breadcrumb
         trail={[{ label: "Home", href: "/" }]}
@@ -64,236 +63,114 @@ const emirates = [
     </div>
   </header>
 
-  <!-- 2. Methods (sticky) + the form -->
-  <Section class="pt-0">
-    <div class="wrap">
-      <div
-        class="grid grid-cols-[0.8fr_1.2fr] items-start gap-16 max-nav:grid-cols-1 max-nav:gap-10"
+  <!-- 2. The three ways in, before the form — because two of them are faster
+       than any form and pretending otherwise would be dishonest. -->
+  <div class="wrap">
+    <div class="grid grid-cols-3 items-stretch gap-4 max-nav:grid-cols-1">
+      <!-- WhatsApp gets the most visual weight: in the UAE plant trade it is
+           the enquiry channel, not a fallback. -->
+      <a
+        href={site.whatsapp.href}
+        target="_blank"
+        rel="noopener"
+        class="press flex items-center gap-4 rounded-md bg-whatsapp p-5 text-white transition-transform duration-200 hover:-translate-y-[2px]"
       >
-        <div class="sticky top-header-gap max-nav:static">
-          <!-- WhatsApp gets the most visual weight: in the UAE plant trade it
-               is the enquiry channel, not a fallback. -->
-          <a
-            href={site.whatsapp.href}
-            target="_blank"
-            rel="noopener"
-            class="press flex items-center gap-4 rounded-md bg-whatsapp p-5 text-white transition-transform duration-200 hover:-translate-y-[2px]"
-          >
-            <span
-              class="flex h-[46px] w-[46px] shrink-0 items-center justify-center rounded-sm bg-white/20"
-            >
-              <Icon name="whatsapp" size={24} />
-            </span>
-            <span>
-              <span class="block text-caption text-white/75">WhatsApp</span>
-              <span class="block text-subhead font-medium">
-                Message the yard
-              </span>
-            </span>
-            <Icon name="arrow-up-right" size={18} class="ml-auto" />
-          </a>
-
-          <!-- Three separate tel: rows, not a dropdown. -->
-          <div class="mt-4 rounded-md border border-line bg-white p-5">
-            <span class="flex items-center gap-3">
-              <span
-                class="flex h-[38px] w-[38px] shrink-0 items-center justify-center rounded-sm bg-brand-tint text-brand"
-              >
-                <Icon name="phone" size={18} />
-              </span>
-              <span class="text-caption text-faint">Call us</span>
-            </span>
-            <ul class="mt-4 flex flex-col">
-              {
-                site.phones.map((phone) => (
-                  <li>
-                    <a
-                      href={phone.href}
-                      class="block border-t border-line py-[10px] font-mono text-cell text-ink transition-colors hover:text-brand"
-                    >
-                      {phone.display}
-                    </a>
-                  </li>
-                ))
-              }
-            </ul>
-          </div>
-
-          <div class="mt-4 flex flex-col gap-3">
-            {
-              [
-                {
-                  icon: "mail" as const,
-                  label: "Email",
-                  value: site.email,
-                  href: `mailto:${site.email}`,
-                },
-                {
-                  icon: "clock" as const,
-                  label: "Working hours",
-                  value: site.hoursLong,
-                  href: undefined,
-                },
-              ].map((row) => (
-                <div class="flex items-center gap-4 rounded-md border border-line bg-white p-4">
-                  <span class="flex h-[44px] w-[44px] shrink-0 items-center justify-center rounded-sm bg-brand-tint text-brand">
-                    <Icon name={row.icon} size={20} />
-                  </span>
-                  <span>
-                    <span class="block text-caption text-faint">
-                      {row.label}
-                    </span>
-                    {row.href ? (
-                      <a
-                        href={row.href}
-                        class="block text-base font-medium text-ink transition-colors hover:text-brand"
-                      >
-                        {row.value}
-                      </a>
-                    ) : (
-                      <span class="block text-base font-medium text-ink">
-                        {row.value}
-                      </span>
-                    )}
-                  </span>
-                </div>
-              ))
-            }
-          </div>
-        </div>
-
-        <!-- The form, in the order the profile's prompt implies:
-             machine, duty, dates. -->
-        <form
-          id="enquiry-form"
-          data-wa={site.whatsapp.href}
-          data-email={site.email}
-          class="card p-9 shadow-[0_24px_60px_-36px_rgba(10,14,23,0.4)] max-xs:p-6"
+        <span
+          class="flex h-[46px] w-[46px] shrink-0 items-center justify-center rounded-sm bg-white/20"
         >
-          <p class="mb-6 text-meta font-medium text-ink">
-            Send us the machine, the duty and the dates — or just describe the
-            job and we'll specify it for you.
-          </p>
+          <Icon name="whatsapp" size={24} />
+        </span>
+        <span>
+          <span class="block text-caption text-white/75">WhatsApp</span>
+          <span class="block text-subhead font-medium">Message the yard</span>
+        </span>
+        <Icon name="arrow-up-right" size={18} class="ml-auto" />
+      </a>
 
-          <div class="grid grid-cols-2 gap-3 max-cmp:grid-cols-1">
-            <input
-              class="q-field"
-              type="text"
-              name="name"
-              autocomplete="name"
-              placeholder="Name *"
-              required
-            />
-            <input
-              class="q-field"
-              type="text"
-              name="company"
-              autocomplete="organization"
-              placeholder="Company"
-            />
-          </div>
-          <div class="grid grid-cols-2 gap-3 max-cmp:grid-cols-1">
-            <input
-              class="q-field"
-              type="tel"
-              name="phone"
-              autocomplete="tel"
-              placeholder="Phone *"
-              required
-            />
-            <input
-              class="q-field"
-              type="email"
-              name="email"
-              autocomplete="email"
-              placeholder="Email"
-            />
-          </div>
+      <!-- Three separate tel: rows, not a dropdown. -->
+      <div class="rounded-md border border-line bg-white p-5">
+        <span class="flex items-center gap-3">
+          <span
+            class="flex h-[38px] w-[38px] shrink-0 items-center justify-center rounded-sm bg-brand-tint text-brand"
+          >
+            <Icon name="phone" size={18} />
+          </span>
+          <span class="text-caption text-faint">Call us</span>
+        </span>
+        <ul class="mt-3 flex flex-col">
+          {
+            site.phones.map((phone) => (
+              <li>
+                <a
+                  href={phone.href}
+                  class="block border-t border-line py-[9px] font-mono text-cell text-ink transition-colors hover:text-brand"
+                >
+                  {phone.display}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
 
-          <select class="q-field" name="category" required>
-            <option value="">Equipment category *</option>
-            {categoryNames.map((category) => <option>{category}</option>)}
-          </select>
-
-          <!-- Buy or hire is the site's core distinction; a dropdown would
-               hide it. Three visible pills instead. -->
-          <fieldset class="mb-3">
-            <legend class="mb-[10px] text-caption text-faint">
-              Buy or hire *
-            </legend>
-            <div class="flex flex-wrap gap-2">
-              {
-                ["Buy outright", "Hire", "Not sure yet"].map((option, i) => (
-                  <label class="mode-pill cursor-pointer">
-                    <input
-                      type="radio"
-                      name="mode"
-                      value={option}
-                      class="sr-only"
-                      required={i === 0}
-                    />
-                    <span class="inline-flex items-center rounded-full border border-line-strong px-[14px] py-[7px] font-mono text-label font-medium whitespace-nowrap text-muted transition-colors">
-                      {option}
-                    </span>
-                  </label>
-                ))
-              }
+      <div
+        class="flex flex-col gap-4 rounded-md border border-line bg-white p-5"
+      >
+        {
+          [
+            {
+              icon: "mail" as const,
+              label: "Email",
+              value: site.email,
+              href: `mailto:${site.email}`,
+            },
+            {
+              icon: "clock" as const,
+              label: "Working hours",
+              value: site.hoursLong,
+              href: undefined,
+            },
+          ].map((row) => (
+            <div class="flex items-center gap-4">
+              <span class="flex h-[38px] w-[38px] shrink-0 items-center justify-center rounded-sm bg-brand-tint text-brand">
+                <Icon name={row.icon} size={18} />
+              </span>
+              <span class="min-w-0">
+                <span class="block text-caption text-faint">{row.label}</span>
+                {row.href ? (
+                  <a
+                    href={row.href}
+                    class="block truncate text-base font-medium text-ink transition-colors hover:text-brand"
+                  >
+                    {row.value}
+                  </a>
+                ) : (
+                  <span class="block text-base font-medium text-ink">
+                    {row.value}
+                  </span>
+                )}
+              </span>
             </div>
-          </fieldset>
+          ))
+        }
+      </div>
+    </div>
+  </div>
 
-          <!-- The placeholder is a real spec: it teaches the customer what to
-               write far better than "Enter details". -->
-          <input
-            class="q-field"
-            type="text"
-            name="duty"
-            placeholder="Duty / spec — e.g. 500 kVA, continuous duty, low noise"
-          />
-
-          <div class="grid grid-cols-2 gap-3 max-cmp:grid-cols-1">
-            <label class="block">
-              <span class="mb-[6px] block text-caption text-faint">From</span>
-              <input class="q-field" type="date" name="from" />
-            </label>
-            <label class="block">
-              <span class="mb-[6px] block text-caption text-faint">To</span>
-              <input class="q-field" type="date" name="to" />
-            </label>
-          </div>
-
-          <select class="q-field" name="location">
-            <option value="">Delivery location</option>
-            {emirates.map((emirate) => <option>{emirate}</option>)}
-          </select>
-
-          <textarea
-            class="q-field"
-            name="message"
-            rows="3"
-            placeholder="Anything else about the job"></textarea>
-
-          <Button variant="primary" type="submit" class="press mt-2 w-full">
-            <Icon name="whatsapp" size={17} />
-            Send enquiry on WhatsApp
-          </Button>
-
-          <p class="mt-4 mb-0 text-center text-caption text-faint">
-            {site.quotePromise}
-            <br />
-            <button
-              type="button"
-              id="email-instead"
-              class="mt-2 cursor-pointer underline transition-colors hover:text-ink"
-            >
-              Or send it by email instead
-            </button>
-          </p>
-        </form>
+  <!-- 3. The form. `id` is what every quote CTA on this page scrolls to
+       instead of opening the dialog (docs 14 §2). -->
+  <Section id="quote" class="pt-[72px] max-mob:pt-[48px]">
+    <div class="wrap">
+      <div class="q-inline-head">
+        <h2 class="q-inline-title">{DIALOG.title}</h2>
+      </div>
+      <div class="border-b border-line-strong">
+        <QuoteForm instance="q-inline" variant="inline" />
       </div>
     </div>
   </Section>
 
-  <!-- 3. Two locations, doing two different jobs -->
+  <!-- 4. Two locations, doing two different jobs -->
   <Section tone="gray">
     <div class="wrap">
       <h2 class="mb-10 text-h3 leading-[1.12]">Where to find us</h2>
@@ -324,7 +201,7 @@ const emirates = [
         }
       </div>
 
-      <!-- 4. Hours + legal -->
+      <!-- 5. Hours + legal -->
       <div class="mt-12 border-t border-line-strong pt-8">
         <p
           class="mb-0 font-mono text-caption leading-[1.9] tracking-[1.3px] text-faint uppercase"
@@ -339,100 +216,50 @@ const emirates = [
 </Base>
 
 <style>
-  .q-field {
-    width: 100%;
-    background: #fff;
-    border: 1px solid var(--color-line-strong);
-    border-radius: var(--radius-sm);
-    color: var(--color-ink);
-    padding: 12px 14px;
-    font-size: 14px;
-    font-family: inherit;
-    margin-bottom: 12px;
-    transition:
-      border-color 0.15s ease,
-      box-shadow 0.15s ease;
+  /* The same device the dialog's head draws: a rule that starts brand and
+     stops, so the inline mount and the modal read as one thing seen twice
+     rather than two arrangements of the same fields. */
+  .q-inline-head {
+    position: relative;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--color-line);
   }
-  .q-field::placeholder {
-    color: var(--color-faint);
+  .q-inline-head::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 -1px 0;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      var(--color-brand) 0 88px,
+      transparent 88px
+    );
   }
-  .q-field:focus {
-    outline: none;
-    border-color: var(--color-brand-bright);
-    box-shadow: 0 0 0 3px rgba(47, 111, 255, 0.15);
-  }
-  select.q-field:invalid {
-    color: var(--color-faint);
-  }
-  label.block .q-field {
-    margin-bottom: 0;
-  }
-
-  .mode-pill span:hover {
-    border-color: var(--color-ink);
-    color: var(--color-ink);
-  }
-  .mode-pill input:checked + span {
-    border-color: var(--color-brand);
-    background: var(--color-brand-tint);
-    color: var(--color-brand);
-  }
-  .mode-pill input:focus-visible + span {
-    outline: 2px solid var(--color-brand-bright);
-    outline-offset: 2px;
+  .q-inline-title {
+    font-family: var(--font-mono);
+    font-size: var(--text-h3);
+    line-height: 1.05;
+    text-transform: uppercase;
+    letter-spacing: -0.03em;
   }
 </style>
 
 <script>
+  import { untilPageSwap } from "@/scripts/untilPageSwap";
+  import { initQuoteForm } from "@/scripts/quote/form";
+
   /**
-   * The form has no backend. WhatsApp is the primary path because it is how
-   * this trade actually works; the email link is the paper-trail fallback for
-   * a desktop visitor without WhatsApp Web. Every field carries a real
-   * `name`/`required`, so a POST endpoint can drop in later with no markup
-   * change — swap the two handlers for a fetch and nothing else moves.
+   * The inline mount. Same call the dialog makes — the only difference is
+   * which element it is handed (docs/site-expansion/14 §2).
+   *
+   * The dialog is still mounted from `Base` on this page, so two instances of
+   * this form coexist in one document. That is the case every generated id and
+   * every root-scoped query exists for, and this is the page that proves it.
    */
   document.addEventListener("astro:page-load", () => {
-    const form = document.getElementById(
-      "enquiry-form",
-    ) as HTMLFormElement | null;
-    if (!form) return;
-
-    const compose = () => {
-      const data = new FormData(form);
-      const get = (key: string) => String(data.get(key) ?? "").trim();
-      const dates = [get("from"), get("to")].filter(Boolean).join(" → ");
-
-      return [
-        "Equipment enquiry — collinscouae.com",
-        `Name: ${get("name")}${get("company") ? ` (${get("company")})` : ""}`,
-        `Phone: ${get("phone")}`,
-        get("email") && `Email: ${get("email")}`,
-        `Equipment: ${get("category")}`,
-        `Buy or hire: ${get("mode")}`,
-        get("duty") && `Duty / spec: ${get("duty")}`,
-        dates && `Dates: ${dates}`,
-        get("location") && `Delivery: ${get("location")}`,
-        get("message") && `Notes: ${get("message")}`,
-      ]
-        .filter(Boolean)
-        .join("\n");
-    };
-
-    form.addEventListener("submit", (event) => {
-      event.preventDefault();
-      window.open(
-        `${form.dataset.wa}?text=${encodeURIComponent(compose())}`,
-        "_blank",
-      );
-    });
-
-    document.getElementById("email-instead")?.addEventListener("click", () => {
-      // Same required-field checking the submit button gets — an email with
-      // half the fields empty is worse than no email.
-      if (!form.reportValidity()) return;
-      window.location.href = `mailto:${form.dataset.email}?subject=${encodeURIComponent(
-        "Equipment enquiry",
-      )}&body=${encodeURIComponent(compose())}`;
-    });
+    const root = document.querySelector<HTMLElement>(
+      "[data-quote-root]:not(dialog [data-quote-root])",
+    );
+    if (root) initQuoteForm(root, { signal: untilPageSwap() });
   });
 </script>

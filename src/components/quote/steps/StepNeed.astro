@@ -1,0 +1,69 @@
+---
+/**
+ * Section 01 — what you need: buy or hire, and which machine.
+ *
+ * **Buy/hire is the opening question**, and that is the single most
+ * consequential ordering decision in the form. It changes the vocabulary of
+ * the rating step (`AVAILABILITY_LABEL` is keyed by mode, so a hirer reads "In
+ * yard" where a buyer reads "Ready stock"), it decides which fields section 03
+ * even has, and it is the cheapest possible thing to ask first — one tap, no
+ * thinking. It is also the site's core distinction, so burying it third
+ * contradicted every other page (docs/site-expansion/14 §3).
+ *
+ * It is rendered as giant type rather than pills. A one-tap opening gesture is
+ * the one place on the site where a binary choice earns display type, and this
+ * one is not even binary — "Not sure yet" is restored, because customers move
+ * between hire and purchase and forcing an undecided buyer to guess produces
+ * worse data than an honest "not sure" (§14.3b, settled on review 2026-08-22).
+ *
+ * Data arrives as props; copy comes from `lib/quote/options.ts`. This
+ * component reads neither the content collection nor `config/site.ts`.
+ */
+import ChipGroup from "@/components/ui/ChipGroup.astro";
+import CategoryPicker from "@/components/quote/CategoryPicker.astro";
+import QuoteSection from "@/components/quote/QuoteSection.astro";
+import { FIELD_COPY, MODES } from "@/lib/quote/options";
+import type { QuoteCategory, QuoteMode } from "@/lib/quote/schema";
+
+interface Props {
+  /** Per-instance id prefix — two forms on one page must not collide. */
+  instance: string;
+  /** The twelve, in catalogue order. */
+  categories: QuoteCategory[];
+  /** This section's number in the form's order. */
+  number?: string;
+  mode?: QuoteMode | null;
+  category?: string | null;
+  class?: string;
+}
+
+const {
+  instance,
+  categories,
+  number = "01",
+  mode = null,
+  category = null,
+  class: extra = "",
+} = Astro.props;
+---
+
+<QuoteSection id="need" instance={instance} number={number} class={extra}>
+  <div class="flex flex-col gap-14 max-cmp:gap-10">
+    <ChipGroup
+      instance={instance}
+      name="mode"
+      legend={FIELD_COPY.mode.label}
+      options={MODES}
+      variant="display"
+      value={mode}
+      required
+    />
+
+    <CategoryPicker
+      instance={instance}
+      categories={categories}
+      value={category}
+      required
+    />
+  </div>
+</QuoteSection>

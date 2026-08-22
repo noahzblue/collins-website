@@ -78,7 +78,9 @@ const all = (await getCollection("equipment")).sort(
           </p>
         </div>
         <div class="flex flex-wrap gap-3">
-          <Button variant="primary" href="/contact">Request a quote</Button>
+          <Button variant="primary" href="/contact" data-quote-open>
+            Request a quote
+          </Button>
           <Button
             variant="outline"
             href={site.whatsapp.href}

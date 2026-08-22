@@ -1,0 +1,260 @@
+---
+/**
+ * A radio group rendered as chips — the form's answer to every short list of
+ * mutually exclusive choices.
+ *
+ *   <ChipGroup instance={id} name="duration" legend="How long"
+ *              options={DURATIONS} required />
+ *
+ * The option list is data, not markup: adding a duration is a one-line edit in
+ * `lib/quote/options.ts` that cannot break the markup, cannot collide with a
+ * second instance's ids, and cannot leak a display string into the payload
+ * (docs/site-expansion/14 §15.3c).
+ *
+ * **Nothing here is rounded.** The rounded chip was the first attempt and it
+ * was rejected on review: `rounded-full` on this site now means a badge or a
+ * dot — a thing you read — and every one of these is a thing you press. The
+ * four faces below are all square, and all of them are the same device at a
+ * different scale: text with a rule under it that inks when chosen.
+ *
+ *   rule      the default. A bottom rule under the label. The giant buy/hire
+ *             control shrunk to chip size, so a form full of these reads as
+ *             one idea rather than two.
+ *   bar       the lineage of `Button.astro`'s `outline` variant — square, a
+ *             rule top and bottom, and a brand-tint fill on hover. Use where a
+ *             group needs more presence than a rule but is not the headline.
+ *   segment   all options in one continuous hairline strip, the way the mesh
+ *             draws the picker. Best for a short, closed set (two or three)
+ *             where the options are alternatives to each other.
+ *   display   the giant treatment for buy/hire — the site's core distinction
+ *             and the reason it opens the form (docs 14 §14.3b, settled on
+ *             review 2026-08-22).
+ *
+ * It is the same radio group in all four; only the face changes.
+ *
+ * The input is visually hidden rather than restyled, so arrow-key navigation,
+ * form association and `:checked` stay native (docs 14 §11).
+ */
+import type { Option } from "@/lib/forms";
+import { scopedId } from "@/lib/forms";
+
+interface Props {
+  /** The radio group's `name`, and part of every generated id. */
+  name: string;
+  /** Per-instance id prefix — two forms on one page must not collide. */
+  instance: string;
+  legend: string;
+  options: Option[];
+  /** rule = the default · bar · segment · display (buy/hire only). */
+  variant?: "rule" | "bar" | "segment" | "display";
+  /** The `value` of the option to pre-select. */
+  value?: string | null;
+  /** Adds the visible marker and `aria-required` (docs 14 §11). */
+  required?: boolean;
+  /** Error message. Its presence is what puts the group in its error state. */
+  error?: string;
+  /** Supporting line under the legend. */
+  hint?: string;
+  /** Hides the legend visually but keeps it for assistive tech. */
+  hideLegend?: boolean;
+  class?: string;
+}
+
+const {
+  name,
+  instance,
+  legend,
+  options,
+  variant = "rule",
+  value = null,
+  required = false,
+  error,
+  hint,
+  hideLegend = false,
+  class: extra = "",
+} = Astro.props;
+
+const id = scopedId(instance, name);
+const legendId = `${id}-legend`;
+const hintId = hint ? `${id}-hint` : undefined;
+/* Always rendered — see ui/Field.astro for why. */
+const errorId = `${id}-error`;
+const describedBy = [hintId, errorId].filter(Boolean).join(" ");
+
+/* Variants are lookup maps, not conditionals — house style, see ui/Pill.astro. */
+const layouts: Record<NonNullable<Props["variant"]>, string> = {
+  rule: "flex flex-wrap items-end gap-x-8 gap-y-1 max-cmp:gap-x-6",
+  bar: "flex flex-wrap gap-3",
+  /* `mesh` closes the strip into one lattice; `w-max` keeps it the width of
+     its options rather than the width of the form. */
+  segment: "mesh flex w-max max-w-full flex-wrap",
+  display: "flex flex-wrap items-baseline gap-x-10 gap-y-1 max-cmp:gap-x-7",
+};
+
+/* A tap target is at least 44px on a phone (docs 14 §6). For `rule` that
+   height has to sit on the label rather than the face, or the padding would
+   push the rule away from the text it belongs to. */
+const wrappers: Record<NonNullable<Props["variant"]>, string> = {
+  rule: "flex items-end max-mob:min-h-[44px]",
+  bar: "flex",
+  segment: "flex",
+  display: "flex items-baseline",
+};
+
+const faces: Record<NonNullable<Props["variant"]>, string> = {
+  rule: "chip-face block border-b-2 border-transparent pb-[7px] font-mono text-sm font-medium whitespace-nowrap text-faint transition-colors",
+  bar: "chip-face inline-flex min-h-[44px] items-center rounded-none border-t border-b border-line-strong px-[18px] font-mono text-sm font-medium whitespace-nowrap text-muted transition-colors",
+  segment:
+    "chip-face inline-flex min-h-[46px] items-center px-[20px] font-mono text-sm font-medium whitespace-nowrap text-muted transition-colors",
+  display:
+    "chip-face block border-b-2 border-transparent pb-[6px] font-display text-h2 leading-[1.1] tracking-[-0.02em] whitespace-nowrap text-faint transition-colors max-cmp:text-h3",
+};
+---
+
+<fieldset
+  class:list={["min-w-0 border-0 p-0", extra]}
+  data-chip-group={name}
+  data-variant={variant}
+>
+  <legend
+    id={legendId}
+    class:list={[
+      "mb-[10px] p-0 text-caption text-faint",
+      hideLegend && "sr-only",
+    ]}
+  >
+    {legend}{required && " *"}
+  </legend>
+
+  {
+    hint && (
+      <p id={hintId} class="mt-0 mb-[10px] text-caption text-faint">
+        {hint}
+      </p>
+    )
+  }
+
+  {
+    /* A <fieldset> is a `group`, which does not take `aria-required`. The
+      radios' own wrapper is the radiogroup, so the state lands where a
+      screen reader will read it with the options. */
+  }
+  <div
+    role="radiogroup"
+    aria-labelledby={legendId}
+    aria-required={required ? "true" : undefined}
+    aria-invalid={error ? "true" : undefined}
+    aria-describedby={describedBy}
+    class:list={[layouts[variant], error && "chip-group-error"]}
+  >
+    {
+      options.map((option) => (
+        <label class:list={["chip cursor-pointer", wrappers[variant]]}>
+          <input
+            type="radio"
+            class="sr-only"
+            name={name}
+            id={scopedId(instance, name, option.value)}
+            value={option.value}
+            checked={option.value === value}
+            required={required}
+          />
+          <span class:list={faces[variant]}>{option.label}</span>
+        </label>
+      ))
+    }
+  </div>
+
+  <p
+    id={errorId}
+    data-error-for={name}
+    hidden={!error}
+    class="mt-[10px] mb-0 text-caption text-error"
+  >
+    {error}
+  </p>
+</fieldset>
+
+<style>
+  /* State lives here rather than in `peer-*` utilities: the rules are short,
+     they read as one block, and it is the pattern the site already uses for
+     the mode pills on /contact. */
+  .chip-face {
+    transition:
+      color 200ms var(--ease-out-expo),
+      border-color 200ms var(--ease-out-expo),
+      background-color 200ms var(--ease-out-expo);
+  }
+  /* The visually-hidden input keeps the focus, so the face has to show it. */
+  .chip input:focus-visible + .chip-face {
+    outline: 2px solid var(--color-brand-bright);
+    outline-offset: 2px;
+  }
+
+  /* ── rule · the default ────────────────────────────────────────
+     The buy/hire control at chip scale. Nothing fills — the rule under the
+     label is the entire signal, which is what keeps a step with four of these
+     groups in it from reading as a wall of boxes. */
+  [data-variant="rule"] .chip:hover .chip-face {
+    color: var(--color-ink);
+    border-color: var(--color-line-strong);
+  }
+  [data-variant="rule"] .chip input:checked + .chip-face {
+    color: var(--color-ink);
+    border-color: var(--color-brand);
+  }
+
+  /* ── bar · the Button `outline` lineage ────────────────────────
+     Square, a rule above and below, and the tint arriving on hover — the same
+     move `ui/Button.astro`'s outline variant makes, so a chip and a secondary
+     button belong to one family. */
+  [data-variant="bar"] .chip:hover .chip-face {
+    background: var(--color-brand-tint);
+    border-color: transparent;
+    color: var(--color-ink);
+  }
+  [data-variant="bar"] .chip input:checked + .chip-face {
+    background: var(--color-brand-tint);
+    border-color: var(--color-brand);
+    color: var(--color-brand);
+  }
+
+  /* ── segment · one continuous strip ────────────────────────────
+     The mesh draws the hairlines between cells, so the faces carry no border
+     of their own and the chosen one fills. Best on a short closed set, where
+     the options are alternatives to each other rather than a list. */
+  [data-variant="segment"] .chip:hover .chip-face {
+    background: var(--color-surface);
+    color: var(--color-ink);
+  }
+  [data-variant="segment"] .chip input:checked + .chip-face {
+    background: var(--color-brand-tint);
+    color: var(--color-brand);
+    /* Inset, so the ring cannot move the cell and pull the strip out of true. */
+    box-shadow: inset 0 0 0 1px var(--color-brand);
+  }
+
+  /* ── display · buy / hire ──────────────────────────────────────
+     No tint fill: at this size a wash reads as highlighted text, not as a
+     chosen answer, so the rule does all of it. */
+  [data-variant="display"] .chip:hover .chip-face {
+    border-color: var(--color-line-strong);
+    color: var(--color-ink);
+  }
+  [data-variant="display"] .chip input:checked + .chip-face {
+    border-color: var(--color-brand);
+    color: var(--color-ink);
+  }
+
+  /* Error marks the group, whatever the face. `rule` and `display` have only a
+     bottom border to mark, which is why it is set rather than added to. */
+  .chip-group-error .chip-face {
+    border-color: var(--color-error);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .chip-face {
+      transition-duration: 1ms;
+    }
+  }
+</style>

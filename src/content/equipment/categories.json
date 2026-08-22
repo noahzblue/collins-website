@@ -437,6 +437,7 @@
     "heroImage": "/images/equipment/telehandlers-hero.jpg",
     "availableHire": true,
     "availableSale": true,
+    "attachments": true,
     "sortOrder": 7,
     "ranges": [
       {
@@ -543,6 +544,7 @@
     "heroImage": "/images/equipment/excavators-hero.jpg",
     "availableHire": true,
     "availableSale": true,
+    "attachments": true,
     "featured": true,
     "sortOrder": 9,
     "ranges": [
@@ -649,6 +651,7 @@
     "heroImage": "/images/equipment/backhoe-loaders-hero.jpg",
     "availableHire": true,
     "availableSale": true,
+    "attachments": true,
     "sortOrder": 11,
     "ranges": [
       {
@@ -684,6 +687,7 @@
     "heroImage": "/images/equipment/skid-steer-loaders-hero.jpg",
     "availableHire": true,
     "availableSale": true,
+    "attachments": true,
     "sortOrder": 12,
     "ranges": [
       {

@@ -59,6 +59,12 @@ const equipment = defineCollection({
     availableSale: z.boolean().default(true),
     /** Shown in the homepage teaser grid — six of the twelve. */
     featured: z.boolean().default(false),
+    /** Takes work attachments — a breaker, an auger, forks, a sweeper. Four
+     *  of the twelve do, and it is not derivable from `family`: telehandlers
+     *  and forklifts are both material handling and only one of them takes
+     *  them. The quote form asks for attachments only when this is true
+     *  (docs/site-expansion/14 §7). */
+    attachments: z.boolean().default(false),
     ranges: z.array(range).min(1),
     /** Sizing advice. Defaults to [] so the block simply doesn't render. */
     dutyGuide: z.array(dutyScenario).default([]),

@@ -1,0 +1,469 @@
+---
+/**
+ * The site's modal shell — a centred panel at ≥900px, a full-screen sheet
+ * below it.
+ *
+ *   <Dialog id="quote-dialog" title="Request a quotation" discard={DISCARD}>
+ *     …body…
+ *     <Fragment slot="foot">…sticky actions…</Fragment>
+ *   </Dialog>
+ *
+ * **A native `<dialog>` opened with `showModal()`**, because everything a
+ * hand-rolled overlay has to reinvent comes free with it: the top layer (which
+ * beats every z-index on the site, including the `z-[60]` floating buttons and
+ * the view-transition veil), a real focus trap, Escape, `inert` on the page
+ * behind, and `::backdrop`. Each of those is a bug waiting to happen in a
+ * hand-written version (docs/site-expansion/14 §4).
+ *
+ * The `<dialog>` element **is** the panel — there is no inner wrapper. That
+ * keeps the entrance honest: the element animates, its `::backdrop` fades, and
+ * nothing has to be kept in sync with anything else.
+ *
+ * Below 900px it becomes a full-screen sheet rather than a centred card. A
+ * form this long inside a floating card on a phone is unusable, and `dvh`
+ * rather than `vh` is what stops iOS Safari's collapsing toolbar from burying
+ * the sticky footer under the browser chrome.
+ *
+ * Presentation only. Open, close, history, focus and the body scroll lock are
+ * `scripts/quote/dialog.ts`'s — this file owns the markup and the hooks it
+ * queries (`data-dialog-*`), nothing else.
+ */
+import Icon from "@/components/ui/Icon.astro";
+
+interface Props {
+  /** Element id. This is the name a trigger opens the dialog by. */
+  id: string;
+  /** The heading. Focus lands here on open — a screen reader user should hear
+   *  what this is before being dropped into a text field — and
+   *  `aria-labelledby` points at it. */
+  title: string;
+  /** A line under the title, inside the fixed head. */
+  subtitle?: string;
+  /** Accessible name for the close button. */
+  closeLabel: string;
+  /** Panel width at ≥900px. */
+  width?: "md" | "lg";
+  /**
+   * Copy for the discard confirm. Its presence is what arms the dirty guard:
+   * with it, Escape and a backdrop click on a dirty dialog ask first; without
+   * it, they close. Fifteen fields behind an accidental Escape is the single
+   * most likely way this feature earns a complaint (docs 14 §4).
+   */
+  discard?: { title: string; body?: string; keep: string; discard: string };
+  class?: string;
+  /** Anything else — a `data-*` hook for the script that drives it, usually. */
+  [key: string]: unknown;
+}
+
+const {
+  id,
+  title,
+  subtitle,
+  closeLabel,
+  width = "lg",
+  discard,
+  class: extra = "",
+  ...rest
+} = Astro.props;
+
+const titleId = `${id}-title`;
+
+/* Variants are lookup maps, not conditionals — house style, see ui/Pill.astro. */
+const widths: Record<NonNullable<Props["width"]>, string> = {
+  md: "[--dlg-width:820px]",
+  /* Wide enough that a 4K display gets a panel and not a postage stamp. The
+     form is a four-column picker and a two-column rating list beside a
+     summary rail; below about 1400 those start fighting each other. */
+  lg: "[--dlg-width:1500px]",
+};
+---
+
+<dialog
+  id={id}
+  data-dialog
+  aria-labelledby={titleId}
+  class:list={["dlg", widths[width], extra]}
+  {...rest}
+>
+  {
+    /* Three cells on a shared hairline rather than a title with a rule under
+      it: at 1500px a centred title leaves an acre of empty header, and the
+      lattice is the language the rest of the panel already speaks. The note
+      cell is the tinted one, the way a `.mesh` heading row is. */
+  }
+  <header class="dlg-head">
+    <div class="dlg-head-title">
+      {
+        /* `autofocus` puts the opening focus here rather than on the first
+          control; the script re-asserts it, because a dialog re-opened without
+          a fresh render keeps whatever had focus last. */
+      }
+      <h2
+        id={titleId}
+        data-dialog-title
+        tabindex="-1"
+        autofocus
+        class="dlg-title"
+      >
+        {title}
+      </h2>
+    </div>
+
+    {
+      subtitle && (
+        <div class="dlg-head-note">
+          <span
+            class="mt-[6px] block h-2 w-2 shrink-0 bg-brand"
+            aria-hidden="true"
+          />
+          <p class="mb-0 text-note leading-relaxed text-muted">{subtitle}</p>
+        </div>
+      )
+    }
+
+    <button
+      type="button"
+      data-dialog-close
+      aria-label={closeLabel}
+      class="dlg-close"
+    >
+      <Icon name="close" size={20} />
+    </button>
+  </header>
+
+  {
+    /* Outside the scrolling area, so a progress bar or a summary line stays
+      put while the body scrolls under it. */
+    Astro.slots.has("head") && <slot name="head" />
+  }
+
+  {
+    /* `data-lenis-prevent` keeps Lenis off this container — it owns the
+      document, not this panel. `overscroll-behavior: contain` stops reaching
+      the end of the form from scroll-chaining into the page behind. */
+  }
+  <div class="dlg-body" data-dialog-scroll data-lenis-prevent>
+    <slot />
+  </div>
+
+  {
+    Astro.slots.has("foot") && (
+      <footer class="dlg-foot">
+        <slot name="foot" />
+      </footer>
+    )
+  }
+
+  {
+    discard && (
+      <div class="dlg-guard" data-dialog-guard hidden>
+        <div class="dlg-guard-card">
+          <p class="mb-0 text-subhead leading-snug text-ink">{discard.title}</p>
+          {discard.body && (
+            <p class="mt-3 mb-0 text-base leading-relaxed text-muted">
+              {discard.body}
+            </p>
+          )}
+          <div class="mt-7 flex flex-wrap gap-3">
+            <button
+              type="button"
+              data-dialog-keep
+              class="guard-btn guard-keep cursor-pointer px-[22px] py-[11px] font-mono text-sm font-medium"
+            >
+              {discard.keep}
+            </button>
+            <button
+              type="button"
+              data-dialog-discard
+              class="guard-btn guard-discard cursor-pointer px-[22px] py-[11px] font-mono text-sm font-medium"
+            >
+              {discard.discard}
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+</dialog>
+
+<style>
+  /* ── The panel ──────────────────────────────────────────────────
+     Every UA default on <dialog> (margin, border, padding, a max-width and
+     max-height computed from the viewport) is overridden here, so the shape is
+     ours and not four browsers' opinions of it. */
+  .dlg {
+    /* Zeroed for reduced motion, so the entrance is one token, not a second
+       set of rules. */
+    --dlg-rise: 10px;
+    /* The panel's own gutter. Everything inside reads it — the head cells
+       here, and `quote/QuoteSection.astro` through inheritance — so the
+       content lines up down the whole panel from one number. */
+    --dlg-gutter: clamp(28px, 3.4vw, 72px);
+
+    margin: auto;
+    width: min(var(--dlg-width), calc(100dvw - 48px));
+    max-width: none;
+    /* Near the full height on purpose. A short panel floating in the middle
+       of a 4K display reads as a widget; this one is the surface, and the
+       margin left around it is what keeps it from reading as a page. */
+    height: 98dvh;
+    max-height: 98dvh;
+    padding: 0;
+    border: 0;
+    /* Square. `--radius-md` is right for a card sitting in a page; this is
+       not sitting in anything. */
+    border-radius: 0;
+    background: #ffffff;
+    color: var(--color-body);
+    overflow: clip;
+    box-shadow: 0 40px 90px -34px rgba(6, 10, 20, 0.5);
+
+    opacity: 0;
+    translate: 0 var(--dlg-rise);
+    transition:
+      opacity 260ms var(--ease-out-expo),
+      translate 260ms var(--ease-out-expo),
+      /* Without these two the element is display:none the instant it closes
+         and the exit never plays. */
+      display 260ms allow-discrete,
+      overlay 260ms allow-discrete;
+  }
+  .dlg[open] {
+    display: flex;
+    flex-direction: column;
+    opacity: 1;
+    translate: 0 0;
+  }
+  /* The from-state of the entrance. Without it the element simply appears at
+     its open state — there is no previous style to interpolate from. */
+  @starting-style {
+    .dlg[open] {
+      opacity: 0;
+      translate: 0 var(--dlg-rise);
+    }
+  }
+
+  .dlg::backdrop {
+    background: color-mix(in srgb, var(--color-scrim) 55%, transparent);
+    opacity: 0;
+    transition:
+      opacity 260ms var(--ease-out-expo),
+      display 260ms allow-discrete,
+      overlay 260ms allow-discrete;
+  }
+  .dlg[open]::backdrop {
+    opacity: 1;
+  }
+  @starting-style {
+    .dlg[open]::backdrop {
+      opacity: 0;
+    }
+  }
+
+  /* ── The three bands ────────────────────────────────────────────
+     Head and foot are fixed; only the body scrolls. That is what makes the
+     mobile sheet's top bar and action row stay put. */
+  /* ── The head ───────────────────────────────────────────────────
+     Cells on a shared hairline, and a rule beneath that starts brand and
+     becomes hairline — the same accent bar `ui/Eyebrow.astro` draws before a
+     label, stretched into the rule it sits on. */
+  .dlg-head {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: stretch;
+    position: relative;
+    border-bottom: 1px solid var(--color-line);
+  }
+  .dlg-head::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 -1px 0;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      var(--color-brand) 0 calc(var(--dlg-gutter) + 88px),
+      transparent calc(var(--dlg-gutter) + 88px)
+    );
+  }
+
+  .dlg-head-title {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    padding: 26px var(--dlg-gutter);
+  }
+  .dlg-title {
+    font-family: var(--font-mono);
+    font-size: var(--text-h3);
+    line-height: 1.05;
+    text-transform: uppercase;
+    letter-spacing: -0.03em;
+    color: var(--color-ink);
+    outline: none;
+  }
+
+  .dlg-head-note {
+    flex: 0 0 clamp(280px, 26%, 400px);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 22px clamp(24px, 2.4vw, 40px);
+    background: var(--color-surface);
+    border-left: 1px solid var(--color-line);
+  }
+
+  /* Flush into the corner with a rule down its left edge, so it reads as the
+     last cell of the header rather than an icon parked in the padding. */
+  .dlg-close {
+    flex: 0 0 var(--dlg-close, 84px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: 0;
+    border-left: 1px solid var(--color-line);
+    background: #ffffff;
+    color: var(--color-muted);
+    transition:
+      background-color 200ms var(--ease-out-expo),
+      color 200ms var(--ease-out-expo);
+  }
+  .dlg-close:hover {
+    background: var(--color-brand-tint);
+    color: var(--color-brand);
+  }
+  .dlg-close:focus-visible {
+    outline: 2px solid var(--color-brand-bright);
+    outline-offset: -4px;
+  }
+  .dlg-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  .dlg-foot {
+    flex: 0 0 auto;
+    border-top: 1px solid var(--color-line);
+  }
+
+  /* A backdrop click on a dirty dialog does not close it — so it has to say
+     so, by pointing at the control that does. */
+  .dlg-close[data-nudge] {
+    animation: dlg-nudge 380ms var(--ease-in-out-strong);
+  }
+  @keyframes dlg-nudge {
+    0%,
+    100% {
+      translate: 0;
+    }
+    25% {
+      translate: -4px;
+    }
+    75% {
+      translate: 4px;
+    }
+  }
+
+  /* ── The full-screen sheet ──────────────────────────────────────
+     `dvh`, never `vh`: iOS Safari's collapsing toolbar makes `100vh` taller
+     than the screen, which buries the foot under the browser chrome. */
+  @media (max-width: 900px) {
+    .dlg {
+      --dlg-rise: 16px;
+      --dlg-close: 60px;
+      width: 100dvw;
+      height: 100dvh;
+      max-height: none;
+      box-shadow: none;
+    }
+    .dlg-head-title {
+      padding: 16px var(--dlg-gutter);
+    }
+    .dlg-title {
+      font-size: var(--text-subhead);
+    }
+    /* The promise is a desktop courtesy. On a sheet the head has one job:
+       say what this is and offer the way out. */
+    .dlg-head-note {
+      display: none;
+    }
+    .dlg-head::after {
+      background: linear-gradient(
+        90deg,
+        var(--color-brand) 0 calc(var(--dlg-gutter) + 40px),
+        transparent calc(var(--dlg-gutter) + 40px)
+      );
+    }
+    /* No dimmed layer behind something that covers the screen completely. */
+    .dlg::backdrop {
+      background: transparent;
+    }
+  }
+
+  /* ── The discard confirm ────────────────────────────────────────
+     In-panel, not `window.confirm()` — a browser confirm is unstyled, it
+     cannot say what is at stake, and on a phone it reads as an error. */
+  .dlg-guard {
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: color-mix(in srgb, #ffffff 82%, transparent);
+    -webkit-backdrop-filter: blur(3px);
+    backdrop-filter: blur(3px);
+  }
+  .dlg-guard[hidden] {
+    display: none;
+  }
+  .dlg-guard-card {
+    width: 100%;
+    max-width: 420px;
+    padding: 28px;
+    background: #ffffff;
+    border: 1px solid var(--color-line-strong);
+    border-radius: var(--radius-md);
+    box-shadow: 0 24px 60px -30px rgba(6, 10, 20, 0.45);
+  }
+  /* Square, like everything else that gets pressed inside this panel. */
+  .guard-btn {
+    border-radius: 0;
+    transition:
+      background-color 200ms var(--ease-out-expo),
+      color 200ms var(--ease-out-expo),
+      border-color 200ms var(--ease-out-expo);
+  }
+  .guard-keep {
+    background: var(--color-brand-bright);
+    color: #ffffff;
+  }
+  .guard-keep:hover {
+    background: var(--color-brand-hover);
+  }
+  .guard-discard {
+    border-top: 1px solid var(--color-line-strong);
+    border-bottom: 1px solid var(--color-line-strong);
+    color: var(--color-error);
+  }
+  .guard-discard:hover {
+    background: var(--color-surface);
+    border-color: var(--color-error);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .dlg {
+      --dlg-rise: 0px;
+    }
+    .dlg,
+    .dlg::backdrop {
+      transition-duration: 1ms;
+    }
+    .dlg-close[data-nudge] {
+      animation: none;
+    }
+  }
+</style>

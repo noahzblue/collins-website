@@ -1,0 +1,746 @@
+---
+/**
+ * /lab/quote — the quote form's preview harness. DEV ONLY. DELETE BEFORE LAUNCH.
+ *
+ * Not a mockup. Every block below is the real component with different props,
+ * against the real `categories.json` and the real tokens — so what gets signed
+ * off here is what ships. `collins-contact-v2.html` is the argument against the
+ * alternative: to render anything it hand-copied the catalogue into a JS array,
+ * and that copy had already drifted from the collection before anyone reviewed
+ * it (docs/site-expansion/14 §15.7).
+ *
+ * Settled on review 2026-08-22:
+ *   §14.3(a) underline fields, and no box around them or around the group.
+ *   §14.3(b) giant type with an inking rule for buy/hire.
+ * Everything below now belongs to one device — text with a rule under it — at
+ * four scales. Nothing is rounded: `rounded-full` on this site means a badge or
+ * a dot, and every control here is a thing you press.
+ *
+ * Still open, which is what this page is for now: which chip face, how the
+ * category picker behaves inside a dropdown, and whether the rating list is a
+ * list, a grid or a dropdown.
+ *
+ * Kept out of the index three ways, because a static build emits this HTML
+ * whether or not anything links to it: `noindex` below, the `/lab/` sitemap
+ * filter in astro.config.mjs, and the `import.meta.env.DEV` guard.
+ */
+import { getCollection } from "astro:content";
+import Base from "@/layouts/Base.astro";
+import Eyebrow from "@/components/ui/Eyebrow.astro";
+import Field from "@/components/ui/Field.astro";
+import Dropdown from "@/components/ui/Dropdown.astro";
+import ChipGroup from "@/components/ui/ChipGroup.astro";
+import ChoiceTile from "@/components/ui/ChoiceTile.astro";
+import RatingList from "@/components/quote/RatingList.astro";
+import QuoteForm from "@/components/quote/QuoteForm.astro";
+import Button from "@/components/ui/Button.astro";
+import {
+  CHANNELS,
+  CONDITIONS,
+  DURATIONS,
+  EMIRATES,
+  FIELD_COPY,
+  MODES,
+  TIMEFRAMES,
+  TRANSPORT,
+} from "@/lib/quote/options";
+
+const isDev = import.meta.env.DEV;
+
+const categories = await getCollection("equipment");
+const pick = (id: string) => {
+  const match = categories.find((category) => category.id === id);
+  if (!match) throw new Error(`/lab/quote: no equipment category "${id}"`);
+  return match;
+};
+
+const generators = pick("generators");
+const compressors = pick("air-compressors");
+const backhoes = pick("backhoe-loaders");
+const forklifts = pick("forklifts");
+
+/* The four chip faces, in the order they are argued for in ChipGroup.astro. */
+const CHIP_FACES = [
+  {
+    variant: "rule" as const,
+    title: "rule — the default",
+    note: "The buy/hire control at chip scale. Nothing fills; the rule is the whole signal, which is what stops a step carrying four groups from reading as a wall of boxes.",
+  },
+  {
+    variant: "bar" as const,
+    title: "bar — the Button outline lineage",
+    note: "Square, a rule above and below, brand-tint arriving on hover — the same move ui/Button.astro's outline variant makes, so a chip and a secondary button belong to one family.",
+  },
+  {
+    variant: "segment" as const,
+    title: "segment — one continuous strip",
+    note: "The mesh draws the hairlines, so the faces carry no border of their own and the chosen one fills. Best on a short closed set, where the options are alternatives to each other rather than a list.",
+  },
+  {
+    variant: "display" as const,
+    title: "display — buy / hire only",
+    note: "Settled for mode. Shown here at chip duty so you can see how far the family stretches: it is the same device as rule, three sizes up.",
+  },
+];
+
+const blocks = [
+  { n: "01", title: "Fields", ref: "underline — settled" },
+  { n: "02", title: "Buy / hire", ref: "giant underline — settled" },
+  { n: "03", title: "Chip faces", ref: "four — pick one" },
+  {
+    n: "04",
+    title: "Category picker",
+    ref: "tiles · rows · expanding · dropdown",
+  },
+  { n: "05", title: "Rating list", ref: "list · grid · dropdown" },
+  { n: "06", title: "The whole form", ref: "inline · and in the dialog" },
+];
+
+const label =
+  "mb-4 block font-mono text-tag tracking-[1.4px] text-faint uppercase";
+const note = "mb-5 max-w-[560px] text-note leading-relaxed text-muted";
+---
+
+<Base
+  title="Quote form — component preview (dev only)"
+  description="Dev-only preview harness for the quote request form's primitives."
+  noindex
+>
+  <div class="wrap pt-[150px] pb-[140px] max-mob:pt-[120px]">
+    <header class="max-w-[760px]">
+      <Eyebrow class="mb-4">Preview harness · dev only</Eyebrow>
+      <h1 class="text-h1 leading-[1.05]">Quote form primitives</h1>
+      <p class="mt-6 text-intro leading-relaxed text-muted">
+        Underline fields and the giant buy/hire control are settled, and
+        everything here now belongs to one device —
+        <strong class="font-normal text-ink">
+          text with a rule under it, at four scales
+        </strong>. Nothing is rounded and nothing is boxed.
+      </p>
+      {
+        isDev && (
+          <ul class="mt-8 flex flex-col gap-[6px] border-t border-line pt-6">
+            {blocks.map((block) => (
+              <li class="flex gap-4 text-note text-muted">
+                <span class="w-[24px] shrink-0 font-mono text-tag text-brand">
+                  {block.n}
+                </span>
+                <span class="w-[150px] shrink-0 text-ink">{block.title}</span>
+                <span class="text-faint">{block.ref}</span>
+              </li>
+            ))}
+          </ul>
+        )
+      }
+    </header>
+
+    {
+      !isDev ? (
+        <p class="mt-16 mb-0 text-lead text-muted">
+          This harness only renders in development.
+        </p>
+      ) : (
+        <>
+          {/* ── 01 · Fields ─────────────────────────────────────── */}
+          <section class="mt-24 border-t border-line-strong pt-12">
+            <div class="mb-10 flex items-baseline gap-5">
+              <span class="font-mono text-tag text-brand">01</span>
+              <div>
+                <h2 class="text-h3 leading-[1.1]">Fields</h2>
+                <p class="mt-3 mb-0 max-w-[620px] text-base text-muted">
+                  Underline, with no box around the field and none around the
+                  group. The dropdown is the same rule with a chevron on it — a
+                  native select's popup is drawn by the operating system and
+                  cannot be styled, so this one is a details element whose panel
+                  is ordinary markup. It pushes rather than floats, which is
+                  what keeps it from being clipped inside a scrolling dialog
+                  panel.
+                </p>
+              </div>
+            </div>
+
+            <form data-lab-form class="max-w-[560px]">
+              <div class="flex flex-col gap-8">
+                <Field
+                  instance="lab-fields"
+                  name="name"
+                  label={FIELD_COPY.name.label}
+                  placeholder={FIELD_COPY.name.placeholder}
+                  autocomplete="name"
+                  required
+                />
+                <Field
+                  instance="lab-fields"
+                  name="phone"
+                  label={FIELD_COPY.phone.label}
+                  type="tel"
+                  placeholder={FIELD_COPY.phone.placeholder}
+                  autocomplete="tel"
+                  required
+                />
+                <Field
+                  instance="lab-fields"
+                  name="email"
+                  label={FIELD_COPY.email.label}
+                  type="email"
+                  placeholder={FIELD_COPY.email.placeholder}
+                  error="Check the email address."
+                />
+                <Field
+                  instance="lab-fields"
+                  name="startDate"
+                  label={FIELD_COPY.startDate.label}
+                  type="date"
+                  hint={FIELD_COPY.startDate.hint}
+                />
+                <Field
+                  instance="lab-fields"
+                  name="quantity"
+                  label={FIELD_COPY.quantity.label}
+                  type="number"
+                  value="1"
+                  min="1"
+                />
+
+                <Dropdown
+                  instance="lab-fields"
+                  name="emirate"
+                  label={FIELD_COPY.emirate.label}
+                  placeholder="Pick an emirate"
+                >
+                  <div class="mesh grid grid-cols-1">
+                    {EMIRATES.map((option) => (
+                      <ChoiceTile
+                        instance="lab-fields-dd"
+                        name="emirate"
+                        layout="row"
+                        value={option.value}
+                        label={option.label}
+                      />
+                    ))}
+                  </div>
+                </Dropdown>
+
+                <Dropdown
+                  instance="lab-fields-open"
+                  name="transport"
+                  label={FIELD_COPY.transport.label}
+                  placeholder="Pick one"
+                  valueLabel="Deliver to site"
+                  open
+                  hint="Shown open, so the panel and the trigger can be judged together."
+                >
+                  <div class="mesh grid grid-cols-1">
+                    {TRANSPORT.map((option) => (
+                      <ChoiceTile
+                        instance="lab-fields-open-dd"
+                        name="transport"
+                        layout="row"
+                        value={option.value}
+                        label={option.label}
+                        checked={option.value === "deliver"}
+                      />
+                    ))}
+                  </div>
+                </Dropdown>
+
+                <Field
+                  instance="lab-fields"
+                  name="notes"
+                  label={FIELD_COPY.notes.label}
+                  element="textarea"
+                  placeholder={FIELD_COPY.notes.placeholder}
+                />
+              </div>
+            </form>
+          </section>
+
+          {/* ── 02 · Buy / hire ─────────────────────────────────── */}
+          <section class="mt-24 border-t border-line-strong pt-12">
+            <div class="mb-10 flex items-baseline gap-5">
+              <span class="font-mono text-tag text-brand">02</span>
+              <div>
+                <h2 class="text-h3 leading-[1.1]">Buy / hire</h2>
+                <p class="mt-3 mb-0 max-w-[620px] text-base text-muted">
+                  Settled. Below it, the same control at rule scale — the two
+                  are one device, which is the argument for the chip faces in
+                  block 03. One caveat worth knowing: §14.3(b) was written when
+                  the prototype had dropped "Not sure yet", so with three
+                  options restored it wraps to two lines below 600px.
+                </p>
+              </div>
+            </div>
+
+            <form data-lab-form class="flex flex-col gap-12">
+              <div>
+                <span class={label}>Giant — as it will ship</span>
+                <ChipGroup
+                  instance="lab-mode-display"
+                  name="mode"
+                  legend={FIELD_COPY.mode.label}
+                  options={MODES}
+                  variant="display"
+                  value="hire"
+                  required
+                />
+              </div>
+              <div>
+                <span class={label}>The same control at chip scale</span>
+                <ChipGroup
+                  instance="lab-mode-rule"
+                  name="mode-rule"
+                  legend={FIELD_COPY.mode.label}
+                  options={MODES}
+                  variant="rule"
+                  value="hire"
+                  required
+                />
+              </div>
+            </form>
+          </section>
+
+          {/* ── 03 · Chip faces ─────────────────────────────────── */}
+          <section class="mt-24 border-t border-line-strong pt-12">
+            <div class="mb-10 flex items-baseline gap-5">
+              <span class="font-mono text-tag text-brand">03</span>
+              <div>
+                <h2 class="text-h3 leading-[1.1]">Chip faces</h2>
+                <p class="mt-3 mb-0 max-w-[620px] text-base text-muted">
+                  The rounded chip is gone. Four square faces, each shown on a
+                  long list (six durations — the group most likely to wrap), a
+                  short one (three conditions, the closed set segment is built
+                  for) and one in its error state. Section 03 of the real form
+                  carries three of these at once, so what matters is how they
+                  read stacked, not one at a time.
+                </p>
+              </div>
+            </div>
+
+            <form data-lab-form class="flex flex-col gap-16">
+              {CHIP_FACES.map((face) => (
+                <div>
+                  <span class={label}>{face.title}</span>
+                  <p class={note}>{face.note}</p>
+                  <div class="flex flex-col gap-9">
+                    <ChipGroup
+                      instance={`lab-face-${face.variant}`}
+                      name={`duration-${face.variant}`}
+                      legend={FIELD_COPY.duration.label}
+                      options={DURATIONS}
+                      variant={face.variant}
+                      value="1-3-months"
+                      required
+                    />
+                    <ChipGroup
+                      instance={`lab-face-${face.variant}`}
+                      name={`condition-${face.variant}`}
+                      legend={FIELD_COPY.condition.label}
+                      options={CONDITIONS}
+                      variant={face.variant}
+                    />
+                    <ChipGroup
+                      instance={`lab-face-${face.variant}`}
+                      name={`emirate-${face.variant}`}
+                      legend={FIELD_COPY.emirate.label}
+                      options={EMIRATES}
+                      variant={face.variant}
+                      error="Where is it going?"
+                      required
+                    />
+                  </div>
+                </div>
+              ))}
+            </form>
+          </section>
+
+          {/* ── 04 · Category picker ────────────────────────────── */}
+          <section class="mt-24 border-t border-line-strong pt-12">
+            <div class="mb-10 flex items-baseline gap-5">
+              <span class="font-mono text-tag text-brand">04</span>
+              <div>
+                <h2 class="text-h3 leading-[1.1]">Category picker</h2>
+                <p class="mt-3 mb-0 max-w-[620px] text-base text-muted">
+                  Same component, four densities — the plan is to step down with
+                  the viewport rather than pick one. The expanding row is the
+                  new one: the list stays a scannable column of names, and the
+                  photo opens full-bleed under a row on hover as well as on
+                  selection, so the list can be browsed without committing. In a
+                  dropdown that matters, because a dropdown full of photos is a
+                  dropdown you cannot scan.
+                </p>
+              </div>
+            </div>
+
+            <form data-lab-form class="flex flex-col gap-16">
+              <div>
+                <span class={label}>Tiles, four across · 4:3 · from 980px</span>
+                <div class="mesh grid grid-cols-4 max-nav:grid-cols-3 max-cmp:grid-cols-2">
+                  <ChoiceTile
+                    instance="lab-tiles"
+                    name="category"
+                    value={generators.id}
+                    label={generators.data.name}
+                    meta={generators.data.rangeLabel}
+                    image={generators.data.heroImage}
+                  />
+                  <ChoiceTile
+                    instance="lab-tiles"
+                    name="category"
+                    value={forklifts.id}
+                    label={forklifts.data.name}
+                    meta={forklifts.data.rangeLabel}
+                    image={forklifts.data.heroImage}
+                    checked
+                  />
+                  <ChoiceTile
+                    instance="lab-tiles"
+                    name="category"
+                    value={compressors.id}
+                    label={compressors.data.name}
+                    meta={compressors.data.rangeLabel}
+                  />
+                  <ChoiceTile
+                    instance="lab-tiles"
+                    name="category"
+                    value="other"
+                    label="Something else"
+                    note="We source to spec"
+                    icon="plus"
+                    dashed
+                  />
+                </div>
+              </div>
+
+              <div>
+                <span class={label}>
+                  Tiles, three across · 16:9 · 600 to 980px
+                </span>
+                <div class="mesh grid grid-cols-3 max-cmp:grid-cols-2">
+                  {[generators, forklifts, backhoes].map((category) => (
+                    <ChoiceTile
+                      instance="lab-tiles-wide"
+                      name="category-wide"
+                      value={category.id}
+                      label={category.data.name}
+                      meta={category.data.rangeLabel}
+                      image={category.data.heroImage}
+                      ratio="16/9"
+                    />
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <span class={label}>Rows · under 600px · no photo</span>
+                <p class={note}>
+                  At ~160px wide a machine photo is decorative, not informative,
+                  and twelve of them is roughly 1.5 MB before the customer can
+                  begin. The rangeLabel is the real disambiguator, and it is
+                  text.
+                </p>
+                <div class="mesh grid max-w-[440px] grid-cols-1">
+                  {[generators, compressors].map((category) => (
+                    <ChoiceTile
+                      instance="lab-rows"
+                      name="category-row"
+                      layout="row"
+                      value={category.id}
+                      label={category.data.name}
+                      meta={category.data.rangeLabel}
+                    />
+                  ))}
+                  <ChoiceTile
+                    instance="lab-rows"
+                    name="category-row"
+                    layout="row"
+                    value="other"
+                    label="Something else"
+                    meta="We source to spec"
+                    icon="plus"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <span class={label}>
+                  Rows that open · the photo arrives on selection
+                </span>
+                <p class={note}>
+                  Air compressors is pre-selected so the open state is visible.
+                  Hover any other row and it opens too — hover is browsing,
+                  selection is committing, and both want the photo. The photos
+                  stay lazy, so a list nobody opens costs nothing.
+                </p>
+                <div class="mesh grid max-w-[440px] grid-cols-1">
+                  {[generators, compressors, forklifts].map((category) => (
+                    <ChoiceTile
+                      instance="lab-rows-expand"
+                      name="category-expand"
+                      layout="row"
+                      expand
+                      value={category.id}
+                      label={category.data.name}
+                      meta={category.data.rangeLabel}
+                      image={category.data.heroImage}
+                      ratio="16/9"
+                      checked={category.id === "air-compressors"}
+                    />
+                  ))}
+                  <ChoiceTile
+                    instance="lab-rows-expand"
+                    name="category-expand"
+                    layout="row"
+                    value="other"
+                    label="Something else"
+                    meta="We source to spec"
+                    icon="plus"
+                  />
+                </div>
+              </div>
+
+              <div class="max-w-[560px]">
+                <span class={label}>The same rows, inside a dropdown</span>
+                <Dropdown
+                  instance="lab-picker-dd"
+                  name="category"
+                  label={FIELD_COPY.category.label}
+                  placeholder="Pick a machine"
+                  open
+                  required
+                >
+                  <div class="mesh grid grid-cols-1">
+                    {[generators, compressors, backhoes].map((category) => (
+                      <ChoiceTile
+                        instance="lab-picker-dd"
+                        name="category-dd"
+                        layout="row"
+                        expand
+                        value={category.id}
+                        label={category.data.name}
+                        meta={category.data.rangeLabel}
+                        image={category.data.heroImage}
+                        ratio="16/9"
+                      />
+                    ))}
+                    <ChoiceTile
+                      instance="lab-picker-dd"
+                      name="category-dd"
+                      layout="row"
+                      value="other"
+                      label="Something else"
+                      meta="We source to spec"
+                      icon="plus"
+                    />
+                  </div>
+                </Dropdown>
+              </div>
+            </form>
+          </section>
+
+          {/* ── 05 · Rating list ────────────────────────────────── */}
+          <section class="mt-24 border-t border-line-strong pt-12">
+            <div class="mb-10 flex items-baseline gap-5">
+              <span class="font-mono text-tag text-brand">05</span>
+              <div>
+                <h2 class="text-h3 leading-[1.1]">Rating list</h2>
+                <p class="mt-3 mb-0 max-w-[620px] text-base text-muted">
+                  Three shapes at both extremes — twelve rows for generators,
+                  two for backhoe loaders. Power type and availability are mono
+                  caps with a dot now rather than rounded pills, which is also
+                  how the category pages already set the same field. Below 900px
+                  every list caps its height and scrolls at about four ratings,
+                  with "size it for me" pinned to the bottom of the scroller so
+                  it cannot scroll out of reach. The grid halves the height, and
+                  the price is the duty line clamping to two lines — that is the
+                  trade to weigh, because typicalDuty is what lets someone who
+                  does not know kVA pick 250.
+                </p>
+              </div>
+            </div>
+
+            <div class="flex flex-col gap-16">
+              <form data-lab-form>
+                <span class={label}>
+                  List · generators, 12 rows · hire · 250 kVA selected
+                </span>
+                <RatingList
+                  instance="lab-rating-list"
+                  ranges={generators.data.ranges}
+                  mode="hire"
+                  value="250-kva-diesel"
+                  required
+                />
+              </form>
+
+              <form data-lab-form>
+                <span class={label}>
+                  Grid · the same twelve · three rows tall instead of six
+                </span>
+                <RatingList
+                  instance="lab-rating-grid"
+                  name="rating-grid"
+                  ranges={generators.data.ranges}
+                  mode="hire"
+                  variant="grid"
+                  value="250-kva-diesel"
+                />
+              </form>
+
+              <form data-lab-form class="max-w-[560px]">
+                <span class={label}>Dropdown · the list, folded away</span>
+                <Dropdown
+                  instance="lab-rating-dd"
+                  name="rating"
+                  label={FIELD_COPY.rating.label}
+                  placeholder="Pick a size"
+                  valueLabel="250 kVA"
+                  required
+                >
+                  <RatingList
+                    instance="lab-rating-dd"
+                    name="rating-dd"
+                    ranges={generators.data.ranges}
+                    mode="hire"
+                    value="250-kva-diesel"
+                    scroll="always"
+                  />
+                </Dropdown>
+              </form>
+
+              <form data-lab-form>
+                <span class={label}>List · backhoe loaders, 2 rows · hire</span>
+                <RatingList
+                  instance="lab-rating-backhoe-list"
+                  name="rating-bh-list"
+                  ranges={backhoes.data.ranges}
+                  mode="hire"
+                />
+              </form>
+
+              <form data-lab-form>
+                <span class={label}>
+                  Grid · the same two · buy, so the vocabulary changes
+                </span>
+                <RatingList
+                  instance="lab-rating-backhoe-grid"
+                  name="rating-bh-grid"
+                  ranges={backhoes.data.ranges}
+                  mode="buy"
+                  variant="grid"
+                />
+              </form>
+
+              <form data-lab-form>
+                <span class={label}>
+                  Grid · air compressors, 7 rows · the odd-count row
+                </span>
+                <RatingList
+                  instance="lab-rating-compressors"
+                  name="rating-ac"
+                  ranges={compressors.data.ranges}
+                  mode="hire"
+                  variant="grid"
+                />
+              </form>
+            </div>
+          </section>
+
+          {/* ── 06 · The whole form ─────────────────────────────── */}
+          <section class="mt-24 border-t border-line-strong pt-12">
+            <div class="mb-10 flex items-baseline gap-5">
+              <span class="font-mono text-tag text-brand">06</span>
+              <div>
+                <h2 class="text-h3 leading-[1.1]">The whole form</h2>
+                <p class="mt-3 mb-0 max-w-[620px] text-base text-muted">
+                  All four sections, twice: inline below, and inside the global
+                  dialog behind the button. Both read the same twelve categories
+                  from the collection and both are the same components — the
+                  only difference is the instance prefix and the variant, and
+                  that difference is the point. This page is the
+                  two-instances-in-one-document case slice 7 is really about,
+                  arriving early: every id is generated, so they cannot collide,
+                  and each keeps its own draft.
+                </p>
+                <p class="mt-4 mb-0 max-w-[620px] text-base text-muted">
+                  Worth checking at three widths. The picker is photo tiles four
+                  across above 980px, three across at 16:9 between 980 and 600,
+                  and text rows grouped under five family headings below 600.
+                  The summary is a rail above 1240px, a slash-separated sticky
+                  bar between 1240 and 900, and below 900 it is gone — the four
+                  sections become four steps with a progress bar and a sticky
+                  footer instead.
+                </p>
+                <div class="mt-7 flex flex-wrap items-center gap-4">
+                  <Button data-quote-open size="lg" class="press">
+                    Open the dialog
+                  </Button>
+                  <span class="text-note text-muted">
+                    Escape, the backdrop and browser back all close it — try
+                    each after changing something.
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div class="border-y border-line-strong">
+              <QuoteForm instance="lab-inline" variant="inline" />
+            </div>
+          </section>
+
+          {/* ── Section 04's remaining groups ───────────────────── */}
+          <section class="mt-24 border-t border-line-strong pt-12">
+            <form data-lab-form class="flex flex-col gap-9">
+              <span class={label}>Section 04's remaining groups</span>
+              <ChipGroup
+                instance="lab-tail"
+                name="channel"
+                legend={FIELD_COPY.channel.label}
+                options={CHANNELS}
+                variant="segment"
+                value="whatsapp"
+              />
+              <ChipGroup
+                instance="lab-tail"
+                name="timeframe"
+                legend={FIELD_COPY.timeframe.label}
+                options={TIMEFRAMES}
+                hint="Budgeting only is a real answer — we quote either way."
+              />
+            </form>
+          </section>
+        </>
+      )
+    }
+  </div>
+</Base>
+
+<script>
+  import { untilPageSwap } from "@/scripts/untilPageSwap";
+  import { initQuoteForm } from "@/scripts/quote/form";
+
+  /**
+   * Each preview block is its own form so radio groups stay independent, and
+   * none of them has an action — Enter in a text field would otherwise reload
+   * the page.
+   *
+   * Block 06's form is a real one and gets the real script. `QuoteDialog`
+   * wires the dialog's copy; this wires the inline copy, which is the same
+   * call `/contact` will make in slice 7.
+   */
+  document.addEventListener("astro:page-load", () => {
+    for (const form of document.querySelectorAll<HTMLFormElement>(
+      "[data-lab-form]",
+    )) {
+      form.addEventListener("submit", (event) => event.preventDefault());
+    }
+
+    for (const root of document.querySelectorAll<HTMLElement>(
+      "[data-quote-root]",
+    )) {
+      // The dialog's own root is initialised by QuoteDialog — skip it here or
+      // it gets two sets of listeners.
+      if (root.closest("dialog")) continue;
+      initQuoteForm(root, { signal: untilPageSwap() });
+    }
+  });
+</script>

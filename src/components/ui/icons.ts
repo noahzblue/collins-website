@@ -65,6 +65,12 @@ export const icons = {
     mode: "stroke",
     body: `<path d="M12 5v14M5 12h14"/>`,
   },
+  /** Chevron pointing down — the dropdown trigger. Rotated 180° when open, so
+   *  it is one glyph and two states, the same trick `plus` uses. */
+  "chevron-down": {
+    mode: "stroke",
+    body: `<path d="m6 9 6 6 6-6"/>`,
+  },
   /** Medal / award — top brands. */
   award: {
     mode: "stroke",
@@ -89,6 +95,11 @@ export const icons = {
   refresh: {
     mode: "stroke",
     body: `<path d="M21 12a9 9 0 0 0-9-9 9.8 9.8 0 0 0-6.7 2.7L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.8 9.8 0 0 0 6.7-2.7L21 16"/><path d="M16 16h5v5"/>`,
+  },
+  /** Cross — closes an overlay. The counterpart to `menu`. */
+  close: {
+    mode: "stroke",
+    body: `<path d="M6 6l12 12M18 6 6 18"/>`,
   },
   /** Hamburger — the mobile nav toggle. */
   menu: {

@@ -1,0 +1,134 @@
+---
+/**
+ * "Which machine" — the twelve categories plus the one that is not a machine.
+ *
+ *   <CategoryPicker instance={id} categories={categories} />
+ *
+ * **One set of radios, three densities.** Photo tiles four across at 980px and
+ * up, three across at 16:9 between 600 and 980, and text rows below 600 —
+ * stepped down entirely in CSS, because two copies of the markup would be two
+ * radios sharing one `name` and the second would silently win
+ * (docs/site-expansion/14 §5).
+ *
+ * What replaces the photo on a phone is not nothing: it is the `rangeLabel`
+ * ("10 kVA to 1,250 kVA, diesel"). At ~160px wide a machine photo is
+ * decorative rather than informative, and twelve of them is roughly 1.5 MB and
+ * four screens of scroll before the customer can begin — while the range is
+ * the actual disambiguator between a generator and a compressor, and it is
+ * text.
+ *
+ * **The family headings are the mobile list's structure and nothing else.**
+ * Twelve rows under five headings is about 750px — under two phone screens,
+ * everything reachable by scroll. Deliberately not an accordion: an accordion
+ * hides the thing the customer is looking for and charges them a tap to find
+ * out it was not there. Above 600px the headings are simply not displayed, and
+ * the tiles close up into a grid.
+ *
+ * The grouping runs at every width even though only the phone shows it, so the
+ * tile grid reads in catalogue order too — one order, not a second one that
+ * has to be kept in step.
+ *
+ * Data comes in as props. This component never calls `getCollection`, which is
+ * what lets the same picker render inside the dialog and inline on `/contact`
+ * with no branching (docs 14 §15.3b).
+ */
+import ChoiceTile from "@/components/ui/ChoiceTile.astro";
+import { groupByFamily } from "@/lib/equipment";
+import { scopedId } from "@/lib/forms";
+import { FIELD_COPY, OTHER_TILE } from "@/lib/quote/options";
+import { OTHER_CATEGORY, type QuoteCategory } from "@/lib/quote/schema";
+
+interface Props {
+  /** Per-instance id prefix — two forms on one page must not collide. */
+  instance: string;
+  /** The twelve, in catalogue order. Shaped by the composition layer. */
+  categories: QuoteCategory[];
+  /** The radio group's `name`. */
+  name?: string;
+  /** The selected category id, or `OTHER_CATEGORY`. */
+  value?: string | null;
+  legend?: string;
+  required?: boolean;
+  class?: string;
+}
+
+const {
+  instance,
+  categories,
+  name = "category",
+  value = null,
+  legend = FIELD_COPY.category.label,
+  required = false,
+  class: extra = "",
+} = Astro.props;
+
+const groups = groupByFamily(categories);
+const legendId = scopedId(instance, name, "legend");
+
+/* A family heading is a cell of the same lattice, so it sits on the hairline
+   above its rows rather than floating between two grids. */
+const heading =
+  "col-span-full hidden bg-surface px-5 py-[10px] font-mono text-tag font-medium tracking-[1.4px] text-faint uppercase max-cmp:block";
+---
+
+<fieldset class:list={["min-w-0 border-0 p-0", extra]} data-category-picker>
+  <legend id={legendId} class="mb-[10px] p-0 text-caption text-faint">
+    {legend}{required && " *"}
+  </legend>
+
+  <div
+    role="radiogroup"
+    aria-labelledby={legendId}
+    aria-required={required ? "true" : undefined}
+    class="mesh grid grid-cols-4 max-nav:grid-cols-3 max-cmp:grid-cols-1"
+  >
+    {
+      groups.map((group) => (
+        <>
+          <p class={heading}>{group.family}</p>
+          {group.items.map((category) => (
+            <ChoiceTile
+              instance={instance}
+              name={name}
+              layout="responsive"
+              ratio="step"
+              value={category.id}
+              label={category.name}
+              meta={category.rangeLabel}
+              image={category.heroImage}
+              checked={category.id === value}
+              required={required}
+            />
+          ))}
+        </>
+      ))
+    }
+
+    {
+      /* Last, and drawn as an escape rather than a machine: no photo, a dashed
+        outline and a `+`. It is a service, not an error state — see §10a. */
+    }
+    <ChoiceTile
+      instance={instance}
+      name={name}
+      layout="responsive"
+      ratio="step"
+      value={OTHER_CATEGORY}
+      label={OTHER_TILE.label}
+      meta={OTHER_TILE.note}
+      icon="plus"
+      dashed
+      checked={value === OTHER_CATEGORY}
+      required={required}
+    />
+  </div>
+
+  {/* Always rendered, filled at runtime — see ui/Field.astro for why. */}
+  <p
+    id={`${legendId}-error`}
+    data-error-for={name}
+    hidden
+    class="mt-[10px] mb-0 text-caption text-error"
+  >
+  </p>
+</fieldset>

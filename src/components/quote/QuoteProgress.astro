@@ -1,0 +1,88 @@
+---
+/**
+ * The mobile step bar: `01 / 04`, the step's name, and a fill.
+ *
+ * This is the whole argument for paginating below 900px. The same questions
+ * are asked either way — what changes is whether the customer can see how much
+ * is left. Four labelled steps with a bar complete better than one long
+ * scroll, because the end is visible from the start
+ * (docs/site-expansion/14 §1).
+ *
+ * Sticky at the top of the panel's own scroll area rather than in the dialog's
+ * fixed head, so the inline variant on /contact gets the same behaviour with
+ * no second arrangement — it only has to clear the site header, which is what
+ * `--q-sticky-top` carries.
+ */
+interface Props {
+  /** Per-instance id prefix — two forms on one page must not collide. */
+  instance: string;
+  class?: string;
+}
+
+const { instance, class: extra = "" } = Astro.props;
+---
+
+<div
+  class:list={["q-progress", extra]}
+  data-quote-progress
+  id={`${instance}-progress`}
+>
+  <div class="flex items-baseline gap-4">
+    <span class="q-progress-count" data-progress-count></span>
+    <span class="q-progress-title" data-progress-title></span>
+  </div>
+  <div class="q-progress-track" aria-hidden="true">
+    <span class="q-progress-fill" data-progress-fill></span>
+  </div>
+</div>
+
+<style>
+  /* Only a phone paginates, so only a phone gets a step bar. */
+  .q-progress {
+    display: none;
+  }
+
+  @media (max-width: 900px) {
+    .q-progress {
+      display: block;
+      position: sticky;
+      top: var(--q-sticky-top, 0px);
+      z-index: 6;
+      padding: 12px var(--dlg-gutter, 20px) 0;
+      background: #ffffff;
+    }
+    .q-progress-count {
+      font-family: var(--font-mono);
+      font-size: var(--text-tag);
+      font-weight: 500;
+      letter-spacing: 1.2px;
+      color: var(--color-brand);
+    }
+    .q-progress-title {
+      font-family: var(--font-mono);
+      font-size: var(--text-tag);
+      font-weight: 500;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: var(--color-faint);
+    }
+    .q-progress-track {
+      margin-top: 10px;
+      height: 2px;
+      background: var(--color-line);
+    }
+    .q-progress-fill {
+      display: block;
+      height: 100%;
+      width: calc(var(--t, 0) * 100%);
+      background: var(--color-brand);
+      transition: width 420ms var(--ease-out-expo);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .q-progress-fill {
+      transition-duration: 1ms;
+    }
+  }
+</style>

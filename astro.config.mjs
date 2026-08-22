@@ -19,7 +19,12 @@ export default defineConfig({
   prefetch: { prefetchAll: true, defaultStrategy: "viewport" },
 
   // 30+ pages after the site expansion — a sitemap stops being optional.
-  integrations: [sitemap()],
+  // `/lab/` is the dev-only component preview harness
+  // (docs/site-expansion/14 §15.7). The build is static, so those routes emit
+  // HTML whether or not anything links to them — the filter here and the
+  // `noindex` prop on Base.astro are what keep them out of the index. Both go
+  // when the harness is deleted before launch (see todo.md).
+  integrations: [sitemap({ filter: (page) => !page.includes("/lab/") })],
 
   vite: {
     plugins: [tailwindcss()],

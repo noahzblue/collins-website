@@ -16,6 +16,7 @@ import {
   AVAILABILITY_LABEL,
   AVAILABILITY_TONE,
   enquireHref,
+  quoteTrigger,
   type Mode,
 } from "@/lib/equipment";
 
@@ -25,10 +26,13 @@ interface Props {
   ranges: Ranges;
   /** Category name — words the enquiry message ("a 250 kVA generator"). */
   name: string;
+  /** Category id. Lets a row open the quote form on this exact size; omit it
+   *  and the row falls back to the WhatsApp enquiry alone (docs 14 §9a). */
+  categoryId?: string;
   mode?: Mode;
 }
 
-const { ranges, name, mode = "hire" } = Astro.props;
+const { ranges, name, categoryId, mode = "hire" } = Astro.props;
 
 /* Columns only appear when the data fills them — crawler cranes and
    compressors carry no power type, so that column would sit empty. */
@@ -109,10 +113,14 @@ const td = "px-6 py-[17px] align-middle max-cmp:p-0 max-xs:px-5";
             <td
               class={`${td} text-right whitespace-nowrap max-cmp:mt-[14px] max-cmp:ml-5 max-cmp:inline-flex`}
             >
+              {/* The machine, the size and buy-or-hire, all three answered
+                  by one click. WhatsApp stays as the `href` for anyone whose
+                  script never ran. */}
               <a
                 href={enquireHref(name, mode, range.label)}
                 target="_blank"
                 rel="noopener"
+                {...(categoryId ? quoteTrigger(categoryId, mode, range) : {})}
                 class="group inline-flex items-center gap-[5px] text-note font-medium text-brand transition-colors hover:text-brand-hover"
               >
                 Enquire

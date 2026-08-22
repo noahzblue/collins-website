@@ -39,6 +39,7 @@
   --color-surface-2: #eef1f5; /* second-step off-white */
 
   /* Support */
+  --color-error: #b42318; /* form errors — the only red on the site */
   --color-navy: #081459; /* deep navy — wordmark sub, signature */
   --color-whatsapp: #25d366; /* WhatsApp green */
   --color-scrim: #060a14; /* cool black behind photo overlays */
@@ -285,6 +286,50 @@
     background: #ffffff;
     border: 1px solid var(--color-line);
     border-radius: var(--radius-md);
+  }
+
+  /* Hairline mesh: a dense selection grid drawn as one continuous 1px
+     lattice rather than a set of floating cards. Cells butt against each other
+     on a shared hairline, which is what makes the grid read as a spec sheet
+     rather than a set of floating cards.
+
+     A deliberate alternative to `.card`, not a variant of it: dense selection
+     grids (the quote form's category picker and rating list) get the mesh,
+     standalone panels get the card, and the two are never mixed inside one
+     step. See docs/site-expansion/14 §14.1a.
+
+     Column count is the caller's — `.mesh` only owns the lattice:
+       <div class="mesh grid grid-cols-2 max-mob:grid-cols-1">
+
+     The rule is drawn per cell with an `outline`, not by a line-coloured
+     container showing through the `gap`. Both look identical when the grid is
+     full, and only this one survives a grid that isn't: an unfilled cell area
+     has nothing to draw an outline, so it stays white instead of painting a
+     grey block. That matters because almost nothing here divides evenly — the
+     picker is thirteen tiles across four, three and two columns, and seven of
+     the twelve categories have an odd number of ranges. Counting items and
+     padding the last row per breakpoint is a rule callers would have to
+     remember at every call site, which is the kind of rule that gets
+     forgotten.
+
+     An outline also costs no layout, so it cannot push the lattice out of
+     true — and a cell that takes the outline over for its focus ring still
+     sits inside its neighbours' rules, so the lattice holds. */
+  .mesh {
+    gap: 1px;
+    background: #ffffff;
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-sm);
+    /* `clip`, not `hidden` — a hidden box is a scroll container, which breaks
+       any scroll-driven animation inside it (see ui/ParallaxImage.astro). */
+    overflow: clip;
+  }
+  .mesh > * {
+    background: #ffffff;
+    /* 1px into the 1px gap from either side — the two overlap exactly, so a
+       shared edge reads as one hairline, and the outer edges are clipped by
+       the container's own border. */
+    outline: 1px solid var(--color-line);
   }
 
   /* ---- On-scroll entrance ------------------------------------

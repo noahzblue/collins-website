@@ -1,0 +1,344 @@
+---
+/**
+ * One category's sizes as a radio group — section 02 of the quote form.
+ *
+ * The same 68 ranges `equipment/RangeTable.astro` renders, but with a radio
+ * input per row where the table has an enquiry link. Different control, same
+ * data: folding both into one component behind a `control` prop would produce
+ * a component with two personalities, so the derived logic is shared through
+ * `lib/equipment.ts` and the markup is not (docs/site-expansion/14 §15.5).
+ *
+ * Sized against the real catalogue, which is why both extremes matter: twelve
+ * rows for generators, two for backhoe loaders. Median is six, so this list
+ * needs no search, no filter and no virtualisation — generators are the
+ * outlier, not the norm (docs 14 §The numbers).
+ *
+ * Two shapes, because the right one depends on how much room section 02 gets:
+ *
+ *   list  two columns of full-width rows, duty on a second line. The default,
+ *         and the only one that shows every duty line in full.
+ *   grid  four across, the size ladder as a block of cells. Twelve ratings
+ *         become three rows instead of six, which is the difference between
+ *         scrolling section 02 and seeing all of it — but the duty line clamps
+ *         to two lines. `typicalDuty` is the most valuable text in this form:
+ *         "Tower crane plus offices, no mains supply" is what lets a site
+ *         manager who does not know kVA pick 250. Clamping it is a real cost,
+ *         not a formatting detail.
+ *
+ * Availability speaks the vocabulary the customer's mode implies. Asking buy
+ * or hire first is what makes that possible, and it is the whole reason the
+ * question moved to the front (docs 14 §3).
+ *
+ * Power type and availability are set as mono caps with a dot, not as `Pill`.
+ * Docs 14 §14.2 said keep the rounded pill so the form would not grow a
+ * private variant of a site-wide badge — but the rounded chip is gone from
+ * this form entirely (review 2026-08-22), and a lone rounded badge inside a
+ * square lattice is exactly the mismatch that rule was written to prevent.
+ * This is not an invention either: `equipment/RangeTable.astro` already reads
+ * the same field as a dot plus a label on the category pages, so the two
+ * renderings of these 68 ranges agree rather than diverge.
+ *
+ * On a phone the list caps its height and scrolls — four or five ratings
+ * visible, the rest a thumb away, instead of twelve rows of section 02 pushing
+ * everything else off the screen. The escape row is `sticky` inside that
+ * scroller, so "size it for me" cannot scroll out of reach.
+ *
+ * Not here yet: the duty textarea that "Not sure — size it for me" opens, and
+ * the `dutyGuide` accordion beneath the list. Both are behaviour, and behaviour
+ * arrives with step 02 (docs 14 §15.7 slice 3).
+ */
+import { scopedId } from "@/lib/forms";
+import {
+  AVAILABILITY_LABEL,
+  AVAILABILITY_TONE,
+  rangeKey,
+} from "@/lib/equipment";
+import { FIELD_COPY, RATING_UNSURE } from "@/lib/quote/options";
+import {
+  availabilityMode,
+  type QuoteMode,
+  type QuoteRange,
+} from "@/lib/quote/schema";
+
+interface Props {
+  ranges: QuoteRange[];
+  /**
+   * Which availability vocabulary to speak. `auto` renders both and lets an
+   * ancestor `[data-mode]` choose in CSS — which is what the live form needs,
+   * because mode is answered after this list is rendered. A fixed mode is for
+   * a caller that already knows (the preview harness, a category page).
+   */
+  mode?: QuoteMode | "auto" | null;
+  /** Per-instance id prefix — two forms on one page must not collide. */
+  instance: string;
+  /** list = two columns of rows · grid = four across, compact. */
+  variant?: "list" | "grid";
+  /** Where the list caps its height and scrolls. */
+  scroll?: "mobile" | "always" | "never";
+  /** The radio group's `name`. */
+  name?: string;
+  /** Accessible name for the group. The visible heading is section 02's. */
+  legend?: string;
+  /** `rangeKey()` of the range to pre-select, or `RATING_UNSURE.value`. */
+  value?: string | null;
+  required?: boolean;
+  class?: string;
+}
+
+const {
+  ranges,
+  mode = "auto",
+  instance,
+  variant = "list",
+  scroll = "mobile",
+  name = "rating",
+  legend = FIELD_COPY.rating.label,
+  value = null,
+  required = false,
+  class: extra = "",
+} = Astro.props;
+
+/* One entry for a known mode, two for `auto` — the second is hidden until an
+   ancestor says the customer is buying. Rendering both is what keeps the 68
+   rows server-rendered while their vocabulary stays a runtime answer. */
+const vocabulary = (availability: QuoteRange["availability"]) =>
+  mode === "auto"
+    ? [
+        {
+          cls: "avail avail-hire",
+          text: AVAILABILITY_LABEL.hire[availability],
+        },
+        { cls: "avail avail-buy", text: AVAILABILITY_LABEL.buy[availability] },
+      ]
+    : [
+        {
+          cls: "",
+          text: AVAILABILITY_LABEL[availabilityMode(mode)][availability],
+        },
+      ];
+
+const columns: Record<NonNullable<Props["variant"]>, string> = {
+  list: "grid-cols-2 max-mob:grid-cols-1",
+  grid: "grid-cols-4 max-nav:grid-cols-3 max-mob:grid-cols-2 max-xs:grid-cols-1",
+};
+
+const cells: Record<NonNullable<Props["variant"]>, string> = {
+  list: "flex flex-col px-5 py-[14px]",
+  grid: "flex flex-col px-4 py-[14px]",
+};
+
+const mark =
+  "mark block h-[16px] w-[16px] shrink-0 rounded-full border border-line-strong bg-white";
+
+/* The structural layer: mono, tracked caps. Same vocabulary the index rail and
+   the table heads use, so a spec reads as a spec. */
+const meta = "font-mono text-tag font-medium tracking-[0.9px] uppercase";
+
+/* Capped height, so twelve ratings do not push the rest of the step off a
+   phone. `never` is for a list that already sits in something that scrolls. */
+const scrolls: Record<NonNullable<Props["scroll"]>, string> = {
+  mobile: "max-mob:max-h-[var(--rating-max)] max-mob:overflow-y-auto",
+  always: "max-h-[var(--rating-max)] overflow-y-auto",
+  never: "",
+};
+---
+
+<div
+  class:list={["mesh grid", columns[variant], scrolls[scroll], extra]}
+  role="radiogroup"
+  data-lenis-prevent
+  aria-label={legend}
+  aria-required={required ? "true" : undefined}
+  data-rating-list
+  data-variant={variant}
+>
+  {
+    ranges.map((range) => {
+      /* Keyed on the range, not on its label — "3 ton" appears twice in the
+         forklift list and only the power type tells them apart. */
+      const key = rangeKey(range);
+      const id = scopedId(instance, name, key);
+      return (
+        <label
+          class:list={["rating", cells[variant]]}
+          for={id}
+          data-rating-row={key}
+        >
+          <input
+            type="radio"
+            class="sr-only"
+            id={id}
+            name={name}
+            value={key}
+            checked={key === value}
+            required={required}
+          />
+
+          <span class="flex items-center gap-[10px]">
+            <span class={mark} />
+            <span class="text-cell font-medium text-ink">{range.label}</span>
+            {variant === "list" && range.powerType && (
+              <span class={`${meta} text-faint`}>{range.powerType}</span>
+            )}
+            {variant === "list" && (
+              <span
+                class={`${meta} ml-auto flex shrink-0 items-center gap-[7px] text-body`}
+              >
+                <span
+                  class:list={[
+                    "h-[6px] w-[6px] rounded-full",
+                    AVAILABILITY_TONE[range.availability],
+                  ]}
+                />
+                {vocabulary(range.availability).map((word) => (
+                  <span class={word.cls}>{word.text}</span>
+                ))}
+              </span>
+            )}
+          </span>
+
+          {variant === "grid" && (
+            <span
+              class={`${meta} mt-[7px] flex flex-wrap items-center gap-x-[10px] gap-y-[3px] pl-[26px] text-body`}
+            >
+              <span class="flex items-center gap-[7px]">
+                <span
+                  class:list={[
+                    "h-[6px] w-[6px] rounded-full",
+                    AVAILABILITY_TONE[range.availability],
+                  ]}
+                />
+                {vocabulary(range.availability).map((word) => (
+                  <span class={word.cls}>{word.text}</span>
+                ))}
+              </span>
+              {range.powerType && (
+                <span class="text-faint">{range.powerType}</span>
+              )}
+            </span>
+          )}
+
+          {range.typicalDuty && (
+            <span
+              class:list={[
+                "mt-[6px] pl-[26px] text-note leading-snug text-muted",
+                variant === "grid" && "line-clamp-2",
+              ]}
+            >
+              {range.typicalDuty}
+            </span>
+          )}
+        </label>
+      );
+    })
+  }
+
+  {
+    /* The escape. The prototype had this row and nothing happened when you
+       picked it, which broke the form's own promise (docs 14 §10b).
+       `col-span-full` rather than a number, so it closes the row whatever the
+       variant's column count is. */
+  }
+  <label
+    class:list={["rating rating-unsure col-span-full", cells[variant]]}
+    for={scopedId(instance, name, RATING_UNSURE.value)}
+    data-rating-row={RATING_UNSURE.value}
+  >
+    <input
+      type="radio"
+      class="sr-only"
+      id={scopedId(instance, name, RATING_UNSURE.value)}
+      name={name}
+      value={RATING_UNSURE.value}
+      checked={RATING_UNSURE.value === value}
+      required={required}
+    />
+    <span class="flex items-center gap-[10px]">
+      <span class={mark}></span>
+      <span class="text-cell font-medium text-ink">{RATING_UNSURE.label}</span>
+    </span>
+    {
+      RATING_UNSURE.hint && (
+        <span class="mt-[6px] pl-[26px] text-note leading-snug text-muted">
+          {RATING_UNSURE.hint}
+        </span>
+      )
+    }
+  </label>
+</div>
+
+<style>
+  /* Hire is the default reading — it states where the machine physically is,
+     which is true either way. Buy's "Ready stock / Short lead" is sales
+     language addressed to someone who has already decided (docs 14 §schema). */
+  .avail-buy {
+    display: none;
+  }
+  :global([data-mode="buy"]) .avail-hire {
+    display: none;
+  }
+  :global([data-mode="buy"]) .avail-buy {
+    display: inline;
+  }
+
+  .rating {
+    cursor: pointer;
+    transition: background-color 160ms var(--ease-out-expo);
+  }
+  .rating:hover {
+    background: var(--color-surface);
+  }
+  .rating:hover .mark {
+    border-color: var(--color-ink);
+  }
+
+  .rating:has(input:checked) {
+    background: var(--color-brand-tint);
+    /* Inset, not a border: a border would move the cell a pixel and pull the
+       whole mesh out of true. */
+    box-shadow: inset 0 0 0 1px var(--color-brand);
+    position: relative;
+    z-index: 1;
+  }
+  .rating:has(input:checked) .mark {
+    border-color: var(--color-brand);
+    background: var(--color-brand);
+    box-shadow: inset 0 0 0 3px #ffffff;
+  }
+
+  .rating:has(input:focus-visible) {
+    outline: 2px solid var(--color-brand-bright);
+    outline-offset: -2px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Roughly three and a half rows before it scrolls. The half is deliberate —
+     a cut-off row is the clearest possible "there is more below", and a cap
+     that happened to land on a whole row would read as the end of the list. */
+  [data-rating-list] {
+    --rating-max: 340px;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+  }
+
+  /* The escape reads as an option, not as another size — quieter ground, and
+     it sits under a full-width rule rather than beside a rating.
+
+     `sticky` pins it to the bottom of the scroller so it cannot scroll out of
+     reach; where nothing scrolls it is inert. Doubled class because
+     `.rating:has(input:checked)` sets `position: relative` and would otherwise
+     win on specificity the moment it is the chosen answer. */
+  .rating.rating-unsure {
+    position: sticky;
+    bottom: 0;
+    z-index: 2;
+    background: var(--color-surface);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .rating {
+      transition-duration: 1ms;
+    }
+  }
+</style>

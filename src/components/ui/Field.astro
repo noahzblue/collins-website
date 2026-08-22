@@ -1,0 +1,178 @@
+---
+/**
+ * A labelled form control: label, control, hint, error.
+ *
+ *   <Field instance={id} name="phone" label="Phone" type="tel" required />
+ *   <Field instance={id} name="notes" label="Anything else" element="textarea" />
+ *   <Field instance={id} name="family" label="Closest to"
+ *          element="select" options={families} placeholder="Pick one" />
+ *
+ * It renders the control rather than taking it as a slot, so the id, the
+ * label's `for`, `aria-describedby` and `aria-invalid` are wired from one
+ * place. Hardcoded ids are how the prototype guaranteed a collision the moment
+ * a second instance existed (docs/site-expansion/14 §2), and the fix only
+ * holds if a caller cannot forget to apply it.
+ *
+ * Underline, not boxed — docs 14 §14.3(a), settled on review 2026-08-22. The
+ * boxed variant is gone rather than kept behind a prop: this form is the whole
+ * subject of its surface, so there is no second field style on the site to
+ * support. The consequence the doc names is real and still outstanding —
+ * `/contact`'s inline mount uses this component, so `.q-field` retires with it
+ * (slice 7).
+ *
+ * No box around the field, and none around the group either: the rule under
+ * the text is the whole affordance, and a bordered container only repeats a
+ * boundary the underline has already drawn.
+ *
+ * `element` picks the tag, and is deliberately not called `as`: a prop named
+ * `as` becomes a destructuring binding named `as`, which silently severs
+ * `interface Props` from `Astro.props`. Everything then degrades to `any` and
+ * the only trace is a `ts(6196) 'Props' is declared but never used` hint. Same
+ * failure mode as an unclosed tag in a frontmatter comment, different trigger.
+ *
+ * Anything else (`min`, `max`, `autocomplete`, `inputmode`, `data-*`) passes
+ * straight through to the control.
+ */
+import type { Option } from "@/lib/forms";
+import { scopedId } from "@/lib/forms";
+
+interface Props {
+  /** The control's `name`, and half of its generated id. */
+  name: string;
+  /** Per-instance id prefix — two forms on one page must not collide. */
+  instance: string;
+  label: string;
+  element?: "input" | "textarea" | "select";
+  /** `type` when `as="input"`. Listed rather than left open: these are the
+   *  five the form uses, and a typo in a sixth would silently render a text
+   *  box. `number` for the quantity, not the prototype's unvalidated `text`. */
+  type?: "text" | "tel" | "email" | "date" | "number";
+  value?: string;
+  placeholder?: string;
+  /** Supporting line under the control. Announced with the control. */
+  hint?: string;
+  /** Error message. Its presence is what puts the field in its error state. */
+  error?: string;
+  required?: boolean;
+  /** `as="select"` only. `placeholder` becomes the empty first entry. */
+  options?: Option[];
+  rows?: number;
+  class?: string;
+  [key: string]: unknown;
+}
+
+const {
+  name,
+  instance,
+  label,
+  element = "input",
+  type = "text",
+  value,
+  placeholder,
+  hint,
+  error,
+  required = false,
+  options = [],
+  rows = 3,
+  class: extra = "",
+  ...rest
+} = Astro.props;
+
+const id = scopedId(instance, name);
+const hintId = hint ? `${id}-hint` : undefined;
+/* Always rendered, even when empty. Validation happens at runtime, and a slot
+   that exists from the start is one the script fills rather than builds — so
+   the id and the `aria-describedby` wiring cannot drift from it. */
+const errorId = `${id}-error`;
+const describedBy = [hintId, errorId].filter(Boolean).join(" ");
+
+const control = [
+  "ctl w-full rounded-none border-0 border-b border-line-strong bg-transparent px-0 py-[14px] font-sans text-intro text-ink transition-colors placeholder:text-faint",
+  error && "ctl-error",
+  element === "textarea" && "resize-y",
+].filter(Boolean);
+
+const shared = {
+  id,
+  name,
+  required,
+  "aria-invalid": error ? ("true" as const) : undefined,
+  "aria-describedby": describedBy,
+  "data-field": name,
+  ...rest,
+};
+---
+
+<div class:list={["flex flex-col", extra]}>
+  <label for={id} class="mb-[6px] text-caption text-faint">
+    {label}{required && " *"}
+  </label>
+
+  {
+    element === "textarea" ? (
+      <textarea
+        class:list={control}
+        rows={rows}
+        placeholder={placeholder}
+        set:text={value ?? ""}
+        {...shared}
+      />
+    ) : element === "select" ? (
+      <select class:list={control} {...shared}>
+        {placeholder && <option value="">{placeholder}</option>}
+        {options.map((option) => (
+          <option value={option.value} selected={option.value === value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
+    ) : (
+      <input
+        class:list={control}
+        type={type}
+        value={value}
+        placeholder={placeholder}
+        {...shared}
+      />
+    )
+  }
+
+  {
+    hint && (
+      <p id={hintId} class="mt-[6px] mb-0 text-caption text-faint">
+        {hint}
+      </p>
+    )
+  }
+  <p
+    id={errorId}
+    data-error-for={name}
+    hidden={!error}
+    class="mt-[6px] mb-0 text-caption text-error"
+  >
+    {error}
+  </p>
+</div>
+
+<style>
+  /* The global `:focus-visible` outline is a box, which is the wrong shape for
+     a field whose only edge is the rule beneath it — so it is replaced with a
+     focus treatment of the same shape rather than dropped. */
+  .ctl:focus {
+    outline: none;
+    border-color: var(--color-brand-bright);
+    /* Thickens the rule without the 1px layout shift a border change causes. */
+    box-shadow: 0 1px 0 0 var(--color-brand-bright);
+  }
+  .ctl-error,
+  .ctl-error:focus {
+    border-color: var(--color-error);
+    box-shadow: none;
+  }
+
+  /* An unanswered select shows its prompt in placeholder grey, like every
+     other empty control — `:invalid` would only cover the required ones. */
+  select.ctl:has(option[value=""]:checked) {
+    color: var(--color-faint);
+  }
+</style>

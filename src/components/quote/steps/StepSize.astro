@@ -1,0 +1,209 @@
+---
+/**
+ * Section 02 — what size.
+ *
+ * Three shapes, one section, because the answer to section 01 decides which
+ * one applies:
+ *
+ *   nothing picked   a line saying what unlocks it. An empty panel reads as
+ *                    broken; this does not.
+ *   a machine        that category's ratings, the duty escape, quantity, and
+ *                    attachments where the machine takes them.
+ *   something else   the ratings are **replaced** — there is no size ladder
+ *                    for a machine we have not been told about yet — by "what
+ *                    do you need?" and an optional family, to route it
+ *                    (docs/site-expansion/14 §10a).
+ *
+ * **Every category's ratings are rendered, and eleven are hidden.** All 68
+ * rows server-side is about 25KB and it means section 02 still works if the
+ * script never runs, which a client-built list cannot claim (§13). If that
+ * weight ever matters, the escape hatch is the JSON catalogue this step
+ * already emits for the summary — but do not reach for it first.
+ *
+ * `typicalDuty` is the most valuable text in this form. "Tower crane plus
+ * offices, no mains supply" is what lets a site manager who does not know kVA
+ * pick 250, so it stays at every viewport — `RatingList` owns that.
+ *
+ * The `dutyGuide` accordion is an exception, not a fixture: one of the twelve
+ * categories has one. Nothing in this layout may depend on it being there.
+ */
+import DutyGuideList from "@/components/equipment/DutyGuideList.astro";
+import RatingList from "@/components/quote/RatingList.astro";
+import QuoteSection from "@/components/quote/QuoteSection.astro";
+import ChipGroup from "@/components/ui/ChipGroup.astro";
+import Field from "@/components/ui/Field.astro";
+import Icon from "@/components/ui/Icon.astro";
+import { scopedId, type Option } from "@/lib/forms";
+import {
+  DUTY_GUIDE_LABEL,
+  FIELD_COPY,
+  SECTION_EMPTY,
+} from "@/lib/quote/options";
+import type { QuoteCategoryDetail } from "@/lib/quote/schema";
+
+interface Props {
+  /** Per-instance id prefix — two forms on one page must not collide. */
+  instance: string;
+  /** The twelve with their ranges, in catalogue order. */
+  categories: QuoteCategoryDetail[];
+  /** The five families, as options for the "something else" branch. */
+  families: Option[];
+  number?: string;
+  class?: string;
+}
+
+const {
+  instance,
+  categories,
+  families,
+  number = "02",
+  class: extra = "",
+} = Astro.props;
+---
+
+<QuoteSection id="size" instance={instance} number={number} class={extra}>
+  <p data-size-empty class="mb-0 max-w-[46ch] text-lead text-faint">
+    {SECTION_EMPTY.size}
+  </p>
+
+  <div data-size-machine hidden class="flex flex-col gap-14 max-cmp:gap-10">
+    <div>
+      <p class="mb-[10px] text-caption text-faint">
+        {FIELD_COPY.rating.label} *
+      </p>
+
+      {
+        categories.map((category) => (
+          <div
+            data-rating-panel={category.id}
+            data-attachments={category.attachments ? "" : undefined}
+            hidden
+          >
+            <RatingList
+              instance={`${instance}-${category.id}`}
+              ranges={category.ranges}
+              legend={`${FIELD_COPY.rating.label} — ${category.name}`}
+              required
+            />
+
+            {category.dutyGuide.length > 0 && (
+              <details class="dg mt-5" data-duty-guide>
+                <summary class="dg-summary">
+                  <Icon name="plus" size={15} class="dg-mark" />
+                  {DUTY_GUIDE_LABEL}
+                </summary>
+                <div class="pt-5">
+                  <DutyGuideList
+                    scenarios={category.dutyGuide}
+                    surface="mesh"
+                  />
+                </div>
+              </details>
+            )}
+          </div>
+        ))
+      }
+
+      <p
+        id={scopedId(instance, "rating", "error")}
+        data-error-for="rating"
+        hidden
+        class="mt-[10px] mb-0 text-caption text-error"
+      >
+      </p>
+    </div>
+
+    {
+      /* Opened by "Not sure — size it for me", which is the one row the
+        prototype had and did nothing with — breaking the form's own promise
+        (docs 14 §10b). */
+    }
+    <div data-conditional="duty" hidden>
+      <Field
+        instance={instance}
+        name="duty"
+        label={FIELD_COPY.duty.label}
+        element="textarea"
+        rows={3}
+        placeholder={FIELD_COPY.duty.placeholder}
+      />
+    </div>
+
+    <div class="grid grid-cols-2 gap-12 max-cmp:grid-cols-1 max-cmp:gap-10">
+      <Field
+        instance={instance}
+        name="quantity"
+        label={FIELD_COPY.quantity.label}
+        type="number"
+        value="1"
+        min="1"
+        step="1"
+        inputmode="numeric"
+      />
+      <div data-conditional="attachments" hidden>
+        <Field
+          instance={instance}
+          name="attachments"
+          label={FIELD_COPY.attachments.label}
+          placeholder={FIELD_COPY.attachments.placeholder}
+        />
+      </div>
+    </div>
+  </div>
+
+  <div data-size-other hidden class="flex flex-col gap-14 max-cmp:gap-10">
+    <Field
+      instance={instance}
+      name="otherItem"
+      label={FIELD_COPY.otherItem.label}
+      placeholder={FIELD_COPY.otherItem.placeholder}
+      hint={FIELD_COPY.otherItem.hint}
+      required
+    />
+    <ChipGroup
+      instance={instance}
+      name="family"
+      legend={FIELD_COPY.family.label}
+      hint={FIELD_COPY.family.hint}
+      options={families}
+    />
+  </div>
+</QuoteSection>
+
+<style>
+  /* The sizing guide, folded away. `plus` rotates into a cross rather than
+     being swapped for one — one glyph, two states, the same trick the
+     services accordion uses. */
+  .dg-summary {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--color-line);
+    font-family: var(--font-mono);
+    font-size: var(--text-note);
+    color: var(--color-muted);
+    list-style: none;
+    transition: color 200ms var(--ease-out-expo);
+  }
+  .dg-summary::-webkit-details-marker {
+    display: none;
+  }
+  .dg-summary:hover {
+    color: var(--color-ink);
+  }
+  .dg-mark {
+    transition: rotate 240ms var(--ease-out-expo);
+    color: var(--color-brand);
+  }
+  .dg[open] .dg-mark {
+    rotate: 45deg;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .dg-mark {
+      transition-duration: 1ms;
+    }
+  }
+</style>

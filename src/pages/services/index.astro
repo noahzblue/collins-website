@@ -128,7 +128,16 @@ const enquire = (title: string) => {
                     </ul>
 
                     <div class="mt-8 flex flex-wrap items-center gap-3">
-                      <Button variant="primary" href="/contact" class="press">
+                      {/* Four of the six services are not equipment supply,
+                          so this opens the form at section 01 rather than
+                          pre-answering it — the machine is not known here
+                          (docs/site-expansion/14 §10c). */}
+                      <Button
+                        variant="primary"
+                        href="/contact"
+                        data-quote-open
+                        class="press"
+                      >
                         {service.cta}
                       </Button>
                       <Button

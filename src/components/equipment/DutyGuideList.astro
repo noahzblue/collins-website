@@ -1,0 +1,54 @@
+---
+/**
+ * The sizing-guide scenarios, as cells. Nothing else — no heading, no eyebrow.
+ *
+ * Split out of `DutyGuide.astro` so the quote form can put the same scenarios
+ * inside a `<details>` in step 02 without dragging a page-level `<h2>` and a
+ * "Sizing guide" eyebrow into a dialog with it. The wrapper keeps those; this
+ * keeps the content (docs/site-expansion/14 §15.5).
+ *
+ * Two surfaces, because the two callers sit on different ground: a category
+ * page is a column of standalone panels, so the cards are `.card`; the quote
+ * form's step 02 is a lattice, and `global.css` is explicit that the mesh and
+ * the card are not mixed inside one step (§14.1a).
+ */
+import type { CollectionEntry } from "astro:content";
+
+interface Props {
+  scenarios: CollectionEntry<"equipment">["data"]["dutyGuide"];
+  /** card = separated panels, on a page · mesh = one hairline lattice, in the form. */
+  surface?: "card" | "mesh";
+  class?: string;
+}
+
+const { scenarios, surface = "card", class: extra = "" } = Astro.props;
+
+/* Variants are lookup maps, not conditionals — house style, see ui/Pill.astro. */
+const grids: Record<NonNullable<Props["surface"]>, string> = {
+  card: "grid grid-cols-3 gap-5 max-nav:grid-cols-1",
+  mesh: "mesh grid grid-cols-3 max-nav:grid-cols-1",
+};
+
+const cells: Record<NonNullable<Props["surface"]>, string> = {
+  card: "card flex flex-col p-7 max-xs:p-6",
+  mesh: "flex flex-col px-5 py-[18px]",
+};
+---
+
+{
+  scenarios.length > 0 && (
+    <div class:list={[grids[surface], extra]}>
+      {scenarios.map((scenario, index) => (
+        <div class={cells[surface]}>
+          <span class="mb-4 font-mono text-label tracking-[0.5px] text-brand">
+            {String(index + 1).padStart(2, "0")}
+          </span>
+          <h3 class="mb-3 text-subhead leading-[1.25]">{scenario.situation}</h3>
+          <p class="mb-0 text-detail leading-relaxed text-muted">
+            {scenario.advice}
+          </p>
+        </div>
+      ))}
+    </div>
+  )
+}

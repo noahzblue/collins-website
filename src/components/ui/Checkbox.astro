@@ -1,0 +1,100 @@
+---
+/**
+ * A single yes/no — a square box and a label.
+ *
+ *   <Checkbox instance={id} name="docs" label="Documentation for finance" />
+ *
+ * Square, like every other control in this form: `rounded-full` on this site
+ * means a badge or a dot, and this is a thing you press. The input is visually
+ * hidden rather than restyled, so the checked state, form association and
+ * keyboard behaviour stay native.
+ */
+import Icon from "@/components/ui/Icon.astro";
+import { scopedId } from "@/lib/forms";
+
+interface Props {
+  name: string;
+  /** Per-instance id prefix — two forms on one page must not collide. */
+  instance: string;
+  label: string;
+  hint?: string;
+  checked?: boolean;
+  class?: string;
+}
+
+const {
+  name,
+  instance,
+  label,
+  hint,
+  checked = false,
+  class: extra = "",
+} = Astro.props;
+
+const id = scopedId(instance, name);
+const hintId = hint ? `${id}-hint` : undefined;
+---
+
+<div class:list={["flex flex-col", extra]}>
+  <label
+    for={id}
+    class="cb flex cursor-pointer items-start gap-[14px] py-[6px]"
+  >
+    <input
+      type="checkbox"
+      class="sr-only"
+      id={id}
+      name={name}
+      checked={checked}
+      aria-describedby={hintId}
+      data-field={name}
+    />
+    <span
+      class="cb-box mt-[1px] flex h-[20px] w-[20px] shrink-0 items-center justify-center border border-line-strong bg-white text-white"
+      aria-hidden="true"
+    >
+      <Icon name="check" size={13} class="cb-tick" />
+    </span>
+    <span class="text-base leading-snug text-ink">{label}</span>
+  </label>
+  {
+    hint && (
+      <p id={hintId} class="mt-[6px] mb-0 pl-[34px] text-caption text-faint">
+        {hint}
+      </p>
+    )
+  }
+</div>
+
+<style>
+  .cb-box {
+    transition:
+      background-color 160ms var(--ease-out-expo),
+      border-color 160ms var(--ease-out-expo);
+  }
+  .cb-tick {
+    opacity: 0;
+    transition: opacity 160ms var(--ease-out-expo);
+  }
+  .cb:hover .cb-box {
+    border-color: var(--color-ink);
+  }
+  .cb:has(input:checked) .cb-box {
+    background: var(--color-brand);
+    border-color: var(--color-brand);
+  }
+  .cb:has(input:checked) .cb-tick {
+    opacity: 1;
+  }
+  .cb:has(input:focus-visible) .cb-box {
+    outline: 2px solid var(--color-brand-bright);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cb-box,
+    .cb-tick {
+      transition-duration: 1ms;
+    }
+  }
+</style>

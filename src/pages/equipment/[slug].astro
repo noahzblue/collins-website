@@ -28,6 +28,7 @@ import {
   CTA_LABEL,
   availabilityBadges,
   enquireHref,
+  quoteTrigger,
   singular,
 } from "@/lib/equipment";
 import { site } from "@/config/site";
@@ -109,7 +110,12 @@ if (relatedEntries.length !== related.length) {
         </p>
       </div>
 
-      <RangeTable ranges={ranges} name={name} mode="hire" />
+      <RangeTable
+        ranges={ranges}
+        name={name}
+        categoryId={category.id}
+        mode="hire"
+      />
 
       <p class="mt-5 max-w-[720px] text-note leading-relaxed text-faint">
         <strong class="font-medium text-muted">In yard</strong> — on the ground and
@@ -140,15 +146,28 @@ if (relatedEntries.length !== related.length) {
           </p>
 
           <div class="mb-7 flex flex-wrap gap-3">
+            {
+              /* Both know which machine this page is about, so the dialog
+                opens with section 01 already answered and lands the customer
+                on the terms. The WhatsApp `href` stays as the no-JS fallback
+                (docs/site-expansion/14 §9a). */
+            }
             <Button
               variant="primary"
               href={enquireHref(name, "hire")}
               target="_blank"
               rel="noopener"
+              {...quoteTrigger(category.id, "hire")}
             >
               {CTA_LABEL.hire}
             </Button>
-            <Button variant="outline" href="/contact">Request a quote</Button>
+            <Button
+              variant="outline"
+              href="/contact"
+              {...quoteTrigger(category.id)}
+            >
+              Request a quote
+            </Button>
           </div>
 
           <ContactRows
