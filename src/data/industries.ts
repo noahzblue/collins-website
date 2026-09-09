@@ -42,7 +42,7 @@ export const industries: Industry[] = [
     slug: "construction",
     name: "Construction",
     tagline: "Power, lifting and light for every stage of the build.",
-    body: "From enabling works to handover, construction sites run on temporary power and reliable lifting. We keep generators, tower lights, forklifts and heavy machinery ready to dispatch from our Sajjah yard — sized to your load schedule, on terms that flex as the programme moves, to buy outright or on hire.",
+    body: "From enabling works to handover, construction sites run on temporary power and reliable lifting. We keep generators, tower lights, forklifts and heavy machinery ready to dispatch from our Sajjah yard — sized to your load schedule, on terms that flex as the programme moves, to buy or on hire.",
     duty: {
       title: "Sized on starting load, not running load",
       body: "A tower crane and a batching plant draw far more at start-up than they do in service. We specify against the largest starting load on your schedule, so the set you take actually starts what you run — and we re-size free when the programme changes.",

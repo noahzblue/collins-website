@@ -64,11 +64,10 @@ const enquire = (title: string) => {
   </Section>
 
   <!-- Beat 3 — the six blocks, sides alternating, siblings of /equipment's rows -->
-  <Section tone="gray" class="pt-0">
+  <Section tone="gray">
     <RailSections
       items={services.map((s) => ({ id: s.slug, label: s.title }))}
       ariaLabel="Services"
-      class="pt-[110px] max-mob:pt-[72px]"
     >
       {
         services.map((service, i) => (

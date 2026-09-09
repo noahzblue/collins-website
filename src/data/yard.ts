@@ -50,10 +50,10 @@ export const yardPoints = [
     alt: "A loaded flatbed carrying plant out through the yard gate at first light.",
   },
   {
-    title: "Buy outright or hire.",
+    title: "Buy or hire.",
     body: "Move from a trial hire to a purchase, or straight to a purchase, without changing supplier, paperwork or point of contact.",
     image: "/images/why-brands.jpg",
-    alt: "A line of branded machines standing ready in the yard, available either to buy outright or on hire.",
+    alt: "A line of branded machines standing ready in the yard, available either to buy or on hire.",
   },
   {
     title: "Support after handover.",

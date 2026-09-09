@@ -32,14 +32,14 @@ export const whoWeAre = {
 export const missionVision = [
   {
     label: "Our mission",
-    body: "To deliver high performance power solutions and heavy machinery engineered to exceed industrial standards, and to keep them running long after the invoice is settled. Durability, precision and uptime are what we sell; the machine is how we deliver it.",
-    /** Rendered on its own line, in brand-bright. */
+    body: "To deliver high performance power solutions and heavy machinery engineered to exceed industrial standards, and to keep them running long after the invoice is settled. Durability, precision and uptime are what we sell, the machine is how we deliver it.",
+    /** Rendered on its own line. */
     closer: "",
   },
   {
     label: "Our vision",
-    body: "To be the first call in the Emirates for equipment that has to work on the day it arrives. We grow by being the supplier a site manager trusts on a tight programme,",
-    closer: "not by being the cheapest quote in the inbox.",
+    body: "To be the first call in the Emirates for equipment that has to work on the day it arrives. We grow by being the supplier a site manager trusts on a tight programme, not by being the cheapest quote in the inbox.",
+    closer: "",
   },
 ];
 

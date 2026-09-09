@@ -52,7 +52,7 @@ export const supplyModes = {
       label: "Sales",
       lead: "Our main business",
       body: "Supplied outright, sourced direct from manufacturers and authorised distributors, handed over commissioned, documented and ready to work.",
-      cta: { label: "Buy outright", href: "/services#equipment-sales" },
+      cta: { label: "Buy", href: "/services#equipment-sales" },
     },
     {
       label: "Rental",
@@ -71,7 +71,7 @@ export const fleet = {
   eyebrow: "Equipment",
   title: ["Built for the job,", "ready when you are."],
   intro:
-    "Sourced direct from manufacturers and authorised distributors, supplied with commissioning, operator handover and parts support — to buy outright or to hire. Six of the twelve categories below.",
+    "Sourced direct from manufacturers and authorised distributors, supplied with commissioning, operator handover and parts support — to buy or to hire. Six of the twelve categories below.",
   viewAll: { label: "View all 12 categories", href: "/equipment" },
 };
 
@@ -83,7 +83,7 @@ export const equipmentHub = {
     "Every category below is sourced direct from manufacturers and authorised distributors, supplied with commissioning, operator handover and parts support — and available for outright purchase or for hire.",
   seoTitle: "Equipment for Sale & Hire in the UAE | Collins Equipments",
   seoDescription:
-    "Twelve categories of industrial and heavy equipment to buy outright or hire — generators, forklifts, cranes, access platforms, earthmoving and material handling, delivered across the UAE.",
+    "Twelve categories of industrial and heavy equipment to buy or hire — generators, forklifts, cranes, access platforms, earthmoving and material handling, delivered across the UAE.",
   closing: {
     title: "Not seeing the machine you need?",
     body: "The twelve above are what we carry day to day. Tell us the job and we'll source to spec — most enquiries come back the same day.",

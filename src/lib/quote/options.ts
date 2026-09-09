@@ -42,7 +42,7 @@ export type { Option };
 export const MODES: Option[] = [
   {
     value: "buy",
-    label: "Buy outright",
+    label: "Buy",
     hint: "New or inspected used, commissioned before handover.",
   },
   {
