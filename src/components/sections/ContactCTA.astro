@@ -55,13 +55,17 @@ import { MODES } from "@/lib/quote/options";
         structural face and that component is the editorial one. */
     }
     <div
-      class="rule-brand mb-10 flex flex-wrap items-end justify-between gap-x-10 gap-y-6 pb-9 max-mob:pb-7"
+      class="rule-brand mb-10 flex flex-wrap items-end justify-between gap-x-10 gap-y-6 pb-9 max-mob:pb-7 max-cmp:mb-6 max-cmp:gap-y-4 max-cmp:pb-5"
     >
       <div>
-        <Eyebrow class="mb-4">{contactSection.eyebrow}</Eyebrow>
+        <Eyebrow class="mb-4 max-cmp:mb-[10px]">
+          {contactSection.eyebrow}
+        </Eyebrow>
         <h2 class="cta-title" set:html={contactSection.title.join("<br>")} />
       </div>
-      <p class="mb-0 max-w-[430px] text-lead leading-relaxed text-muted">
+      <p
+        class="mb-0 max-w-[430px] text-lead leading-relaxed text-muted max-cmp:max-w-none"
+      >
         {contactSection.body}
       </p>
     </div>
@@ -92,7 +96,11 @@ import { MODES } from "@/lib/quote/options";
               <span class="mode-top">
                 <span class="mode-face">{option.label}</span>
                 <span class="mode-arrow shrink-0">
-                  <Icon name="arrow-right" size={20} />
+                  <Icon
+                    name="arrow-right"
+                    size={20}
+                    class="max-cmp:h-[16px] max-cmp:w-[16px]"
+                  />
                 </span>
               </span>
               <span class="mode-hint">{option.hint}</span>
@@ -238,6 +246,22 @@ import { MODES } from "@/lib/quote/options";
     }
     .mode-item:last-child .mode-cell {
       padding-bottom: 0;
+    }
+  }
+
+  /* The three answers are the largest tap targets on the page and they stay
+     that way — only the air around them comes in. */
+  @media (max-width: 600px) {
+    .mode-cell,
+    .mode-item + .mode-item .mode-cell {
+      padding: 0 0 17px;
+      gap: 6px;
+    }
+    .mode-item + .mode-item .mode-cell {
+      padding-top: 17px;
+    }
+    .mode-face {
+      padding-bottom: 5px;
     }
   }
 

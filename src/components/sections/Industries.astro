@@ -34,12 +34,23 @@ import { industriesSection } from "@/data/content";
        inline because `reveal.ts` leaves an already-set `--reveal-delay` alone
        — that is how a component overrides the default stagger. */
     }
-    <div class="grid grid-cols-4 gap-5 max-nav:grid-cols-2 max-xs:grid-cols-1">
+    {
+      /* Two columns all the way down, never one.
+    
+         Eight full-width 4:3 tiles is 2,150px — the reader scrolls past seven
+         sectors to reach the eighth and has no idea, at any point, how many
+         are left. Two portrait columns put the same eight in four rows and
+         roughly one screen, and portrait is the better crop for these
+         photographs anyway: a person, a rig, a crane are all taller than they
+         are wide. The tile keeps its swap, its scrim and its label — only the
+         column count changes. */
+    }
+    <div class="grid grid-cols-4 gap-5 max-nav:grid-cols-2 max-cmp:gap-[10px]">
       {
         industries.map((ind, i) => (
           <a
             href={`/industries/${ind.slug}`}
-            class="press group relative aspect-[3/4] overflow-clip rounded-md max-xs:aspect-[4/3]"
+            class="press group relative aspect-[3/4] overflow-clip rounded-md"
             style={`--reveal-delay:${(i % 4) * 70}ms`}
             data-reveal
           >
@@ -65,7 +76,7 @@ import { industriesSection } from "@/data/content";
             <span class="absolute top-4 right-4 flex h-8 w-8 -translate-y-1 items-center justify-center rounded-full bg-white/15 text-white opacity-0 backdrop-blur-sm transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
               <Icon name="arrow-up-right" size={15} />
             </span>
-            <span class="absolute right-5 bottom-5 left-5 text-subhead leading-snug font-medium text-white">
+            <span class="absolute right-5 bottom-5 left-5 text-subhead leading-snug font-medium text-white max-cmp:right-3 max-cmp:bottom-3 max-cmp:left-3 max-cmp:text-detail">
               {ind.name}
             </span>
           </a>
@@ -76,7 +87,7 @@ import { industriesSection } from "@/data/content";
     <ViewAllBar
       href={industriesSection.viewAll.href}
       label={industriesSection.viewAll.label}
-      class="mt-[64px] max-mob:mt-[40px]"
+      class="mt-[64px] max-mob:mt-[40px] max-cmp:mt-[26px]"
     />
   </div>
 </Section>

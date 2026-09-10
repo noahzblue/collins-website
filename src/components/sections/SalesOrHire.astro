@@ -42,14 +42,14 @@ import { supplyModes } from "@/data/content";
   <div class="wrap">
     <Eyebrow class="mb-[16px]">{supplyModes.eyebrow}</Eyebrow>
     <h2
-      class="max-w-[760px] text-h2 leading-[1.06]"
+      class="max-w-[760px] text-h2 leading-[1.06] max-cmp:leading-[1.12]"
       data-reveal="lines"
       set:html={supplyModes.title.join("<br>")}
     />
 
     <div
       id="supply-modes"
-      class="modes border- mt-[68px] border-line max-mob:mt-[44px]"
+      class="modes border- mt-[68px] border-line max-mob:mt-[44px] max-cmp:mt-[26px]"
       data-reveal
     >
       {
@@ -58,7 +58,7 @@ import { supplyModes } from "@/data/content";
             <h3 class="mode-head">
               <button
                 type="button"
-                class="mode-trigger relative flex w-full cursor-pointer items-center gap-7 py-[34px] text-left max-mob:gap-5 max-mob:py-[26px]"
+                class="mode-trigger relative flex w-full cursor-pointer items-center gap-7 py-[34px] text-left max-mob:gap-5 max-mob:py-[26px] max-cmp:gap-4 max-cmp:py-[17px]"
                 aria-expanded={i === 0 ? "true" : "false"}
                 aria-controls={`supply-panel-${i}`}
                 id={`supply-trigger-${i}`}
@@ -66,11 +66,15 @@ import { supplyModes } from "@/data/content";
                 <span class="mode-num font-mono text-micro tracking-[2px] transition-colors duration-300">
                   {String(i + 1).padStart(2, "0")}
                 </span>
-                <span class="mode-label font-mono text-[clamp(28px,3.4vw,44px)] leading-[1] tracking-[-0.03em] uppercase transition-colors duration-300">
+                <span class="mode-label font-mono text-[clamp(28px,3.4vw,44px)] leading-[1] tracking-[-0.03em] uppercase transition-colors duration-300 max-cmp:text-[clamp(23px,6.6vw,28px)]">
                   {mode.label}
                 </span>
                 <span class="mode-sign ml-auto shrink-0 transition-all duration-500">
-                  <Icon name="plus" size={24} />
+                  <Icon
+                    name="plus"
+                    size={24}
+                    class="max-cmp:h-[18px] max-cmp:w-[18px]"
+                  />
                 </span>
 
                 {/* The rule under the head doubles as the timer while the
@@ -93,21 +97,25 @@ import { supplyModes } from "@/data/content";
               aria-labelledby={`supply-trigger-${i}`}
             >
               <div class="mode-clip overflow-hidden">
-                <div class="max-w-[440px] pt-[30px] pb-[56px] max-mob:pt-[24px] max-mob:pb-[40px]">
+                <div class="max-w-[440px] pt-[30px] pb-[56px] max-mob:pt-[24px] max-mob:pb-[40px] max-cmp:pt-[15px] max-cmp:pb-[26px]">
                   <span class="block font-mono text-label font-medium tracking-[2px] text-brand uppercase">
                     {mode.lead}
                   </span>
-                  <p class="mt-5 mb-0 text-lead-lg leading-relaxed text-muted">
+                  <p class="mt-5 mb-0 text-lead-lg leading-relaxed text-muted max-cmp:mt-3">
                     {mode.body}
                   </p>
                   <Button
                     variant="outline"
                     href={mode.cta.href}
                     size="lg"
-                    class="press mt-9"
+                    class="press mt-9 max-cmp:mt-5"
                   >
                     {mode.cta.label}
-                    <Icon name="arrow-right" size={16} />
+                    <Icon
+                      name="arrow-right"
+                      size={16}
+                      class="max-cmp:h-[14px] max-cmp:w-[14px]"
+                    />
                   </Button>
                 </div>
               </div>
@@ -118,7 +126,7 @@ import { supplyModes } from "@/data/content";
     </div>
 
     <p
-      class="mt-14 mb-0 max-w-[760px] border-t border-line pt-4 text-tag leading-relaxed text-muted uppercase max-mob:mt-9 max-mob:pt-7"
+      class="mt-14 mb-0 max-w-[760px] border-t border-line pt-4 text-tag leading-relaxed text-muted uppercase max-mob:mt-9 max-mob:pt-7 max-cmp:mt-6 max-cmp:pt-4"
       data-reveal
     >
       {supplyModes.footnote}

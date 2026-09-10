@@ -10,12 +10,15 @@
 
 export const hero = {
   eyebrow: "Sales & Rental · Dubai & Sharjah · UAE",
-  /** Title is split so the closing phrase can be colour-emphasised. The full
-   *  stop lives inside `emphasis`: left in `tail` it renders as an orphan
-   *  white dot after the blue run, which at display size reads as a glitch. */
+  /** Title is split so the closing phrase can be colour-emphasised. The dash
+   *  opens the blue run rather than closing the white one — it is the hinge
+   *  between the two halves of the sentence, and reading white it looks like
+   *  punctuation the colour forgot. The full stop lives inside `emphasis` for
+   *  the same reason: left in `tail` it renders as an orphan white dot after
+   *  the blue run, which at display size reads as a glitch. */
   title: {
-    lead: "Heavy equipment, power and transport — ",
-    emphasis: "for sale and for hire.",
+    lead: "Heavy equipment, power and transport ",
+    emphasis: "— for sale and for hire.",
     tail: "",
   },
   sub: "Generators to 1,250 kVA, forklifts, cranes and compressors — supplied outright or on hire from our Sajjah yard, across the UAE.",

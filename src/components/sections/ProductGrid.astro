@@ -69,7 +69,7 @@ const featured = (await getCollection("equipment"))
               aria-hidden="true"
             />
 
-            <span class="absolute right-6 bottom-6 left-6 flex items-end justify-between gap-4 max-xs:right-5 max-xs:bottom-5 max-xs:left-5">
+            <span class="absolute right-6 bottom-6 left-6 flex items-end justify-between gap-4 max-cmp:right-4 max-cmp:bottom-4 max-cmp:left-4 max-cmp:gap-2">
               <span class="font-mono text-subhead leading-[1.15] tracking-[-0.01em] text-white uppercase">
                 {category.data.name}
               </span>
@@ -86,7 +86,7 @@ const featured = (await getCollection("equipment"))
     <ViewAllBar
       href={fleet.viewAll.href}
       label={fleet.viewAll.label}
-      class="mt-[64px] max-mob:mt-[40px]"
+      class="mt-[64px] max-mob:mt-[40px] max-cmp:mt-[26px]"
     />
   </div>
 </Section>
@@ -122,9 +122,51 @@ const featured = (await getCollection("equipment"))
       aspect-ratio: 4 / 3;
     }
   }
+  /* On a phone the block turns on its side.
+  
+     Stacked one per row, six 4:3 photographs are 1,600px of column — five
+     screens of scrolling to look at six words, and the reader has to spend all
+     of it to find out there is a seventh screen underneath. Turned sideways it
+     is one screen: the same block, the same hairlines, the same tiles, laid
+     along the axis that has room instead of the one that doesn't.
+  
+     It stays a GRID rather than becoming a flex strip, because the hairlines
+     here are the `gap` over a line-coloured background — the divider between
+     tile 3 and tile 4 exists only as long as they are cells of one grid.
+     `grid-auto-flow: column` keeps every one of them and costs one property.
+  
+     Tiles are 74% wide, so the next one is always half in frame: the overflow
+     is the affordance and the rail needs no arrows, dots or instructions —
+     the same argument /yard's fleet strip makes for the same shape.
+  
+     `overscroll-behavior-x: contain` is what Lenis reads to stand off the
+     horizontal axis while a vertical swipe over the rail still scrolls the
+     page (scripts/scroll.ts, `allowNestedScroll`). Not `data-lenis-prevent` —
+     that stops the page dead.
+  
+     The photos hold still in here. `ParallaxImage` resolves its drift against
+     the nearest scroll container, which below this breakpoint is the rail
+     rather than the page, so the timeline is inert — which is exactly what
+     this grid wants anyway ("The grid does not react to the pointer"), and the
+     zoom covers the parked crop either way. */
   @media (max-width: 600px) {
     .cat-grid {
-      grid-template-columns: 1fr;
+      grid-template-columns: none;
+      grid-template-rows: none;
+      grid-auto-flow: column;
+      grid-auto-columns: 74%;
+      overflow-x: auto;
+      overflow-y: hidden;
+      scroll-snap-type: x mandatory;
+      overscroll-behavior-x: contain;
+      scrollbar-width: none;
+    }
+    .cat-grid::-webkit-scrollbar {
+      display: none;
+    }
+    .tile {
+      aspect-ratio: 3 / 4;
+      scroll-snap-align: start;
     }
   }
 </style>

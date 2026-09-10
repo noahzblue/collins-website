@@ -30,11 +30,22 @@ const {
 const base =
   "inline-flex items-center justify-center gap-2 font-mono font-medium whitespace-nowrap rounded-md transition-all duration-200 cursor-pointer";
 
+/* Four rungs, and each one steps down again on a phone.
+ *
+ * The label shrinks for free — `text-sm` and `text-base` are tokens, and the
+ * phone pass in global.css re-pitches them. What does NOT come for free is the
+ * padding: `lg`'s 30/15 is a third of a 358px column spent on air around four
+ * words, and two CTAs side by side simply do not fit. So the inset is halved
+ * roughly a rung per size below `cmp`, which is what lets the hero keep its
+ * two buttons on ONE line instead of stacking them into a pair of full-width
+ * slabs — a phone's most valuable vertical space spent saying nothing.
+ *
+ * Nothing drops below a 40px tall target: small is the point, fiddly is not. */
 const sizes: Record<NonNullable<Props["size"]>, string> = {
-  xs: "px-[14px] py-[6px] text-sm",
-  sm: "px-[19px] py-[9px] text-sm",
-  md: "px-[24px] py-[12px] text-sm",
-  lg: "px-[30px] py-[15px] text-base",
+  xs: "px-[14px] py-[6px] text-sm max-cmp:px-[11px] max-cmp:py-[6px]",
+  sm: "px-[19px] py-[9px] text-sm max-cmp:px-[14px] max-cmp:py-[8px]",
+  md: "px-[24px] py-[12px] text-sm max-cmp:px-[17px] max-cmp:py-[9px]",
+  lg: "px-[30px] py-[15px] text-base max-cmp:px-[19px] max-cmp:py-[10px] max-cmp:text-sm",
 };
 
 const variants: Record<NonNullable<Props["variant"]>, string> = {

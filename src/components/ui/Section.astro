@@ -5,6 +5,9 @@
  * are intentionally full-bleed.
  *
  * Padding is deliberately roomy — the airy rhythm is what sells "premium".
+ * It comes from `--spacing-section` rather than a literal, so the three rungs
+ * (desktop / tablet / phone) live together in global.css instead of as a
+ * `max-*` chain repeated in every band that opted out of this component.
  *
  * `theme` is what the floating header should look like while this section is
  * under it (see scripts/themeFlip.ts). It defaults from `tone`, so a dark band
@@ -27,7 +30,7 @@ const toneClass =
 <section
   id={id}
   data-next-theme={theme ?? (tone === "dark" ? "dark" : "light")}
-  class:list={["py-[110px] max-mob:py-[72px]", toneClass, extra]}
+  class:list={["py-section", toneClass, extra]}
 >
   <slot />
 </section>

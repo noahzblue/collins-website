@@ -9,10 +9,12 @@ import { site } from "@/config/site";
 
 <section
   data-next-theme="dark"
-  class="hero relative flex h-[100svh] min-h-[640px] items-end overflow-hidden max-mob:h-auto max-mob:min-h-0"
+  class="hero relative flex h-[100svh] min-h-[640px] items-end overflow-hidden max-cmp:min-h-[560px]"
 >
   <!-- Ambient yard footage. The still underneath is the same frame, so
-       reduced-motion, small screens, and playback failure all degrade to it. -->
+       reduced-motion, small screens, and playback failure all degrade to it —
+       and on a phone the still is what everyone gets (see the note on
+       `.hero-video` below), which is why it is given a drift of its own. -->
   <div class="hero-media absolute inset-0" aria-hidden="true">
     <div
       class="hero-still absolute inset-0 bg-cover bg-center bg-no-repeat"
@@ -46,10 +48,10 @@ import { site } from "@/config/site";
   </div>
 
   <div
-    class="wrap relative z-[2] w-full pt-[220px] pb-[64px] max-mob:pt-[140px] max-mob:pb-[44px]"
+    class="wrap relative z-[2] w-full pt-[220px] pb-[64px] max-mob:pt-[140px] max-mob:pb-[44px] max-cmp:pt-header-gap max-cmp:pb-[30px]"
   >
     <span
-      class="reveal reveal-1 inline-flex items-center gap-2 rounded-md px-[14px] py-[7px] font-mono text-label font-medium tracking-[1px] text-white uppercase backdrop-blur-sm max-xs:text-[10.5px]"
+      class="reveal reveal-1 inline-flex items-center gap-2 rounded-md px-[14px] py-[7px] font-mono text-label font-medium tracking-[1px] text-white uppercase backdrop-blur-sm max-cmp:gap-[6px] max-cmp:px-[10px] max-cmp:py-[5px] max-cmp:tracking-[0.6px]"
     >
       <span
         class="status-dot relative h-[6px] w-[6px] rounded-full bg-brand-bright"
@@ -57,8 +59,14 @@ import { site } from "@/config/site";
       {hero.eyebrow}
     </span>
 
+    <!-- `text-pretty` overrides the base layer's `text-wrap: balance` on
+         purpose. Balance evens the two lines and drags TRANSPORT down into
+         the blue run; the design breaks the line where the sentence does, so
+         the white clause holds line one and the blue clause holds line two.
+         Pretty still guards the last line against a one-word orphan when the
+         headline goes to three or four lines on a phone. -->
     <h1
-      class="reveal reveal-2 mt-6 max-w-[820px] text-display leading-[1.05] text-white max-mob:mt-5"
+      class="reveal reveal-2 mt-[5px] max-w-[820px] text-display leading-[1.325] tracking-[-0.05em] text-pretty text-white max-cmp:mt-[10px] max-cmp:leading-[1.22] max-cmp:tracking-[-0.03em]"
     >
       {hero.title.lead}<span class="text-brand-bright"
         >{hero.title.emphasis}</span
@@ -66,13 +74,13 @@ import { site } from "@/config/site";
     </h1>
 
     <p
-      class="reveal reveal-3 mt-5 max-w-[560px] text-subhead leading-relaxed text-pretty text-white/75 max-mob:mt-4 max-mob:text-lead"
+      class="reveal reveal-3 mt-5 max-w-[560px] text-subhead leading-relaxed text-pretty text-white/75 max-mob:mt-4 max-mob:text-lead max-cmp:mt-[10px] max-cmp:text-detail max-cmp:leading-[1.5]"
     >
       {hero.sub}
     </p>
 
     <div
-      class="reveal reveal-4 mt-10 flex flex-wrap gap-3 max-mob:mt-7 max-xs:flex-col max-xs:items-stretch"
+      class="reveal reveal-4 mt-10 flex flex-wrap gap-3 max-mob:mt-7 max-cmp:mt-5 max-cmp:gap-2"
     >
       {
         hero.ctas.map((cta) => (
@@ -90,7 +98,7 @@ import { site } from "@/config/site";
 
     <!-- Base panel — survey-tag coordinates + the drifting wordmarks. -->
     <div
-      class="reveal reveal-5 mt-14 flex items-center gap-6 rounded-md px-6 py-4 backdrop-blur-sm max-mob:mt-10 max-cmp:flex-col max-cmp:items-start max-cmp:gap-3 max-cmp:px-5"
+      class="reveal reveal-5 mt-14 flex items-center gap-6 rounded-md px-6 py-4 backdrop-blur-sm max-mob:mt-10 max-cmp:mt-7 max-cmp:flex-col max-cmp:items-start max-cmp:gap-3 max-cmp:px-0 max-cmp:py-2"
     >
       <!-- <span
         class="shrink-0 font-mono text-label tracking-[0.5px] text-white/55"
@@ -110,10 +118,37 @@ import { site } from "@/config/site";
 
 <style>
   /* Video is an enhancement only — phones and reduced-motion users get the
-     identical still frame underneath, with no download cost. */
+     identical still frame underneath, with no download cost. The clip is 16MB;
+     sending that to a phone on a UAE mobile connection to decorate the first
+     screen is not a trade this site should make. */
   @media (prefers-reduced-motion: reduce), (max-width: 900px) {
     .hero-video {
       display: none;
+    }
+  }
+
+  /* …but a frozen frame under a hero that is obviously ABOUT motion reads as a
+     video that failed to start, which is worse than no video at all. So where
+     the clip is dropped the still takes over its job: a 26s push, ~4% of the
+     frame, slow enough that you never catch it moving and only register that
+     the picture is alive. It is the same move `ui/FollowerList.astro` makes on
+     its panel, at half the amplitude because this one is full-bleed.
+
+     The width alone is the guard: above it the video covers the still, and
+     below it the video is `display: none`, so there is never a frame where
+     both are moving. */
+  @media (max-width: 900px) {
+    .hero-still {
+      animation: hero-still-drift 26s ease-in-out infinite alternate;
+      transform-origin: 62% 55%;
+    }
+  }
+  @keyframes hero-still-drift {
+    from {
+      transform: scale(1.02) translate3d(0, 0, 0);
+    }
+    to {
+      transform: scale(1.07) translate3d(-1.2%, -0.8%, 0);
     }
   }
 
@@ -230,6 +265,10 @@ import { site } from "@/config/site";
   }
 
   @media (prefers-reduced-motion: reduce) {
+    .hero-still {
+      animation: none;
+      transform: none;
+    }
     .reveal {
       animation: none;
       opacity: 1;

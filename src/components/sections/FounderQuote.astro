@@ -36,13 +36,13 @@ import { quoteSection } from "@/data/content";
       <Eyebrow
         tone="brand-bright"
         bar={false}
-        class="mb-9 justify-center text-center"
+        class="mb-9 justify-center text-center max-cmp:mb-5"
       >
         {quoteSection.eyebrow}
       </Eyebrow>
 
       <blockquote
-        class="font-mono text-h3 leading-[1.3] tracking-[-0.02em] text-balance text-white"
+        class="font-mono text-h3 leading-[1.3] tracking-[-0.02em] text-balance text-white max-cmp:leading-[1.38] max-cmp:text-pretty"
         data-reveal
       >
         <span aria-hidden="true">“</span>{founderQuote.lead}<span
@@ -50,7 +50,7 @@ import { quoteSection } from "@/data/content";
         >{founderQuote.tail}<span aria-hidden="true">”</span>
       </blockquote>
 
-      <figcaption class="mt-10" data-reveal>
+      <figcaption class="mt-10 max-cmp:mt-6" data-reveal>
         <span
           class="block font-mono text-label tracking-[2px] text-white uppercase"
         >

@@ -22,6 +22,8 @@
  *
  * Below the `nav` breakpoint the panel is dropped and the rows become a plain
  * numbered list — a shared image slot needs a pointer to be worth anything.
+ * Each row then carries its own photo: full width under the copy on a tablet,
+ * and a 62px chip inside the row on a phone. See `.row-shot` below.
  */
 export interface FollowerItem {
   label: string;
@@ -55,28 +57,31 @@ const { items, ariaLabel, class: extra = "" } = Astro.props;
           <a
             href={item.href}
             data-row={i}
-            class="row press group flex items-start gap-6 border-b border-line pt-[46px] pb-[26px] transition-colors duration-200 max-xs:gap-4 max-xs:pt-[26px] max-xs:pb-[18px]"
+            class="row press group flex flex-wrap items-start gap-6 border-b border-line pt-[46px] pb-[26px] transition-colors duration-200 max-xs:gap-4 max-xs:pt-[26px] max-xs:pb-[18px]"
           >
             <span class="row-num mt-[3px] shrink-0 font-mono text-caption tracking-[0.5px] text-faint transition-colors duration-200">
               {String(i + 1).padStart(2, "0")}
             </span>
-            <span class="min-w-0 flex-1">
+            {/* Below `nav` there is no shared panel, so each row carries its
+                own photo instead of losing it entirely. It is a direct child
+                of the row rather than part of the text column because the two
+                narrow layouts want it in two different places — see the
+                `.row-shot` note in the stylesheet. */}
+            <span class="row-shot hidden overflow-clip rounded-md max-nav:block">
+              <img
+                src={item.image}
+                alt=""
+                loading="lazy"
+                decoding="async"
+                class="h-full w-full object-cover"
+              />
+            </span>
+            <span class="row-text min-w-0 flex-1">
               <span class="row-title block font-mono text-subhead font-medium tracking-[-0.01em] uppercase transition-colors duration-200">
                 {item.label}
               </span>
               <span class="mt-[6px] block text-detail leading-relaxed text-muted">
                 {item.blurb}
-              </span>
-              {/* Below `nav` there is no shared panel, so each row carries
-                  its own photo instead of losing it entirely. */}
-              <span class="mt-4 hidden overflow-clip rounded-md max-nav:block">
-                <img
-                  src={item.image}
-                  alt=""
-                  loading="lazy"
-                  decoding="async"
-                  class="aspect-[16/10] w-full object-cover"
-                />
               </span>
             </span>
           </a>
@@ -147,6 +152,55 @@ const { items, ariaLabel, class: extra = "" } = Astro.props;
   }
   .row-title {
     color: var(--color-ink);
+  }
+
+  /* ---- The photo, in the two narrow layouts -------------------
+     One `<img>`, two positions, decided by `order` in a wrapping row.
+
+     Tablet (600-980): the row is num + text, and the photo wraps onto a line
+     of its own at full width — a 16:10 plate under the copy it belongs to.
+
+     Phone (below 600): six of those plates is 2,000px of column, which is the
+     single tallest thing on the homepage and it is six pictures of nothing in
+     particular. So the photo comes back INTO the row as a 64px chip between
+     the number and the title. The list turns back into what it is on desktop
+     — a scannable index — and keeps its photography instead of trading one
+     for the other. ~540px for the six, down from ~2,000.
+
+     `order` rather than two elements, because two elements is two `<img>`
+     tags, and the one that is `display: none` is still a URL the browser may
+     decide to go and fetch. */
+  .row-shot {
+    order: 4;
+    width: 100%;
+    margin-top: 16px;
+  }
+  .row-num {
+    order: 1;
+  }
+  .row-text {
+    order: 3;
+  }
+  .row-shot img {
+    aspect-ratio: 16 / 10;
+  }
+
+  @media (max-width: 600px) {
+    .row {
+      gap: 14px;
+      padding-top: 16px;
+      padding-bottom: 16px;
+    }
+    .row-shot {
+      order: 2;
+      width: 62px;
+      height: 62px;
+      margin-top: 0;
+      flex: none;
+    }
+    .row-shot img {
+      aspect-ratio: 1;
+    }
   }
 
   /* A very slow, very small breath — 1.02 to 1.065 over twelve seconds, with a

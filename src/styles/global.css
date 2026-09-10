@@ -70,7 +70,11 @@
   --text-subhead: 18px; /* accordion titles, tile names */
 
   /* Headings. Fluid — one token per level, not per component. */
-  --text-display: clamp(38px, 5.6vw, 68px); /* homepage hero h1 */
+  /* Hero h1 only. The ceiling is the design's 40px, reached at a 1440px
+     viewport; below 1000px the floor holds. 28px is what a 360px screen can
+     take — uppercase mono at -0.05em runs ~0.55em per character, so the
+     longest word in the headline still clears the gutters. */
+  --text-display: clamp(28px, 2.8vw, 40px); /* homepage hero h1 */
   --text-h1: clamp(34px, 5vw, 56px); /* every other page h1 */
   --text-h2: clamp(30px, 3.8vw, 46px); /* primary section heading */
   --text-h3: clamp(26px, 3vw, 36px); /* in-page block heading */
@@ -91,6 +95,12 @@
   --spacing-header: 80px; /* the header's occupied height */
   --spacing-header-gap: 104px; /* header + breathing room: sticky tops,
                                   anchor landings */
+
+  /* The vertical rhythm every band on the site is set to (`ui/Section.astro`
+     writes it as `py-section`). One token rather than a padding value copied
+     into nine components, which is what lets the phone pass below re-pitch the
+     whole page's breathing in a single line. */
+  --spacing-section: 110px;
 
   /* Breakpoints — desktop-first; responsive rules use the max-* variants. */
   --breakpoint-nav: 980px; /* nav hides, two-column splits & grids collapse */
@@ -121,6 +131,76 @@
   --duration-page-out: 110ms;
   --duration-page-in: 230ms;
   --duration-reveal: 700ms;
+}
+
+/* ============================================================
+   THE PHONE PASS — the same design system, one notch down.
+
+   A phone has a third of the width and none of the reading distance, so the
+   desktop scale does not "reflow" onto it, it overflows it: 15px body copy in
+   a 358px column is a wall, and 110px of section padding is a third of the
+   viewport spent on nothing. Every size on the site is a token and every
+   Tailwind size utility compiles to `font-size: var(--text-…)`, so the whole
+   vocabulary can be re-pitched HERE, once, instead of hanging a
+   `max-cmp:text-…` off several hundred elements.
+
+   Read it as: the scale keeps its proportions and loses about a rung. Body
+   copy lands at 14px, the structural layer (labels, eyebrows, mono numbers)
+   at 11-13px, and the headings re-clamp against the viewport they actually
+   have rather than holding a floor that was chosen for a laptop.
+
+   `cmp` (600px), not `mob` (900px), is the switch: 900 is a tablet in
+   portrait, which reads at desktop sizes and already has its own spacing pass.
+   Below 600 the reader is holding the thing in one hand.
+
+   Deliberately unlayered — `@theme` emits into `@layer theme`, and an
+   unlayered rule beats every layer, so this wins without a specificity fight.
+   ============================================================ */
+/* The tablet rung. `mob` already had a spacing pass in every component; this
+   is the same number, moved to the token so `py-section` carries all three. */
+@media (width <= 900px) {
+  :root {
+    --spacing-section: 72px;
+  }
+}
+
+@media (width <= 600px) {
+  :root {
+    /* Body & UI — one rung down, and the bottom of the scale compresses
+       rather than shrinking proportionally: below ~10px tracked mono stops
+       being small type and starts being texture. */
+    --text-micro: 9.5px;
+    --text-tag: 10.5px;
+    --text-label: 11px;
+    --text-caption: 11.5px;
+    --text-meta: 12px;
+    --text-note: 12.5px;
+    --text-sm: 13px;
+    --text-detail: 13.5px;
+    --text-base: 14px;
+    --text-cell: 14px;
+    --text-lead: 14.5px;
+    --text-lead-lg: 15px;
+    --text-intro: 15.5px;
+    --text-subhead: 16px;
+
+    /* Headings re-clamp against the phone's own width. The desktop tokens
+       clamp against a 1000px+ run and bottom out at a floor picked for a
+       laptop — on a 390px screen that floor IS the size, so it may as well be
+       chosen here where it is the only value anyone sees. */
+    --text-display: clamp(21px, 5.9vw, 26px);
+    --text-h1: clamp(25px, 7.2vw, 32px);
+    --text-h2: clamp(23px, 6.6vw, 30px);
+    --text-h3: clamp(19px, 5.3vw, 24px);
+
+    /* The header is physically smaller down here (`top-3` + `h-[56px]`), so
+       the offset everything clears has been wrong on a phone all along. */
+    --spacing-header: 68px;
+    --spacing-header-gap: 88px;
+
+    /* Section rhythm — see `--spacing-section` above. */
+    --spacing-section: 54px;
+  }
 }
 
 /* ============================================================
@@ -262,7 +342,7 @@
   .wrap {
     max-width: var(--wrap-max, 1200px);
     margin-inline: auto;
-    padding-inline: 32px;
+    padding-inline: var(--wrap-pad, 32px);
   }
   /* Wide band — sections that carry a full-width photo panel rather than a
      column of prose. Add alongside .wrap: `class="wrap wrap-wide"`. */
@@ -271,12 +351,12 @@
   }
   @media (max-width: 900px) {
     .wrap {
-      padding-inline: 20px;
+      --wrap-pad: 20px;
     }
   }
   @media (max-width: 520px) {
     .wrap {
-      padding-inline: 16px;
+      --wrap-pad: 16px;
     }
   }
 

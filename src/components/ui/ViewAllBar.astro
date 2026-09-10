@@ -25,7 +25,7 @@ const { href, label, class: extra = "" } = Astro.props;
 <a
   href={href}
   class:list={[
-    "view-all press group flex w-full items-center justify-center gap-3 border-y border-line px-6 py-[30px] font-mono text-sm font-medium tracking-[1.6px] text-ink uppercase transition-colors duration-300 max-mob:py-[22px]",
+    "view-all press group flex w-full items-center justify-center gap-3 border-y border-line px-6 py-[30px] font-mono text-sm font-medium tracking-[1.6px] text-ink uppercase transition-colors duration-300 max-mob:py-[22px] max-cmp:gap-2 max-cmp:px-4 max-cmp:py-[15px] max-cmp:tracking-[1.1px]",
     extra,
   ]}
 >
@@ -33,7 +33,7 @@ const { href, label, class: extra = "" } = Astro.props;
   <Icon
     name="arrow-right"
     size={17}
-    class="transition-transform duration-300 ease-out group-hover:translate-x-[6px]"
+    class="transition-transform duration-300 ease-out group-hover:translate-x-[6px] max-cmp:h-[14px] max-cmp:w-[14px]"
   />
 </a>
 

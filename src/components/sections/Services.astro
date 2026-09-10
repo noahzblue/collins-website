@@ -21,7 +21,9 @@ import { servicesSection } from "@/data/content";
 
 <Section id="services">
   <div class="wrap">
-    <div class="mb-[56px] flex flex-wrap items-end justify-between gap-8">
+    <div
+      class="mb-[56px] flex flex-wrap items-end justify-between gap-8 max-mob:mb-[40px] max-cmp:mb-[24px] max-cmp:gap-4"
+    >
       <div>
         <Eyebrow class="mb-[16px]">{servicesSection.eyebrow}</Eyebrow>
         <h2
@@ -30,7 +32,9 @@ import { servicesSection } from "@/data/content";
           set:html={servicesSection.title.join("<br>")}
         />
       </div>
-      <p class="max-w-[430px] text-lead leading-relaxed text-muted">
+      <p
+        class="max-w-[430px] text-lead leading-relaxed text-muted max-cmp:max-w-none"
+      >
         {servicesSection.intro}
       </p>
     </div>
@@ -49,7 +53,7 @@ import { servicesSection } from "@/data/content";
     <ViewAllBar
       href={servicesSection.viewAll.href}
       label={servicesSection.viewAll.label}
-      class="mt-[80px] max-mob:mt-[40px]"
+      class="mt-[80px] max-mob:mt-[40px] max-cmp:mt-[26px]"
     />
   </div>
 </Section>

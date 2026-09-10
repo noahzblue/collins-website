@@ -32,7 +32,7 @@ const centered = align === "center";
 
 <div
   class:list={[
-    "mb-[60px] gap-8 max-mob:mb-[40px]",
+    "mb-[60px] gap-8 max-mob:mb-[40px] max-cmp:mb-[24px] max-cmp:gap-3",
     centered
       ? "mx-auto flex max-w-[640px] flex-col items-center text-center"
       : "flex flex-wrap items-end justify-between max-mob:gap-4",
@@ -42,12 +42,15 @@ const centered = align === "center";
   <div class:list={[centered && "flex flex-col items-center"]}>
     <Eyebrow
       tone={tone === "dark" ? "brand-bright" : "brand"}
-      class={centered ? "mb-[16px] justify-center" : "mb-[16px]"}
+      class={`mb-[16px] max-cmp:mb-[10px]${centered ? " justify-center" : ""}`}
     >
       {eyebrow}
     </Eyebrow>
     <h2
-      class:list={["text-h2 leading-[1.06] max-mob:mb-[4px]", h2Color]}
+      class:list={[
+        "text-h2 leading-[1.06] max-mob:mb-[4px] max-cmp:leading-[1.12]",
+        h2Color,
+      ]}
       set:html={lines.join("<br>")}
     />
   </div>
@@ -56,7 +59,7 @@ const centered = align === "center";
       <p
         class:list={[
           "text-lead leading-relaxed",
-          centered ? "max-w-[560px]" : "max-w-[430px]",
+          centered ? "max-w-[560px]" : "max-w-[430px] max-cmp:max-w-none",
           introColor,
         ]}
       >

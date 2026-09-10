@@ -13,22 +13,32 @@ const year = new Date().getFullYear();
 const { office, yard } = site.places;
 ---
 
-<footer class="border-t border-line bg-surface pt-24 text-muted max-mob:pt-16">
+<footer
+  class="border-t border-line bg-surface pt-24 text-muted max-mob:pt-16 max-cmp:pt-10"
+>
   <div class="wrap">
     <div
-      class="grid grid-cols-[1.4fr_0.9fr_0.9fr_1.1fr] gap-12 border-b border-line pb-16 max-nav:grid-cols-2 max-nav:gap-10 max-cmp:grid-cols-1"
+      class="grid grid-cols-[1.4fr_0.9fr_0.9fr_1.1fr] gap-12 border-b border-line pb-16 max-nav:grid-cols-2 max-nav:gap-10 max-cmp:gap-x-6 max-cmp:gap-y-8 max-cmp:pb-9"
     >
+      {
+        /* Two columns on a phone, not one: three stacked link lists is 700px
+          of footer under a page that has just spent an hour getting shorter.
+          The brand block spans both so the wordmark and the two addresses
+          keep a full-width line to sit on. */
+      }
       <!-- Brand -->
-      <div>
+      <div class="max-cmp:col-span-2">
         <Logo />
         <p
-          class="mt-5 mb-6 max-w-[280px] text-label leading-relaxed text-muted"
+          class="mt-5 mb-6 max-w-[280px] text-label leading-relaxed text-muted max-cmp:mt-3 max-cmp:mb-4"
         >
           {site.blurb}
         </p>
 
         <!-- Two addresses, because there are two places doing two jobs. -->
-        <ul class="mb-6 flex flex-col gap-[10px] text-label">
+        <ul
+          class="mb-6 flex flex-col gap-[10px] text-label max-cmp:mb-4 max-cmp:gap-2"
+        >
           {
             [office, yard].map((place) => (
               <li class="flex items-center gap-[14px]">
@@ -70,7 +80,7 @@ const { office, yard } = site.places;
       {
         footerColumns.map((col) => (
           <div>
-            <h5 class="mb-5 text-meta font-medium tracking-[1.5px] text-ink uppercase">
+            <h5 class="mb-5 text-meta font-medium tracking-[1.5px] text-ink uppercase max-cmp:mb-3">
               {col.title}
             </h5>
             <ul class="flex flex-col gap-[11px]">
@@ -89,7 +99,7 @@ const { office, yard } = site.places;
       <!-- Get in touch -->
       <div>
         <h5
-          class="mb-5 text-meta font-medium tracking-[1.5px] text-ink uppercase"
+          class="mb-5 text-meta font-medium tracking-[1.5px] text-ink uppercase max-cmp:mb-3"
         >
           Get in touch
         </h5>
@@ -133,7 +143,7 @@ const { office, yard } = site.places;
 
     <!-- Legal line: the checkable credential, from the profile's back cover. -->
     <p
-      class="mb-0 border-b border-line py-6 text-center font-mono text-micro tracking-[0.4px] text-faint"
+      class="mb-0 border-b border-line py-6 text-center font-mono text-micro tracking-[0.4px] text-faint max-cmp:py-4"
     >
       {site.legalName} · Register {site.register} · Licensed by the {
         site.licensingAuthority
@@ -141,7 +151,7 @@ const { office, yard } = site.places;
     </p>
 
     <div
-      class="flex flex-wrap justify-between gap-[10px] py-7 text-micro text-faint max-xs:flex-col max-xs:items-start max-xs:gap-2"
+      class="flex flex-wrap justify-between gap-[10px] py-7 text-micro text-faint max-cmp:py-5 max-xs:flex-col max-xs:items-start max-xs:gap-2"
     >
       <span>© {year} {site.legalName}. All rights reserved.</span>
       <span>{site.credit}</span>
