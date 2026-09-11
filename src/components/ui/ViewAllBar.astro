@@ -10,6 +10,13 @@
  * acknowledges the pointer rather than four words in the middle of it.
  *
  *   <ViewAllBar href="/equipment" label="View all 12 categories" />
+ *
+ * It is deliberately NOT `ui/Button.astro`. A button is an object sitting on
+ * the page; this is a rule the block ends on — full width, hairline top and
+ * bottom, no fill and no radius. What it does borrow from Button is the
+ * *scale*: on a phone it sits at the same 12.5px label and ~40px height as a
+ * small button, so the two read as the same size of control even though they
+ * are not the same shape.
  */
 import Icon from "@/components/ui/Icon.astro";
 
@@ -25,7 +32,7 @@ const { href, label, class: extra = "" } = Astro.props;
 <a
   href={href}
   class:list={[
-    "view-all press group flex w-full items-center justify-center gap-3 border-y border-line px-6 py-[30px] font-mono text-sm font-medium tracking-[1.6px] text-ink uppercase transition-colors duration-300 max-mob:py-[22px] max-cmp:gap-2 max-cmp:px-4 max-cmp:py-[15px] max-cmp:tracking-[1.1px]",
+    "view-all press group flex w-full items-center justify-center gap-3 border-y border-line px-6 py-[30px] font-mono text-sm font-medium tracking-[1.6px] text-ink uppercase transition-colors duration-300 max-mob:py-[22px] max-cmp:gap-[6px] max-cmp:px-4 max-cmp:py-[11px] max-cmp:text-note max-cmp:tracking-[1px]",
     extra,
   ]}
 >
@@ -33,7 +40,7 @@ const { href, label, class: extra = "" } = Astro.props;
   <Icon
     name="arrow-right"
     size={17}
-    class="transition-transform duration-300 ease-out group-hover:translate-x-[6px] max-cmp:h-[14px] max-cmp:w-[14px]"
+    class="transition-transform duration-300 ease-out group-hover:translate-x-[6px] max-cmp:h-[13px] max-cmp:w-[13px]"
   />
 </a>
 

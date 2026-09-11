@@ -138,6 +138,13 @@ const featured = (await getCollection("equipment"))
      Tiles are 74% wide, so the next one is always half in frame: the overflow
      is the affordance and the rail needs no arrows, dots or instructions —
      the same argument /yard's fleet strip makes for the same shape.
+
+     Square, not the 3:4 they started at. A portrait tile is right when tiles
+     stack — it fills a column that has width to spare. In a rail the width is
+     already spent and the height is pure cost, so the crop that was carrying
+     its weight vertically is just making the band taller than the machine in
+     it needs. 1:1 takes ~90px off the section and loses nothing: these are
+     photographs of wide objects.
   
      `overscroll-behavior-x: contain` is what Lenis reads to stand off the
      horizontal axis while a vertical swipe over the rail still scrolls the
@@ -165,7 +172,7 @@ const featured = (await getCollection("equipment"))
       display: none;
     }
     .tile {
-      aspect-ratio: 3 / 4;
+      aspect-ratio: 1 / 1;
       scroll-snap-align: start;
     }
   }

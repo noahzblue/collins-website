@@ -155,6 +155,29 @@
 
    Deliberately unlayered — `@theme` emits into `@layer theme`, and an
    unlayered rule beats every layer, so this wins without a specificity fight.
+   (`@theme` itself cannot hold a media query, so the override has to live out
+   here regardless.) The mechanism this rests on: Tailwind v4 does NOT inline
+   token values into the utilities it generates — `.text-base` compiles to
+   `font-size: var(--text-base)`. Re-point the variable and every utility that
+   reads it moves. Confirm with a walk of `document.styleSheets` if it ever
+   looks like it isn't working; a screenshot cannot tell you whether the token
+   moved or the element never used one.
+
+   THE ESCAPE HATCH THIS DOES NOT REACH: an arbitrary value. Anything written
+   as `text-[clamp(28px,3.6vw,44px)]` is invisible here and has to be
+   re-clamped by hand at the call site. A `font-size` in a scoped `<style>` is
+   fine as long as it reads a token — every one on the site does, which is why
+   `sections/ContactCTA.astro` needs nothing despite setting three of them.
+
+   Audited 2026-09-10 with `grep -rn 'text-\[' src/`. Four homepage sections
+   hold their own clamp and each carries a matching `max-cmp:` one:
+   `TrustStrip`, `SalesOrHire`, `AboutTeaser`, `FounderQuote`. Two more are
+   arbitrary and have NO phone size yet because nothing on the homepage renders
+   them — `ui/AlternatingRow.astro` and `sections/Testimonials.astro` (parked,
+   see its header). Give them one when the page that uses them gets its pass.
+
+   Add a seventh and it is on you to size it for a phone too — run that grep
+   before assuming this block covered a page.
    ============================================================ */
 /* The tablet rung. `mob` already had a spacing pass in every component; this
    is the same number, moved to the token so `py-section` carries all three. */

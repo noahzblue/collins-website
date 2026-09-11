@@ -15,6 +15,12 @@
  * `Testimonials.astro` stays in the repo with its rotation logic intact: when
  * real client quotes exist, that comes back and this quote moves to /about.
  * See docs/site-expansion/10.
+ *
+ * On a phone the quote drops below `--text-h3` rather than riding it. Every
+ * other h3 on the site is a heading — three or four words, sized to be seen
+ * before it is read. This one is forty words of centred mono that has to be
+ * *read*, and at heading size that is six lines of shouting across a 358px
+ * column. The rung below turns it back into a sentence.
  */
 import Section from "@/components/ui/Section.astro";
 import Eyebrow from "@/components/ui/Eyebrow.astro";
@@ -42,7 +48,7 @@ import { quoteSection } from "@/data/content";
       </Eyebrow>
 
       <blockquote
-        class="font-mono text-h3 leading-[1.3] tracking-[-0.02em] text-balance text-white max-cmp:leading-[1.38] max-cmp:text-pretty"
+        class="font-mono text-h3 leading-[1.3] tracking-[-0.02em] text-balance text-white max-cmp:text-[clamp(15.5px,4.5vw,18px)] max-cmp:leading-[1.45] max-cmp:text-pretty"
         data-reveal
       >
         <span aria-hidden="true">“</span>{founderQuote.lead}<span

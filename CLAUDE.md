@@ -60,6 +60,11 @@ rejects the unknown Host header with a bare 403. Use numeric IPs.
   then move on. Never a speculative full-page restyle.
 - **Verify before claiming done:** `bun run check` (0 errors) **and** `bun run build`.
   Run `bun run format` before finishing so the diff is only real changes.
+- **Never write memory files outside the repo.** No `~/.claude/**/memory/` notes, no
+  scratch files in `/tmp` that matter. Anything worth keeping goes in the repo, where
+  it is reviewable and versioned with the code it describes: a mechanism or gotcha
+  belongs in a comment in the file it governs, a decision belongs in
+  `docs/site-expansion/`, a working rule belongs here.
 
 ---
 
