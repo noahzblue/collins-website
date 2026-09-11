@@ -6,8 +6,22 @@
  * be dropped in later by emitting both panels and hiding one with CSS — no
  * re-render, no hrefs rewritten in JS.
  *
- * Below 600px the rows stack: rating + type on one line, duty beneath,
- * availability and the enquiry link on the last line.
+ * Below 980px (`nav` — a five-column table has nowhere to shrink to on a
+ * tablet in portrait) the rows stack: rating + type on one line, duty
+ * beneath, availability and the enquiry link on the last line. Above that,
+ * the table has no scroll wrapper, so a stacking breakpoint any narrower
+ * than the widest fixed-width columns' combined minimum silently clips the
+ * overflow inside the card's `overflow-hidden` rather than showing it.
+ *
+ * The stacked row is a wrapping flex line, not a stack of blocks, and the
+ * three pieces that shape it are worth naming because each looks removable:
+ * the duty cell's `w-full` is what forces the line break (so the label and
+ * its power-type pill share line one and duty gets its own), the
+ * availability cell's `mr-auto` is what pins "Enquire" to the right edge
+ * rather than leaving it adrift beside the status, and the row's `gap-y`
+ * replaces the per-cell top margins this used to carry — margins that no
+ * longer collapse correctly once the cells are flex items. Delete any of
+ * the three and the row still renders, just wrong.
  */
 import type { CollectionEntry } from "astro:content";
 import Icon from "@/components/ui/Icon.astro";
@@ -41,12 +55,12 @@ const hasDuty = ranges.some((r) => r.typicalDuty);
 
 const th =
   "px-6 py-[13px] text-tag font-medium uppercase tracking-[1.4px] text-faint max-xs:px-5";
-const td = "px-6 py-[17px] align-middle max-cmp:p-0 max-xs:px-5";
+const td = "px-6 py-[17px] align-middle max-nav:p-0 max-xs:px-5";
 ---
 
 <div data-mode-panel={mode} class="card overflow-hidden">
-  <table class="w-full border-collapse text-left max-cmp:block">
-    <thead class="max-cmp:hidden">
+  <table class="w-full border-collapse text-left max-nav:block">
+    <thead class="max-nav:hidden">
       <tr class="border-b border-line bg-surface">
         <th scope="col" class={th}>Size / rating</th>
         {
@@ -69,35 +83,31 @@ const td = "px-6 py-[17px] align-middle max-cmp:p-0 max-xs:px-5";
         </th>
       </tr>
     </thead>
-    <tbody class="max-cmp:block">
+    <tbody class="max-nav:block">
       {
         ranges.map((range) => (
-          <tr class="border-b border-line transition-colors last:border-0 hover:bg-surface max-cmp:block max-cmp:px-5 max-cmp:py-5">
+          <tr class="border-b border-line transition-colors last:border-0 hover:bg-surface max-nav:flex max-nav:flex-wrap max-nav:items-center max-nav:gap-x-2 max-nav:gap-y-[7px] max-nav:px-0 max-nav:py-[13px]">
             <td
-              class={`${td} text-cell font-medium whitespace-nowrap text-ink max-cmp:inline-flex max-cmp:text-intro`}
+              class={`${td} text-cell font-medium whitespace-nowrap text-ink max-nav:text-meta`}
             >
               {range.label}
             </td>
 
             {hasPowerType && (
-              <td
-                class={`${td} whitespace-nowrap max-cmp:ml-3 max-cmp:inline-flex`}
-              >
+              <td class={`${td} whitespace-nowrap`}>
                 {range.powerType && <Pill>{range.powerType}</Pill>}
               </td>
             )}
 
             {hasDuty && (
               <td
-                class={`${td} text-detail leading-relaxed text-muted max-cmp:mt-[10px] max-cmp:block`}
+                class={`${td} text-detail leading-relaxed text-muted max-nav:w-full max-nav:text-caption max-nav:leading-snug`}
               >
                 {range.typicalDuty}
               </td>
             )}
 
-            <td
-              class={`${td} whitespace-nowrap max-cmp:mt-[14px] max-cmp:inline-flex`}
-            >
+            <td class={`${td} whitespace-nowrap max-nav:mr-auto`}>
               <span class="inline-flex items-center gap-[7px] text-meta font-medium text-body">
                 <span
                   class:list={[
@@ -110,9 +120,7 @@ const td = "px-6 py-[17px] align-middle max-cmp:p-0 max-xs:px-5";
               </span>
             </td>
 
-            <td
-              class={`${td} text-right whitespace-nowrap max-cmp:mt-[14px] max-cmp:ml-5 max-cmp:inline-flex`}
-            >
+            <td class={`${td} text-right whitespace-nowrap`}>
               {/* The machine, the size and buy-or-hire, all three answered
                   by one click. WhatsApp stays as the `href` for anyone whose
                   script never ran. */}
@@ -121,7 +129,7 @@ const td = "px-6 py-[17px] align-middle max-cmp:p-0 max-xs:px-5";
                 target="_blank"
                 rel="noopener"
                 {...(categoryId ? quoteTrigger(categoryId, mode, range) : {})}
-                class="group inline-flex items-center gap-[5px] text-note font-medium text-brand transition-colors hover:text-brand-hover"
+                class="group inline-flex items-center gap-[5px] text-note font-medium text-brand transition-colors hover:text-brand-hover max-nav:text-caption"
               >
                 Enquire
                 <Icon

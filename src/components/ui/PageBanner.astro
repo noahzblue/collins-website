@@ -22,7 +22,7 @@ const { image, trail, current, title } = Astro.props;
 
 <section
   data-next-theme="glass"
-  class="relative flex min-h-[460px] items-end overflow-clip bg-ink max-mob:min-h-[380px]"
+  class="relative flex min-h-[460px] items-end overflow-clip bg-ink max-mob:min-h-[380px] max-cmp:min-h-[320px]"
 >
   {
     image && (
@@ -32,12 +32,17 @@ const { image, trail, current, title } = Astro.props;
   <div class="scrim-banner absolute inset-0" aria-hidden="true"></div>
 
   <div
-    class="wrap relative z-[1] w-full pt-[180px] pb-[52px] max-mob:pt-[130px] max-mob:pb-[40px]"
+    class="wrap relative z-[1] w-full pt-[180px] pb-[52px] max-mob:pt-[130px] max-mob:pb-[40px] max-cmp:pt-[96px] max-cmp:pb-[26px]"
   >
-    <Breadcrumb trail={trail} current={current} tone="on-dark" class="mb-4" />
+    <Breadcrumb
+      trail={trail}
+      current={current}
+      tone="on-dark"
+      class="mb-4 max-cmp:mb-2"
+    />
 
     <h1
-      class="max-w-[780px] text-h1 leading-[1.05] tracking-[-0.025em] text-white"
+      class="max-w-[780px] text-h1 leading-[1.35] tracking-[-0.025em] text-white"
     >
       {title}
     </h1>

@@ -41,13 +41,16 @@ const { image, trail, current, title, intro, class: extra = "" } = Astro.props;
 
 <section
   data-next-theme="light"
-  class:list={["pt-header-gap pb-[64px] max-mob:pb-[48px]", extra]}
+  class:list={[
+    "pt-header-gap pb-[64px] max-mob:pb-[48px] max-cmp:pb-[26px]",
+    extra,
+  ]}
 >
   <div class="wrap wrap-wide">
-    <Breadcrumb trail={trail} current={current} class="mb-5" />
+    <Breadcrumb trail={trail} current={current} class="mb-5 max-cmp:mb-3" />
 
     <div
-      class="relative aspect-[2.6/1] overflow-clip rounded-md bg-ink max-nav:aspect-[16/9] max-mob:aspect-[3/2]"
+      class="relative aspect-[2.6/1] overflow-clip rounded-md bg-ink max-nav:aspect-[16/9] max-mob:aspect-[3/2] max-cmp:aspect-[16/10]"
     >
       {
         image && (
@@ -57,14 +60,14 @@ const { image, trail, current, title, intro, class: extra = "" } = Astro.props;
     </div>
   </div>
 
-  <div class="wrap mt-[52px] max-mob:mt-[36px]">
+  <div class="wrap mt-[52px] max-mob:mt-[36px] max-cmp:mt-[20px]">
     <h1 class="max-w-[900px] text-h1 leading-[1.05] tracking-[-0.025em]">
       {title}
     </h1>
 
     {
       intro && (
-        <p class="mt-6 max-w-[680px] text-intro leading-relaxed text-muted">
+        <p class="mt-6 max-w-[680px] text-intro leading-relaxed text-muted max-cmp:mt-3">
           {intro}
         </p>
       )

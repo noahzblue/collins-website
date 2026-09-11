@@ -114,8 +114,11 @@
        rounded-md  cards, panels, photo frames, the header bar,
                    every button (ui/Button.astro), the whole page
      `rounded-full` survives only where the shape IS the component —
-     pills, chips, dots and the status light. A button is not one of
-     them: it belongs to the same 5px system as the card it sits in.
+     dots, radio marks, circular icon buttons and the status light. A
+     button is not one of them: it belongs to the same 5px system as the
+     card it sits in. Nor is a badge: `ui/Pill` (every "Hire" / "Buy"
+     chip, power type and tag on the site) is `rounded-sm`, so a label
+     you READ sits on the same near-square system as everything else.
      Never write `rounded-[Npx]`. */
   --radius-sm: 3px;
   --radius-md: 5px;
@@ -203,7 +206,7 @@
     --text-base: 14px;
     --text-cell: 14px;
     --text-lead: 14.5px;
-    --text-lead-lg: 15px;
+    --text-lead-lg: 13px;
     --text-intro: 15.5px;
     --text-subhead: 16px;
 
@@ -212,7 +215,7 @@
        laptop — on a 390px screen that floor IS the size, so it may as well be
        chosen here where it is the only value anyone sees. */
     --text-display: clamp(21px, 5.9vw, 26px);
-    --text-h1: clamp(25px, 7.2vw, 32px);
+    --text-h1: clamp(22px, 3.2vw, 32px);
     --text-h2: clamp(23px, 6.6vw, 30px);
     --text-h3: clamp(19px, 5.3vw, 24px);
 

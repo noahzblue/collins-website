@@ -62,9 +62,20 @@ const num = (i: number) => String(i + 1).padStart(2, "0");
     </ul>
   </nav>
 
+  {
+    /* The strip's own margins come in on a phone; the CHIPS do not.
+  
+       They are already a ~30px target, which is under the thumb floor — and
+       the rule about targets is a floor, not a preference, so the one thing
+       this pass may not do is take another 4px off them to make the bar look
+       tidier. The strip is also permanent chrome while the reader is in the
+       section: every pixel of its height is charged on every screen, which is
+       the argument for shrinking the box around the chips and for leaving the
+       chips alone. */
+  }
   <!-- Mobile chip strip -->
   <div
-    class="chip-strip sticky top-[calc(var(--spacing-header)+6px)] z-20 mb-8 hidden overflow-x-auto rounded-full border border-line bg-white/92 px-[10px] py-[8px] backdrop-blur-md max-nav:block"
+    class="chip-strip sticky top-[calc(var(--spacing-header)+6px)] z-20 mb-8 hidden overflow-x-auto rounded-md border border-line bg-white/92 px-[10px] py-[8px] backdrop-blur-md max-nav:block max-cmp:mb-5"
   >
     <ul class="flex w-max items-center gap-2" aria-label={ariaLabel}>
       {
@@ -73,7 +84,7 @@ const num = (i: number) => String(i + 1).padStart(2, "0");
             <a
               href={`#${item.id}`}
               data-index-link={item.id}
-              class="chip flex items-center gap-[7px] rounded-full border border-line-strong px-[12px] py-[6px] whitespace-nowrap transition-colors duration-200"
+              class="chip flex items-center gap-[7px] rounded-sm border border-line-strong px-[12px] py-[6px] whitespace-nowrap transition-colors duration-200"
             >
               <span class="font-mono text-micro tracking-[0.5px] text-faint">
                 {num(i)}

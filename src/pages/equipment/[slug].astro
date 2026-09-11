@@ -81,12 +81,12 @@ if (relatedEntries.length !== related.length) {
     current={name}
     title={h1}
   >
-    <div class="mt-5 flex flex-wrap items-center gap-3">
+    <div class="mt-2 flex flex-wrap items-center gap-3">
       <span class="text-lead-lg text-white/80">{rangeLabel}</span>
       <span class="text-white/30" aria-hidden="true">·</span>
       {
         availabilityBadges(category.data, "long").map((badge) => (
-          <Pill tone="on-dark" size="md">
+          <Pill tone="on-dark" size="sm">
             {badge}
           </Pill>
         ))
@@ -137,7 +137,7 @@ if (relatedEntries.length !== related.length) {
         <IncludedList mode="hire" />
 
         <div class="card p-8 max-xs:p-6">
-          <h3 class="mb-3 text-[20px]">
+          <h3 class="mb-3 text-[20px] max-cmp:text-subhead">
             Need a {singular(name)} on site?
           </h3>
           <p class="mb-7 text-base leading-relaxed text-muted">

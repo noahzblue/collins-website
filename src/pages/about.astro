@@ -58,7 +58,7 @@ const initials = (name: string) =>
     intro={aboutPage.tagline}
   >
     <div
-      class="mt-7 flex flex-wrap items-center gap-x-4 gap-y-2 font-mono text-caption tracking-[1px] text-faint uppercase"
+      class="mt-7 flex flex-wrap items-center gap-x-1 gap-y-1 font-mono text-caption tracking-[.1px] text-faint uppercase lg:gap-x-4 lg:gap-y-2"
     >
       {
         bannerDetail.map((item, i) => (
@@ -71,7 +71,7 @@ const initials = (name: string) =>
     </div>
   </PageHeader>
 
-  <Section class="pt-[90px] max-mob:pt-[56px]">
+  <Section class="pt-[90px] max-mob:pt-[26px]">
     <RailSections items={aboutBlocks} ariaLabel="About this page">
       <!-- 01 — Who we are -->
       <article id="who-we-are">
@@ -319,10 +319,10 @@ const initials = (name: string) =>
             {
               licensedActivities.map((row) => (
                 <tr class="border-b border-line">
-                  <td class="py-[14px] pr-6 align-top text-cell leading-[1.4] text-body">
+                  <td class="py-[14px] pr-6 align-top text-cell leading-[1.4] text-body max-cmp:pr-3 max-cmp:text-caption">
                     {row.sale}
                   </td>
-                  <td class="border-l border-line py-[14px] pr-6 pl-6 align-top text-cell leading-[1.4] text-body max-xs:pl-4">
+                  <td class="border-l border-line py-[14px] pr-6 pl-6 align-top text-cell leading-[1.4] text-body max-cmp:pr-3 max-cmp:pl-3 max-cmp:text-caption max-xs:pl-4">
                     {row.rental}
                   </td>
                 </tr>

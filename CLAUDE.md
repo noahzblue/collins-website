@@ -57,7 +57,11 @@ rejects the unknown Host header with a bare 403. Use numeric IPs.
   screenshots via the Playwright container still work at the devbox IP). Work from code +
   screenshots the user shares when their server is down.
 - **Design work moves one section at a time** — build it, show it, get it confirmed,
-  then move on. Never a speculative full-page restyle.
+  then move on. Never a speculative full-page restyle. **Exception: a responsive
+  pass runs a whole page at a time** (confirmed 2026-09-11). The rule exists to stop
+  speculative restyling; a mobile pass is not speculative — the brief is fixed, the
+  work is mechanical per section, and the corrections are more useful when the whole
+  page is there to compare against. See `docs/site-expansion/16-designing-for-the-phone.md`.
 - **Verify before claiming done:** `bun run check` (0 errors) **and** `bun run build`.
   Run `bun run format` before finishing so the diff is only real changes.
 - **Never write memory files outside the repo.** No `~/.claude/**/memory/` notes, no

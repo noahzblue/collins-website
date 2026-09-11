@@ -29,13 +29,13 @@ const { points, class: extra = "" } = Astro.props;
 
 <div
   class:list={[
-    "sticky-points grid grid-cols-[0.95fr_1.05fr] items-start gap-[72px] max-nav:grid-cols-1 max-nav:gap-10",
+    "sticky-points grid grid-cols-[0.95fr_1.05fr] items-start gap-[72px] max-nav:grid-cols-1 max-nav:gap-10 max-cmp:gap-6",
     extra,
   ]}
   data-sticky-points
 >
   <div
-    class="media sticky top-header-gap aspect-[4/5] overflow-clip rounded-md bg-surface-2 max-nav:static max-nav:aspect-[16/10]"
+    class="media sticky top-header-gap aspect-[4/5] overflow-clip rounded-md bg-surface-2 max-nav:hidden"
   >
     {
       points.map((point, i) => (
@@ -58,17 +58,30 @@ const { points, class: extra = "" } = Astro.props;
     {
       points.map((point, i) => (
         <li
-          class="point flex min-h-[62svh] flex-col justify-center border-b border-line py-12 last:border-0 max-nav:min-h-0 max-nav:py-9"
+          class="point flex min-h-[62svh] flex-col justify-center border-b border-line py-12 last:border-0 max-nav:min-h-0 max-nav:py-9 max-cmp:py-6"
           data-point={i}
         >
+          {/* The pin loses its point below `nav` — a shared photo slot
+               that isn't sticky just shows the first frame forever, so each
+               point carries its own crop instead. Same aspect steps
+               `ui/AlternatingRow` uses when its row stacks. */}
+          <img
+            src={point.image}
+            alt={point.alt}
+            loading={i === 0 ? "eager" : "lazy"}
+            decoding="async"
+            class="mb-6 hidden aspect-[16/10] w-full rounded-md object-cover max-nav:block max-cmp:mb-4 max-cmp:aspect-[2/1]"
+          />
           <span class="flex items-center gap-[14px]">
             <span class="point-num font-mono text-caption tracking-[0.5px] text-faint transition-colors duration-300">
               {String(i + 1).padStart(2, "0")}
             </span>
             <span class="h-px w-[22px] bg-line-strong" aria-hidden="true" />
           </span>
-          <h3 class="mt-[18px] text-h3 leading-[1.1]">{point.title}</h3>
-          <p class="mt-4 max-w-[460px] text-lead leading-relaxed text-muted">
+          <h3 class="mt-[18px] text-h3 leading-[1.1] max-cmp:mt-[10px]">
+            {point.title}
+          </h3>
+          <p class="mt-4 max-w-[460px] text-lead leading-relaxed text-muted max-cmp:mt-2">
             {point.body}
           </p>
         </li>
@@ -90,10 +103,9 @@ const { points, class: extra = "" } = Astro.props;
     color: var(--color-brand);
   }
 
-  /* Below the nav breakpoint the pin is dropped, so the shared slot would
-     leave four photos invisible — each point gets its own inline photo
-     instead. Handled by the parent page's layout, not here: the media column
-     simply stops being sticky and holds the first frame. */
+  /* Below the nav breakpoint the pinned media column is hidden outright
+     (see its `max-nav:hidden` above) — each point carries its own inline
+     photo instead, rendered in the `<li>` markup below. */
   @media (prefers-reduced-motion: reduce) {
     .frame {
       transition: none;

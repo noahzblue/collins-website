@@ -155,14 +155,14 @@ const isCurrent = (href: string) =>
                   <a
                     href={link.href}
                     aria-current={isCurrent(link.href) ? "page" : undefined}
-                    class="sub-link py-[9px] pl-4 text-note font-medium"
+                    class="sub-link rounded-sm py-[9px] pl-4 text-note font-medium"
                   >
                     All {link.label.toLowerCase()}
                   </a>
                   {link.children.map((child) => (
                     <a
                       href={child.href}
-                      class="sub-link py-[9px] pl-4 text-note"
+                      class="sub-link rounded-sm py-[9px] pl-4 text-note"
                     >
                       {child.label}
                     </a>
@@ -292,6 +292,20 @@ const isCurrent = (href: string) =>
   }
   #site-header[data-tone="glass"] .sub-link {
     color: rgba(255, 255, 255, 0.62);
+  }
+  /* The mobile panel shares the bar's glass, so its hover has to be glass too.
+     The shared `.sub-link:hover` above paints `--color-surface` (near-white)
+     and sets ink type — but the glass rule directly above it carries an id and
+     therefore wins on `color`, leaving white type on a near-white block. Lift
+     the translucency instead and keep the type white, so the hover reads as the
+     glass thickening rather than as a light chip dropped onto it. Scoped to
+     `#nav-panel`: the DESKTOP dropdown is its own white surface and still wants
+     the light hover. */
+  #site-header[data-tone="glass"] #nav-panel .sub-link:hover,
+  #site-header[data-tone="glass"] #nav-panel .sub-link:focus-visible {
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16);
+    color: #fff;
   }
   #site-header[data-tone="solid"] .sub-link {
     color: var(--color-muted);

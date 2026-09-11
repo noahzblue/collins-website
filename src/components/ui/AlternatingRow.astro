@@ -50,9 +50,17 @@ const {
 
 /* Sources are 4:3 landscape; the 4:5 crop is what gives the row its editorial
    column, so the photos are centred rather than fitted. Below the nav
-   breakpoint the row stacks and the photo goes back to landscape. */
+   breakpoint the row stacks and the photo goes back to landscape — and on a
+   phone it goes shallower still.
+   
+   The reason is that the crop changes job when the row stacks. Side by side
+   the photograph is one half of a spread and its height is free: it is filling
+   a column the copy has already paid for. Stacked, every pixel of it is pixels
+   between the reader and the next row, on a page that is eighteen of these.
+   2:1 is the shallowest crop these sources survive and still read as a
+   photograph of a machine rather than a texture swatch. */
 const mediaClass = [
-  "aspect-[4/5] w-full max-nav:aspect-[16/10]",
+  "aspect-[4/5] w-full max-nav:aspect-[16/10] max-cmp:aspect-[2/1]",
   href && "transition-transform duration-500 ease-out group-hover:scale-[1.03]",
 ];
 ---
@@ -60,7 +68,7 @@ const mediaClass = [
 <article
   id={id}
   class:list={[
-    "group grid grid-cols-2 items-center gap-[72px] max-nav:grid-cols-1 max-nav:gap-9",
+    "group grid grid-cols-2 items-center gap-[72px] max-nav:grid-cols-1 max-nav:gap-9 max-cmp:gap-5",
     extra,
   ]}
 >
@@ -96,7 +104,9 @@ const mediaClass = [
   <div class="max-w-[460px] max-nav:max-w-none">
     <slot name="meta" />
 
-    <h2 class="mt-[18px] text-[clamp(28px,3.2vw,38px)] leading-[1.06]">
+    <h2
+      class="mt-[18px] text-[clamp(28px,3.2vw,38px)] leading-[1.06] max-cmp:mt-[10px] max-cmp:text-[clamp(21px,5.6vw,25px)] max-cmp:leading-[1.14]"
+    >
       {
         href ? (
           <a href={href} class="transition-colors hover:text-brand">
@@ -110,7 +120,9 @@ const mediaClass = [
 
     <slot />
 
-    <div class="mt-8 flex flex-wrap items-center gap-3 empty:hidden">
+    <div
+      class="mt-8 flex flex-wrap items-center gap-3 empty:hidden max-cmp:mt-5 max-cmp:gap-2"
+    >
       <slot name="actions" />
     </div>
   </div>

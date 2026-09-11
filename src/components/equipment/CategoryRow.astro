@@ -50,9 +50,9 @@ const href = `/equipment/${category.id}`;
     </div>
   </Fragment>
 
-  <p class="mt-[10px] text-base text-muted">{rangeLabel}</p>
+  <p class="mt-[10px] text-base text-muted max-cmp:mt-[6px]">{rangeLabel}</p>
 
-  <ul class="mt-7 flex flex-col gap-[9px]">
+  <ul class="mt-7 flex flex-col gap-[9px] max-cmp:mt-4 max-cmp:gap-[6px]">
     {
       highlights.map((line) => (
         <li class="flex gap-[11px] text-detail leading-[1.45] font-medium text-body">
@@ -67,7 +67,24 @@ const href = `/equipment/${category.id}`;
     }
   </ul>
 
-  <p class="mt-7 text-lead leading-relaxed text-muted">{summary}</p>
+  {
+    /* The one CONTENT decision in the phone pass, and it belongs here rather
+      than in `ui/AlternatingRow` — the layout is shared with /services, where
+      the six rows ARE the destination and every word of them is wanted. Here
+      the twelve rows are a routing table: the reader is looking for their
+      machine, not reading about all twelve, and the category page two taps
+      away carries this paragraph in full.
+    
+      So on a phone the summary goes and the four highlight lines stay. They
+      say the same thing in a form you can scan at arm's length, which is the
+      form this page is for. `hidden` rather than removed, because at any width
+      that can show a row and a paragraph side by side, the paragraph is free.
+    
+      Overrule by deleting `max-cmp:hidden`; it costs ~110px per row. */
+  }
+  <p class="mt-7 text-lead leading-relaxed text-muted max-cmp:hidden">
+    {summary}
+  </p>
 
   <Fragment slot="actions">
     <Button variant="outline" href={href} class="press">
