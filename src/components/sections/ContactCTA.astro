@@ -18,7 +18,7 @@
  * means the closing band asks something rather than announcing something, and
  * the tap arrives at the machine picker with section 01 already half answered.
  *
- * The three options are `MODES`, not literals: the homepage cannot word the
+ * The two options are `MODES`, not literals: the homepage cannot word the
  * question differently to the form it opens.
  *
  * **The band is written in the form's voice, not the homepage's.** Every other
@@ -28,16 +28,16 @@
  * `.rule-brand` — the rule that starts brand and stops, which is what the
  * dialog and the inline mount both draw under their titles.
  *
- * **The three answers are one row, not three links in a column.** A hairline
- * between each is the whole separation — no surface, no lattice: they sit on
+ * **The two answers are one row, not two links in a column.** A hairline
+ * between them is the whole separation — no surface, no lattice: they sit on
  * the section's own ground, which is what keeps a closing band from reading as
- * three cards bolted to the bottom of the page. (`.mesh` was tried and
+ * cards bolted to the bottom of the page. (`.mesh` was tried and
  * rejected on review — it paints white, and a white panel on the grey band
- * turns three answers into three objects.)
+ * turns two answers into two objects.)
  *
  * A column also has room for the line that says what the difference actually
  * is, which a chip at the top of the form does not — the hints come from
- * `MODES` so the two can't drift.
+ * `MODES` so the copy can't drift.
  */
 import Section from "@/components/ui/Section.astro";
 import Eyebrow from "@/components/ui/Eyebrow.astro";
@@ -83,12 +83,12 @@ import { MODES } from "@/lib/quote/options";
       /* Links, not radios: choosing one is a navigation into the form, not an
         answer held on this page — and here it is a navigation in the plainest
         sense. The homepage does not open the dialog (`scripts/quote/dialog.ts`
-        header), so these three are ordinary links to the page that is
+        header), so these two are ordinary links to the page that is
         entirely the form, and the answer travels in the URL for /contact to
         pick up. No JavaScript is involved in any part of that, which is the
         other reason it is the right shape for the closing band. */
     }
-    <ul class="grid grid-cols-3 max-nav:grid-cols-1">
+    <ul class="grid grid-cols-2 max-nav:grid-cols-1">
       {
         MODES.map((option) => (
           <li class="mode-item flex">
@@ -131,7 +131,7 @@ import { MODES } from "@/lib/quote/options";
   }
 
   /* One column of the row. The anchor fills its `<li>` rather than sitting
-     inside it, so the whole column is the target — on a phone these three are
+     inside it, so the whole column is the target — on a phone these two are
      the largest tap targets on the page and it would be a waste to make the
      word the only live part of them.
 
@@ -192,10 +192,10 @@ import { MODES } from "@/lib/quote/options";
   }
 
   /* The arrow sits there rather than arriving. It was hidden until hover on
-     the first pass, on the argument that three permanent arrows read as a menu
+     the first pass, on the argument that permanent arrows read as a menu
      — but the version that reveals on hover is invisible on every phone, where
      nothing hovers, and that is most of the traffic. Drawn quietly at rest it
-     says "these three navigate" before anyone touches them, which the label
+     says "these navigate" before anyone touches them, which the label
      alone does not. */
   .mode-arrow {
     display: inline-flex;
@@ -209,8 +209,7 @@ import { MODES } from "@/lib/quote/options";
      drawn at rest because it says "this navigates" — a fact about the column
      that is true before you touch it. The rule says "this one" and is only
      ever true of one column at a time, so it stays transparent until the
-     pointer makes it true. Three rules drawn at once would say it of all
-     three. */
+     pointer makes it true. Both rules drawn at once would say it of both. */
   .mode-cell:hover .mode-face,
   .mode-cell:focus-visible .mode-face {
     color: var(--color-brand);
@@ -249,7 +248,7 @@ import { MODES } from "@/lib/quote/options";
     }
   }
 
-  /* The three answers are the largest tap targets on the page and they stay
+  /* The two answers are the largest tap targets on the page and they stay
      that way — only the air around them comes in. */
   @media (max-width: 600px) {
     .mode-cell,

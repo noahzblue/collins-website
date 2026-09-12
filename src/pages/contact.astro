@@ -17,10 +17,21 @@
  * boxed 14px fields retire in favour of the underline ones every other part of
  * the form uses (§14.3a).
  *
- * The contact methods moved from a sticky left column to a band across the
- * top, because the form now needs the full width — below 1240px its summary
- * flattens into a bar, and above it the rail is a real second column that
- * cannot share the page with a sidebar.
+ * **One width, and one skeleton, for the whole page.** Every band here sits in
+ * `wrap-wide`, because the form does and a page that changes its column width
+ * halfway down reads as two pages stapled together. Widening the rest was not
+ * enough on its own: a 1600px band with an 820px headline in the top-left of
+ * it is emptier than the narrow column it replaced. So each band is now built
+ * the way the form already is above 1240px — **the thing itself on the left, a
+ * hairline rail of supporting facts on the right** (`.mast` + `.rail` below).
+ * The masthead runs the headline against the ways in; the closing band runs
+ * the two addresses against the licence details. The form between them is
+ * untouched and needs no special case, because it was the pattern.
+ *
+ * That also retires the old full-width contact strip. The three ways in used
+ * to be a band across the top that everything else had to step over; beside
+ * the headline they are read at the same moment as it, and the form starts
+ * higher up the page than it did.
  *
  * Almost no motion, on purpose: one reveal on the header and that is it. A
  * contact page that animates while you fill it in is a contact page that
@@ -38,164 +49,129 @@ import { contactPage } from "@/data/content";
 import { DIALOG } from "@/lib/quote/options";
 
 const { office, yard } = site.places;
+
+/** The licence facts, as rail rows. Data, not markup — the closing rail and
+ *  the masthead rail are the same three elements with different contents. */
+const registration = [
+  { label: "Registered name", value: site.legalName },
+  { label: "Trade register", value: site.register },
+  { label: "Licensed by", value: site.licensingAuthority },
+  { label: "Working hours", value: site.hoursLong },
+];
 ---
 
 <Base title={contactPage.seoTitle} description={contactPage.seoDescription}>
-  <!-- 1. Header — straight into content -->
-  <header class="pt-[150px] pb-[48px] max-mob:pt-[120px] max-mob:pb-[36px]">
-    <div class="wrap">
-      <Breadcrumb
-        trail={[{ label: "Home", href: "/" }]}
-        current="Contact"
-        class="mb-5"
-      />
-      <Eyebrow class="mb-[16px]">{contactPage.eyebrow}</Eyebrow>
-      <h1
-        class="max-w-[820px] text-h1 leading-[1.05] tracking-[-0.025em]"
-        data-reveal
-      >
-        {contactPage.title}
-      </h1>
-      <p class="mt-6 max-w-[620px] text-intro leading-relaxed text-muted">
-        {contactPage.body}{" "}
-        <strong class="font-normal text-ink">{site.quotePromise}</strong>
-      </p>
+  {
+    /* 1. The masthead — what the page says, and the ways in, at one glance.
+      The breadcrumb sits on `.rule-brand`: the rule that marks the top of a
+      block which ASKS something. The form's own head draws it too, so the
+      page opens and re-opens on the same device. */
+  }
+  <header class="pt-[150px] pb-[76px] max-mob:pt-[120px] max-mob:pb-[52px]">
+    <div class="wrap wrap-wide">
+      <div class="rule-brand pb-5">
+        <Breadcrumb trail={[{ label: "Home", href: "/" }]} current="Contact" />
+      </div>
+
+      <div class="mast mt-14 max-mob:mt-10">
+        <div>
+          <Eyebrow class="mb-[16px]">{contactPage.eyebrow}</Eyebrow>
+          <h1
+            class="max-w-[21ch] text-h1 leading-[1.05] tracking-[-0.025em]"
+            data-reveal
+          >
+            {contactPage.title}
+          </h1>
+          <p class="mt-6 max-w-[60ch] text-intro leading-relaxed text-muted">
+            {contactPage.body}{" "}
+            <strong class="font-normal text-ink">{site.quotePromise}</strong>
+          </p>
+        </div>
+
+        {
+          /* The rail. Two of these three are faster than any form, and
+            pretending otherwise would be dishonest — so they are read
+            alongside the headline rather than after it.
+
+            WhatsApp is the enquiry channel in the UAE plant trade, not a
+            fallback, but it earns that by leading the rail rather than by
+            being a green block. The solid `bg-whatsapp` fill was the one
+            surface on the site painted in a third party's brand colour and
+            it read as an ad dropped into the page; the token is still
+            correct for the floating bubble in `layout/FloatingButtons`. */
+        }
+        <aside class="rail" aria-label="Direct lines">
+          <a
+            href={site.whatsapp.href}
+            target="_blank"
+            rel="noopener"
+            class="rail-row group flex items-start gap-3"
+          >
+            <Icon
+              name="whatsapp"
+              size={17}
+              class="mt-[3px] shrink-0 text-brand transition-transform duration-200 group-hover:-translate-y-[1px]"
+            />
+            <span class="min-w-0">
+              <span class="rail-label">WhatsApp</span>
+              <span
+                class="rail-value flex items-center gap-[6px] font-medium transition-colors group-hover:text-brand"
+              >
+                Message the yard
+                <Icon
+                  name="arrow-up-right"
+                  size={14}
+                  class="shrink-0 text-faint transition-transform duration-200 group-hover:translate-x-[2px] group-hover:-translate-y-[2px] group-hover:text-brand"
+                />
+              </span>
+            </span>
+          </a>
+
+          <!-- Three separate tel: rows, not a dropdown. -->
+          <div class="rail-row flex items-start gap-3">
+            <Icon name="phone" size={17} class="mt-[3px] shrink-0 text-brand" />
+            <span class="min-w-0">
+              <span class="rail-label">Call us</span>
+              <ul class="mt-[6px] flex flex-col">
+                {
+                  site.phones.map((phone) => (
+                    <li>
+                      <a href={phone.href} class="rail-num">
+                        {phone.display}
+                      </a>
+                    </li>
+                  ))
+                }
+              </ul>
+            </span>
+          </div>
+
+          <div class="rail-row flex items-start gap-3">
+            <Icon name="mail" size={17} class="mt-[3px] shrink-0 text-brand" />
+            <span class="min-w-0">
+              <span class="rail-label">Email</span>
+              <a
+                href={`mailto:${site.email}`}
+                class="rail-value block truncate font-medium transition-colors hover:text-brand"
+              >
+                {site.email}
+              </a>
+            </span>
+          </div>
+
+          <div class="rail-row flex items-start gap-3">
+            <Icon name="clock" size={17} class="mt-[3px] shrink-0 text-brand" />
+            <span class="min-w-0">
+              <span class="rail-label">Working hours</span>
+              <span class="rail-value font-medium">{site.hoursLong}</span>
+            </span>
+          </div>
+        </aside>
+      </div>
     </div>
   </header>
 
-  <!-- 2. The three ways in, before the form — because two of them are faster
-       than any form and pretending otherwise would be dishonest. -->
-  <div class="wrap">
-    {
-      /* A hairline rail, not three cards. Three bordered boxes sitting on
-        white made the block read as a widget bolted above the form; the rail
-        is the same structure the mobilisation row on /yard is built from, so
-        it reads as part of the page instead. It is also about a third of the
-        height, which is what matters here — everything below it is the form,
-        and this block's job is to be passed, not admired.
-
-        `items-start`, because the three columns carry different numbers of
-        rows: stretching them would put the hairlines back to work holding up
-        empty space, which is the thing the cards were doing wrong. */
-    }
-    <div
-      class="grid grid-cols-3 items-start border-t border-line-strong max-nav:grid-cols-1 max-nav:border-t-0"
-    >
-      {
-        /* WhatsApp is the enquiry channel in the UAE plant trade, not a
-          fallback — but it earns that by leading the rail, not by being a
-          green block. The solid `bg-whatsapp` fill was the one surface on the
-          site painted in a third party's brand colour, and it read as an ad
-          dropped into the page. The token still exists and is still correct
-          for the floating bubble in `layout/FloatingButtons`. */
-      }
-      <a
-        href={site.whatsapp.href}
-        target="_blank"
-        rel="noopener"
-        class="group flex items-start gap-3 pt-7 pr-6 pb-7 transition-colors max-nav:border-t max-nav:border-line max-nav:pr-0"
-      >
-        <Icon
-          name="whatsapp"
-          size={17}
-          class="mt-[3px] shrink-0 text-brand transition-transform duration-200 group-hover:-translate-y-[1px]"
-        />
-        <span class="min-w-0">
-          <span
-            class="block font-mono text-tag tracking-[1.6px] text-faint uppercase"
-          >
-            WhatsApp
-          </span>
-          <span
-            class="mt-2 flex items-center gap-[6px] text-cell font-medium text-ink transition-colors group-hover:text-brand"
-          >
-            Message the yard
-            <Icon
-              name="arrow-up-right"
-              size={14}
-              class="shrink-0 text-faint transition-transform duration-200 group-hover:translate-x-[2px] group-hover:-translate-y-[2px] group-hover:text-brand"
-            />
-          </span>
-        </span>
-      </a>
-
-      <!-- Three separate tel: rows, not a dropdown. -->
-      <div
-        class="flex items-start gap-3 border-l border-line pt-7 pr-6 pb-7 pl-6 max-nav:border-t max-nav:border-l-0 max-nav:pr-0 max-nav:pl-0"
-      >
-        <Icon name="phone" size={17} class="mt-[3px] shrink-0 text-brand" />
-        <span class="min-w-0">
-          <span
-            class="block font-mono text-tag tracking-[1.6px] text-faint uppercase"
-          >
-            Call us
-          </span>
-          <ul class="mt-1 flex flex-col">
-            {
-              site.phones.map((phone) => (
-                <li>
-                  <a
-                    href={phone.href}
-                    class="block py-[5px] font-mono text-cell text-ink transition-colors hover:text-brand"
-                  >
-                    {phone.display}
-                  </a>
-                </li>
-              ))
-            }
-          </ul>
-        </span>
-      </div>
-
-      <div
-        class="flex flex-col gap-6 border-l border-line pt-7 pb-7 pl-6 max-nav:gap-5 max-nav:border-t max-nav:border-l-0 max-nav:pl-0"
-      >
-        {
-          [
-            {
-              icon: "mail" as const,
-              label: "Email",
-              value: site.email,
-              href: `mailto:${site.email}`,
-            },
-            {
-              icon: "clock" as const,
-              label: "Working hours",
-              value: site.hoursLong,
-              href: undefined,
-            },
-          ].map((row) => (
-            <div class="flex items-start gap-3">
-              <Icon
-                name={row.icon}
-                size={17}
-                class="mt-[3px] shrink-0 text-brand"
-              />
-              <span class="min-w-0">
-                <span class="block font-mono text-tag tracking-[1.6px] text-faint uppercase">
-                  {row.label}
-                </span>
-                {row.href ? (
-                  <a
-                    href={row.href}
-                    class="mt-2 block truncate text-cell font-medium text-ink transition-colors hover:text-brand"
-                  >
-                    {row.value}
-                  </a>
-                ) : (
-                  <span class="mt-2 block text-cell font-medium text-ink">
-                    {row.value}
-                  </span>
-                )}
-              </span>
-            </div>
-          ))
-        }
-      </div>
-    </div>
-  </div>
-
-  <!-- 3. The form. `id` is what every quote CTA on this page scrolls to
+  <!-- 2. The form. `id` is what every quote CTA on this page scrolls to
        instead of opening the dialog (docs 14 §2).
 
        The wide band, not the 1200px text column: the form is a four-column
@@ -214,52 +190,172 @@ const { office, yard } = site.places;
     </div>
   </Section>
 
-  <!-- 4. Two locations, doing two different jobs -->
+  {
+    /* 3. Two locations doing two different jobs, against the licence.
+      The same `.mast` split as the header: the places are the content, the
+      registration is marginalia and is finally shaped like it — it used to
+      be a tracked mono strip stranded under the cards, which is where copy
+      goes when a layout has run out of places to put it. */
+  }
   <Section tone="gray">
-    <div class="wrap">
-      <h2 class="mb-10 text-h3 leading-[1.12]">Where to find us</h2>
-      <div class="grid grid-cols-2 gap-6 max-nav:grid-cols-1">
-        {
-          [office, yard].map((place) => (
-            <div class="card flex flex-col p-9 max-xs:p-7">
-              <span class="font-mono text-micro tracking-[1.6px] text-brand uppercase">
-                {place.tag}
-              </span>
-              <h3 class="mt-3 text-h3 leading-[1.1]">{place.city}</h3>
-              <p class="mt-3 mb-0 text-lead text-body">{place.address}</p>
-              <p class="mt-2 mb-0 text-base text-muted">{place.role}</p>
-              <div class="mt-7 flex flex-wrap gap-3">
-                <Button
-                  variant="outline"
-                  href={directionsHref(place)}
-                  target="_blank"
-                  rel="noopener"
-                  class="press"
-                >
-                  <Icon name="pin" size={16} />
-                  Directions
-                </Button>
-              </div>
-            </div>
-          ))
-        }
-      </div>
+    <div class="wrap wrap-wide">
+      <div class="mast">
+        <div>
+          <h2 class="mb-10 text-h3 leading-[1.12] max-mob:mb-7">
+            Where to find us
+          </h2>
+          <div class="grid grid-cols-2 gap-6 max-cmp:grid-cols-1">
+            {
+              [office, yard].map((place) => (
+                <div class="card flex flex-col p-9 max-xs:p-7">
+                  <span class="font-mono text-micro tracking-[1.6px] text-brand uppercase">
+                    {place.tag}
+                  </span>
+                  <h3 class="mt-3 text-h3 leading-[1.1]">{place.city}</h3>
+                  <p class="mt-3 mb-0 text-lead text-body">{place.address}</p>
+                  <p class="mt-2 mb-0 text-base text-muted">{place.role}</p>
+                  <div class="mt-auto flex flex-wrap gap-3 pt-7">
+                    <Button
+                      variant="outline"
+                      href={directionsHref(place)}
+                      target="_blank"
+                      rel="noopener"
+                      class="press"
+                    >
+                      <Icon name="pin" size={16} />
+                      Directions
+                    </Button>
+                  </div>
+                </div>
+              ))
+            }
+          </div>
+        </div>
 
-      <!-- 5. Hours + legal -->
-      <div class="mt-12 border-t border-line-strong pt-8">
-        <p
-          class="mb-0 font-mono text-caption leading-[1.9] tracking-[1.3px] text-faint uppercase"
-        >
-          {site.hoursLong}<br />
-          {site.legalName} · Register {site.register}<br />
-          Licensed by the {site.licensingAuthority}
-        </p>
+        <aside class="rail" aria-label="Registration">
+          {
+            registration.map((row) => (
+              <div class="rail-row">
+                <span class="rail-label">{row.label}</span>
+                <span class="rail-value">{row.value}</span>
+              </div>
+            ))
+          }
+        </aside>
       </div>
     </div>
   </Section>
 </Base>
 
 <style>
+  /* ── The page's one layout ──────────────────────────────────────
+     The thing itself on the left, a hairline rail of supporting facts on
+     the right. It is not a new arrangement — it is the shape the quote
+     form between these two bands already has above 1240px, where its
+     steps run against its summary rail. Reusing it is what lets the whole
+     page sit in `wrap-wide` without the wide band reading as empty: at
+     1600px a headline alone leaves half the row unused, and the three
+     ways in are exactly the thing worth putting there.
+
+     The rail is a fixed width rather than a fraction so it stays a rail.
+     As a fraction it would grow into a second column of content at the
+     top of the range, and the left side would lose the width this whole
+     change was made to give it. */
+  .mast {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 380px;
+    column-gap: 80px;
+    align-items: start;
+  }
+  @media (max-width: 1240px) {
+    .mast {
+      grid-template-columns: minmax(0, 1fr) 300px;
+      column-gap: 48px;
+    }
+  }
+  /* `nav` is where every other two-column split on the site collapses, and
+     the rail has to stop being a margin before the page gets narrow enough
+     for 300px of it to squeeze the headline. */
+  @media (max-width: 980px) {
+    .mast {
+      grid-template-columns: minmax(0, 1fr);
+      row-gap: 40px;
+    }
+  }
+
+  /* A margin, drawn as one: a hairline down its inner edge and a hairline
+     between each fact. No surface and no card — `.card` is for a panel you
+     are meant to look at, and this is a column you are meant to scan. */
+  .rail {
+    border-left: 1px solid var(--color-line);
+    padding-left: 40px;
+  }
+  @media (max-width: 1240px) {
+    .rail {
+      padding-left: 28px;
+    }
+  }
+  /* Stacked, the separator turns with the layout — the rule that was down
+     the rail's inner edge becomes the rule above it. */
+  @media (max-width: 980px) {
+    .rail {
+      border-top: 1px solid var(--color-line-strong);
+      border-left: 0;
+      padding-left: 0;
+    }
+  }
+
+  .rail-row {
+    padding-block: 20px;
+  }
+  .rail-row + .rail-row {
+    border-top: 1px solid var(--color-line);
+  }
+  /* Beside the headline the first row starts flush, so the rail's top edge
+     lines up with the eyebrow rather than hanging below it. Stacked there
+     is a rule above it to clear, so the padding comes back. */
+  .rail-row:first-child {
+    padding-top: 0;
+  }
+  @media (max-width: 980px) {
+    .rail-row:first-child {
+      padding-top: 20px;
+    }
+  }
+
+  .rail-label {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: var(--text-tag);
+    letter-spacing: 1.6px;
+    text-transform: uppercase;
+    color: var(--color-faint);
+  }
+  .rail-value {
+    display: block;
+    margin-top: 8px;
+    font-size: var(--text-cell);
+    line-height: 1.5;
+    color: var(--color-ink);
+  }
+  .rail-num {
+    display: block;
+    padding-block: 5px;
+    font-family: var(--font-mono);
+    font-size: var(--text-cell);
+    color: var(--color-ink);
+    transition: color 200ms var(--ease-out-expo);
+  }
+  .rail-num:hover {
+    color: var(--color-brand);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .rail-num {
+      transition-duration: 1ms;
+    }
+  }
+
   /* `.rule-brand` (global.css) is the same device the dialog's head draws, so
      the inline mount and the modal read as one thing seen twice rather than
      two arrangements of the same fields. Nothing is inset here — there is no
@@ -301,8 +397,8 @@ const { office, yard } = site.places;
      * The homepage's closing band asks buy-or-hire and then sends people
      * here rather than opening the dialog, so the answer arrives as `?mode=`
      * — the same parameter name the dialog puts on the URL when it opens
-     * (`scripts/quote/dialog.ts`). Without this the three answers would land
-     * on one blank form and the question would have been for nothing.
+     * (`scripts/quote/dialog.ts`). Without this the answers would land on one
+     * blank form and the question would have been for nothing.
      *
      * `prefill` drops anything it does not recognise in silence, so a hand-
      * edited parameter is a no-op rather than an error state (docs 14 §9).

@@ -303,10 +303,6 @@ export function initQuoteForm(
     for (const candidate of findAll<HTMLElement>("[data-mode-panel]")) {
       candidate.hidden = candidate.dataset.modePanel !== state.mode;
     }
-    // `timeframe` and `emirate` are one field across two panels, so the copy
-    // that just became visible has to show the answer the hidden one holds.
-    recheck("timeframe", state.timeframe);
-    recheck("emirate", state.emirate);
 
     show(
       find("[data-export-note]"),
@@ -322,19 +318,6 @@ export function initQuoteForm(
     else clearDraft(instance);
   };
 
-  /** Tick the visible radio of a group whose answer lives in a hidden twin. */
-  const recheck = (name: string, value: string | null) => {
-    if (!value) return;
-    const group = form.elements.namedItem(name);
-    if (!(group instanceof RadioNodeList)) return;
-    for (const input of group) {
-      if (!(input instanceof HTMLInputElement)) continue;
-      const hidden = !!input.closest("[data-mode-panel][hidden]");
-      if (!hidden && input.value === value && !input.checked)
-        input.checked = true;
-    }
-  };
-
   /* ── Errors ───────────────────────────────────────────────────── */
 
   const errorSlots = (field: string) =>
@@ -345,8 +328,6 @@ export function initQuoteForm(
       slot.textContent = message ?? "";
       slot.hidden = !message;
     }
-    // Two panels can carry the same field — `timeframe` is on both buy and
-    // "not sure yet" — so every copy is marked, not the first one found.
     for (const group of findAll<HTMLElement>(
       `[data-chip-group="${field}"] [role="radiogroup"]`,
     )) {

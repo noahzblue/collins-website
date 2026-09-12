@@ -27,12 +27,11 @@ import type { Availability } from "@/lib/equipment";
 export const PAYLOAD_VERSION = 1;
 
 /**
- * Buy / hire is the site's core distinction and the form's opening question,
- * which is why it carries a third value the equipment slice does not need.
- * `lib/equipment.ts` `Mode` is the two-value version used for availability
+ * Buy / hire is the site's core distinction and the form's opening question.
+ * `lib/equipment.ts` `Mode` is the same two values, used for availability
  * vocabulary — see `availabilityMode` below.
  */
-export type QuoteMode = "buy" | "hire" | "unsure";
+export type QuoteMode = "buy" | "hire";
 
 /** How the customer wants to be answered. Decides the handoff (docs 14 §12). */
 export type Channel = "whatsapp" | "call" | "email";
@@ -134,11 +133,7 @@ export const FIELD_NAMES = Object.keys(EMPTY_STATE) as FieldName[];
 /**
  * Which availability vocabulary the rating list should speak.
  *
- * `AVAILABILITY_LABEL` is keyed by the two-value equipment mode. "Not sure
- * yet" has no vocabulary of its own, so it borrows hire's: "In yard / On
- * request / To order" states where the machine physically is, which is true
- * either way — buy's "Ready stock / Short lead" is sales language addressed to
- * someone who has already decided.
+ * `AVAILABILITY_LABEL` is keyed by the two-value equipment mode.
  */
 export const availabilityMode = (mode: QuoteMode | null) =>
   mode === "buy" ? ("buy" as const) : ("hire" as const);
@@ -198,7 +193,7 @@ export interface QuoteIntent {
   item?: string;
   /** `rangeKey()` of a range, or the range's display label. */
   rating?: string;
-  /** `buy` / `hire` / `unsure`. */
+  /** `buy` / `hire`. */
   mode?: string;
 }
 

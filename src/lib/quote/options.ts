@@ -26,18 +26,15 @@ export type { Option };
 /* ── 01 · What you need ─────────────────────────────────────────── */
 
 /**
- * The opening question, and the site's core distinction. "Not sure yet" is
- * here on purpose: customers move between hire and purchase, and forcing an
- * undecided buyer to guess produces worse data than an honest "not sure"
- * (docs 14 §7).
+ * The opening question, and the site's core distinction.
  *
- * The hints are `services.ts` compressed to a line — equipment sales,
- * equipment rental, and the sourcing service that answers the third. The form
- * itself does not show them: `ui/ChipGroup.astro` renders one hint for the
- * group, not one per option. `sections/ContactCTA.astro` does, because a cell
- * on the homepage has room to say what the difference is and the chip at the
- * top of the form does not. They live here rather than in `data/content.ts` so
- * that what "Hire" means is written once, in the same object as the word.
+ * The hints are `services.ts` compressed to a line — equipment sales and
+ * equipment rental. The form itself does not show them: `ui/ChipGroup.astro`
+ * renders one hint for the group, not one per option. `sections/ContactCTA.astro`
+ * does, because a cell on the homepage has room to say what the difference is
+ * and the chip at the top of the form does not. They live here rather than in
+ * `data/content.ts` so that what "Hire" means is written once, in the same
+ * object as the word.
  */
 export const MODES: Option[] = [
   {
@@ -49,11 +46,6 @@ export const MODES: Option[] = [
     value: "hire",
     label: "Hire",
     hint: "Day, week, month or project duration — delivery included.",
-  },
-  {
-    value: "unsure",
-    label: "Not sure yet",
-    hint: "Describe the job and we'll specify it and price it both ways.",
   },
 ];
 
@@ -337,9 +329,6 @@ export const HONEYPOT = "company-website";
 /** Shown when any export destination is chosen — it is a real service. */
 export const EXPORT_NOTE =
   "Export documentation and handling quoted with the machine.";
-
-/** Shown under the "Not sure yet" terms panel, so the choice is not a dead end. */
-export const UNSURE_NOTE = "We'll price it both ways so you can compare.";
 
 /** Return an option's display label, falling back to the raw value. */
 export const labelOf = (options: Option[], value: string | null) =>

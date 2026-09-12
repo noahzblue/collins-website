@@ -133,10 +133,7 @@ export const toMessage = (state: QuoteState, context: QuoteContext): string => {
               `Destination: ${labelOf(DESTINATIONS, state.destination)}`,
             state.docs && "Documentation for finance or insurance: yes",
           ]
-        : [
-            state.timeframe && `When: ${labelOf(TIMEFRAMES, state.timeframe)}`,
-            state.emirate && `Location: ${labelOf(EMIRATES, state.emirate)}`,
-          ];
+        : [];
 
   return [
     "Quotation request — collinscouae.com",
@@ -211,12 +208,7 @@ export const toSummary = (
             slot("timeframe", labelOf(TIMEFRAMES, state.timeframe)),
             slot("destination", labelOf(DESTINATIONS, state.destination)),
           ]
-        : state.mode === "unsure"
-          ? [
-              slot("timeframe", labelOf(TIMEFRAMES, state.timeframe)),
-              slot("emirate", labelOf(EMIRATES, state.emirate)),
-            ]
-          : [];
+        : [];
 
   return [
     slot("mode", labelOf(MODES, state.mode)),

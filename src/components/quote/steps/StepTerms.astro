@@ -1,6 +1,6 @@
 ---
 /**
- * Section 03 — the terms. Three panels, one per mode, only one ever visible.
+ * Section 03 — the terms. Two panels, one per mode, only one ever visible.
  *
  * This is what asking buy or hire first buys us: **nobody is ever shown a
  * field that turns out to be irrelevant to them.** A hirer needs dates, a
@@ -8,9 +8,6 @@
  * destination and documentation. Asked third, as the prototype did, both sets
  * have to exist at once and half of them are noise (docs/site-expansion/14 §3,
  * §7).
- *
- * "Not sure yet" gets the smallest honest set rather than nothing, so the
- * choice is not a dead end — when and where, and a line promising both prices.
  *
  * `startDate` carries no `min` from here. A static build would bake the build
  * date into it, and a page served three weeks later would happily accept
@@ -32,7 +29,6 @@ import {
   SECTION_EMPTY,
   TIMEFRAMES,
   TRANSPORT,
-  UNSURE_NOTE,
 } from "@/lib/quote/options";
 
 interface Props {
@@ -123,32 +119,5 @@ const note =
       <p data-export-note hidden class={note}>{EXPORT_NOTE}</p>
     </div>
     <Checkbox instance={instance} name="docs" label={FIELD_COPY.docs.label} />
-  </div>
-
-  {/* ── Not sure yet ─────────────────────────────────────────── */}
-  <div data-mode-panel="unsure" hidden class={stack}>
-    {
-      /* Same `name` as the buy and hire panels — `timeframe` and `emirate` are
-        one field each, whatever the mode, and one field is one radio group. A
-        second instance prefix is what keeps the ids unique, because two
-        controls with the same id is the collision §2 is about. The script
-        re-checks the visible copy after a mode switch, so an answer given
-        under one mode is still visibly the answer under another. */
-    }
-    <ChipGroup
-      instance={`${instance}-unsure`}
-      name="timeframe"
-      legend={FIELD_COPY.timeframe.label}
-      options={TIMEFRAMES}
-      required
-    />
-    <ChipGroup
-      instance={`${instance}-unsure`}
-      name="emirate"
-      legend={FIELD_COPY.emirate.label}
-      options={EMIRATES}
-      required
-    />
-    <p class={note}>{UNSURE_NOTE}</p>
   </div>
 </QuoteSection>

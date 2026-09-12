@@ -45,7 +45,7 @@ export const validate = (state: QuoteState, today?: string): QuoteError[] => {
     errors.push({ field, section, message });
 
   /* 01 — what you need */
-  if (!state.mode) fail("mode", "need", "Pick buy, hire, or not sure yet.");
+  if (!state.mode) fail("mode", "need", "Pick buy or hire.");
   if (!state.category) fail("category", "need", "Pick a machine.");
 
   /* 02 — what size. "Something else" replaces this section rather than
@@ -77,10 +77,6 @@ export const validate = (state: QuoteState, today?: string): QuoteError[] => {
   if (state.mode === "buy") {
     if (!state.condition) fail("condition", "terms", "New, used, or both?");
     if (!state.timeframe) fail("timeframe", "terms", "When do you need it?");
-  }
-  if (state.mode === "unsure") {
-    if (!state.timeframe) fail("timeframe", "terms", "When do you need it?");
-    if (!state.emirate) fail("emirate", "terms", "Where would it go?");
   }
 
   /* 04 — where to send it. Phone is required and email is not, because this
