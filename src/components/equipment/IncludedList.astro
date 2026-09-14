@@ -4,7 +4,12 @@
  * `data-mode-panel` so the buy/hire toggle can hide one panel with CSS.
  */
 import Icon from "@/components/ui/Icon.astro";
-import { INCLUDED, INCLUDED_HEADING, type Mode } from "@/lib/equipment";
+import {
+  EXCLUDED,
+  INCLUDED,
+  INCLUDED_HEADING,
+  type Mode,
+} from "@/lib/equipment";
 
 interface Props {
   mode?: Mode;
@@ -30,4 +35,12 @@ const { mode = "hire", class: extra = "" } = Astro.props;
       ))
     }
   </ul>
+
+  {
+    EXCLUDED[mode].length > 0 && (
+      <p class="mt-7 mb-0 max-w-[46ch] border-l-2 border-line-strong pl-4 text-note leading-relaxed text-muted">
+        {EXCLUDED[mode].join(" ")}
+      </p>
+    )
+  }
 </div>

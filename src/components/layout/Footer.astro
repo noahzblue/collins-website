@@ -10,7 +10,7 @@ import { site } from "@/config/site";
 import { footerColumns } from "@/data/navigation";
 
 const year = new Date().getFullYear();
-const { office, yard } = site.places;
+const { dubai, sharjah } = site.places;
 ---
 
 <footer
@@ -35,12 +35,12 @@ const { office, yard } = site.places;
           {site.blurb}
         </p>
 
-        <!-- Two addresses, because there are two places doing two jobs. -->
+        <!-- Two addresses, because there are two yards. -->
         <ul
           class="mb-6 flex flex-col gap-[10px] text-label max-cmp:mb-4 max-cmp:gap-2"
         >
           {
-            [office, yard].map((place) => (
+            [dubai, sharjah].map((place) => (
               <li class="flex items-center gap-[14px]">
                 <span class="shrink-0 text-tag font-medium text-faint">
                   {place.tag}

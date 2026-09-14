@@ -22,7 +22,7 @@ export interface Option {
 }
 
 /** Lowercase, alphanumerics and single dashes — safe in an id and in a
- *  `querySelector`. Range labels ("250 kVA") and category names
+ *  `querySelector`. Range labels ("250 KVA") and category names
  *  ("Bobcat / skid steer loaders") both pass through here. */
 export const slug = (value: string) =>
   value

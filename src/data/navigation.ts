@@ -20,7 +20,7 @@ export interface NavLink {
  *
  *  Derived, never listed: a hand-written copy of the six services or the eight
  *  industries is a second thing to keep in step, and the one that drifts is
- *  always the nav. `/equipment` is missing here on purpose — its twelve
+ *  always the nav. `/equipment` is missing here on purpose — its thirteen
  *  categories live in the content collection, which only an `.astro` file can
  *  read, so `layout/Header.astro` supplies that one from `getCollection`.
  */
@@ -43,7 +43,7 @@ export const mainNav: NavLink[] = [
   { label: "Equipment", href: "/equipment" },
   { label: "Services", href: "/services" },
   { label: "Industries", href: "/industries" },
-  { label: "The yard", href: "/yard" },
+  { label: "The yards", href: "/yard" },
   { label: "About", href: "/about" },
   { label: "Contact", href: "/contact" },
 ];
@@ -64,7 +64,7 @@ export const footerColumns: FooterColumn[] = [
       { label: "Forklifts", href: "/equipment/forklifts" },
       { label: "Mobile cranes", href: "/equipment/mobile-cranes" },
       { label: "Excavators", href: "/equipment/excavators" },
-      { label: "All 12 categories", href: "/equipment" },
+      { label: "All 13 categories", href: "/equipment" },
     ],
   },
   {
@@ -73,7 +73,7 @@ export const footerColumns: FooterColumn[] = [
       { label: "About us", href: "/about" },
       { label: "Services", href: "/services" },
       { label: "Industries", href: "/industries" },
-      { label: "The yard", href: "/yard" },
+      { label: "The yards", href: "/yard" },
     ],
   },
 ];

@@ -21,7 +21,7 @@ export const trustFeatures: Feature[] = [
   {
     icon: "clock",
     title: "Readiness",
-    body: "Serviced, fuelled and load tested stock standing in the Sajjah yard. Mobilisation is measured in hours, not weeks \u2014 most units leave the same day they're confirmed.",
+    body: "Serviced, fuelled and load tested stock standing in both yards. Mobilisation is measured in hours, not weeks \u2014 most units leave the same day they're confirmed.",
     image: "/images/why-readiness.jpg",
   },
   {
@@ -69,10 +69,10 @@ export interface Stat {
 }
 
 export const stats: Stat[] = [
-  { value: "1", label: "Yard \u2014 Sajjah, Sharjah" },
-  { value: "12", label: "Equipment categories" },
+  { value: "2", label: "Yards \u2014 Dubai & Sharjah" },
+  { value: "13", label: "Equipment categories" },
   { value: "7", label: "Emirates served" },
-  { value: "1250 kVA", label: "Max generator output" },
+  { value: "1250 KVA", label: "Max generator output" },
 ];
 
 /* ---------- The proof quote ---------- */

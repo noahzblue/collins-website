@@ -6,7 +6,7 @@
  * the bar (scripts/themeFlip.ts), not by any one page's hero height.
  *
  * Three of the six items have somewhere deeper to go, so they carry a
- * sub-menu: twelve equipment categories, six services, eight industries. On
+ * sub-menu: thirteen equipment categories, six services, eight industries. On
  * the bar that is a panel on hover or focus; in the mobile sheet it is a
  * `<details>` accordion, which is the same information with no second
  * implementation and no JavaScript at all.
@@ -22,7 +22,7 @@ import Button from "@/components/ui/Button.astro";
 import Icon from "@/components/ui/Icon.astro";
 import { mainNav, navChildren, type NavLink } from "@/data/navigation";
 
-/* The twelve, in catalogue order. The rest of the sub-menus are derived in
+/* The thirteen, in catalogue order. The rest of the sub-menus are derived in
    `data/navigation.ts`; this one cannot be, because only an `.astro` file can
    read a content collection. */
 const categories = (await getCollection("equipment")).sort(

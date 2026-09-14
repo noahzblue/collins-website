@@ -1,96 +1,104 @@
 /**
- * /yard — "One yard. Ready stock."
+ * /yard — "Two yards. Ready stock."
  *
  * The only page on the site that says where the machines physically are, what
- * happens to them before dispatch, and how fast they leave. Everything else is
+ * happens to them before dispatch, and how fast they leave. Two yards, Dubai
+ * and Sharjah, both holding stock — the page used to argue "one yard, one
+ * roof, one delivery", which was the wrong argument and also untrue. Everything else is
  * a claim a competitor could also make; this is the one that isn't.
  *
  * Copy is verbatim from the company profile, pages 6 and 8. The headline and
  * kicker are the profile's own and better than anything we'd write.
  *
- * ── PHOTOGRAPHY DEBT ─────────────────────────────────────────────────────
- * Every `image` below currently points at a photo already in `public/images/`.
- * They are placeholders standing in for a proper shoot, and this is the page
- * where the images ARE the argument — a page about a physical place is only
- * as credible as its photographs. The brief (docs/site-expansion/09) is one
- * morning at Sajjah: one wide establishing shot, five point images, 8–16 fleet
- * frames, two workshop details, one loaded flatbed at the gate. Consistent
- * time of day matters more than count.
+ * ── PHOTOGRAPHY ──────────────────────────────────────────────────────────
+ * Every `image` below is now a real photograph of Collins plant, shot on a
+ * phone in the yards (`public/images/yard/`). That clears the stock-photo
+ * debt this page carried, and it is the page where it mattered most — a page
+ * about a physical place is only as credible as its photographs.
+ *
+ * Two things still outstanding, both resolution rather than authenticity:
+ * `mixed-plant.jpg` is 720px on its long edge (it is the only wide shot of
+ * both yards' stock together) and `sharjah-gate.jpg` is 960px. Neither can be
+ * AI-upscaled — the models rewrite the signboard and the fleet decals into
+ * nonsense, inventing phone numbers and manufacturer names. They need
+ * re-shooting, not enhancing. The brief (docs/site-expansion/09) still stands
+ * for the rest: one morning at each yard, consistent time of day.
  * ─────────────────────────────────────────────────────────────────────────
  */
 
 export const yardPage = {
   /** profile p.8. */
-  title: "One yard. Ready stock.",
-  kicker: "Yard: Sajjah, Sharjah, U.A.E.",
-  banner: "/images/hero-yard.jpg",
-  seoTitle: "Our Sajjah Yard | Ready Stock, Inspected Before Dispatch",
+  title: "Two yards. Ready stock.",
+  kicker: "Yards: Dubai & Sharjah, U.A.E.",
+  banner: "/images/yard/workshop-genset.jpg",
+  seoTitle:
+    "Our Yards in Dubai & Sharjah | Ready Stock, Inspected Before Dispatch",
   seoDescription:
-    "One yard in Sajjah, Sharjah: generators, forklifts, telehandlers, cranes and trailers under one roof, serviced and function tested before dispatch, within reach of Dubai's main construction corridors.",
+    "Two yards, Dubai and Sharjah: generators, forklifts, telehandlers, cranes and trailers held ready, serviced and function tested before dispatch, within reach of the UAE's main construction corridors.",
 };
 
 /** The five points, verbatim from p.8. One pinned photograph, five frames. */
 export const yardPoints = [
   {
-    title: "Everything under one roof.",
-    body: "Generators, forklifts, telehandlers, cranes and trailers stand in the same yard, so a mixed order arrives on one delivery, on one agreement.",
-    image: "/images/hero-yard.jpg",
-    alt: "Wide view of the Sajjah yard with generators, forklifts and a telehandler standing in the same compound.",
+    title: "One fleet, two yards.",
+    body: "Generators, forklifts, telehandlers, cranes and trailers stand across both yards, so a mixed order is still one agreement, one quotation and one point of contact.",
+    image: "/images/yard/stacker-scissor.jpg",
+    alt: "An electric pallet stacker, a scissor lift and a canopied generator standing together in the Collins yard.",
   },
   {
     title: "Inspected before dispatch.",
     body: "Units are serviced, fuelled and function tested in our workshop, and handed over with a signed condition report.",
-    image: "/images/why-reliability.jpg",
-    alt: "An engineer running a function test on a canopied generator set in the workshop before it leaves the yard.",
+    image: "/images/yard/genset-engine.jpg",
+    alt: "A generator set with its side panel open on the diesel engine, fuel lines and filters in view before dispatch.",
   },
   {
     title: "Fast mobilisation.",
-    body: "Sajjah sits within reach of Dubai's main construction corridors, Jebel Ali and the northern Emirates.",
-    image: "/images/why-delivery.jpg",
-    alt: "A loaded flatbed carrying plant out through the yard gate at first light.",
+    body: "Dubai and Sharjah put stock within reach of the main construction corridors, Jebel Ali and the northern Emirates.",
+    image: "/images/yard/sharjah-gate.jpg",
+    alt: "The gate of the Collins yard in Sharjah, the company signboard mounted on the wall above it.",
   },
   {
     title: "Buy or hire.",
     body: "Move from a trial hire to a purchase, or straight to a purchase, without changing supplier, paperwork or point of contact.",
-    image: "/images/why-brands.jpg",
-    alt: "A line of branded machines standing ready in the yard, available either to buy or on hire.",
+    image: "/images/yard/scissor-lift.jpg",
+    alt: "A scissor lift folded down in the yard beside an electric stacker, available either to buy or on hire.",
   },
   {
     title: "Support after handover.",
     body: "Breakdown response, scheduled servicing and parts held for the equipment we supply.",
-    image: "/images/equipment-spare-parts.jpg",
-    alt: "Parts shelving in the workshop stocked for the generators, forklifts and compressors Collins supplies.",
+    image: "/images/yard/rating-plate.jpg",
+    alt: "The rating plate on a Collins generator set, listing model, serial number and prime and standby output.",
   },
 ];
 
 /** profile p.6 — the four fleet groups and their ranges, each feeding the
  *  catalogue rather than dead-ending in a lightbox. */
 export const galleryIntro =
-  "A look at the fleet leaving the Sajjah yard — the same units supplied outright or made available on hire, every one Collins branded and inspected before dispatch.";
+  "A look at the fleet leaving our yards — the same units supplied outright or made available on hire, every one Collins branded and inspected before dispatch.";
 
 export const fleetGroups = [
   {
     label: "Generators",
-    range: "10 kVA – 1,250 kVA",
-    image: "/images/equipment/generators-hero.jpg",
+    range: "10 KVA – 1250 KVA",
+    image: "/images/yard/generator-150kva.jpg",
     href: "/equipment/generators",
   },
   {
     label: "Forklifts",
     range: "1.4 – 15 ton",
-    image: "/images/equipment/forklifts-hero.jpg",
+    image: "/images/yard/forklift.jpg",
     href: "/equipment/forklifts",
   },
   {
     label: "Air compressors",
-    range: "135 – 1,050 CFM",
-    image: "/images/equipment/air-compressors-hero.jpg",
+    range: "135 – 1050 CFM",
+    image: "/images/yard/compressor.jpg",
     href: "/equipment/air-compressors",
   },
   {
     label: "Cranes & plant",
     range: "Telehandlers, excavators & skid steers",
-    image: "/images/equipment/telehandlers-hero.jpg",
+    image: "/images/yard/mixed-plant.jpg",
     href: "/equipment/telehandlers",
   },
 ];
@@ -124,7 +132,7 @@ export const mobilisation = [
 
 /** The page's blocks, in order — feeds the sticky index rail. */
 export const yardBlocks = [
-  { id: "the-yard", label: "The yard" },
+  { id: "the-yard", label: "The yards" },
   { id: "the-fleet", label: "The fleet" },
   { id: "mobilisation", label: "Mobilisation" },
 ];

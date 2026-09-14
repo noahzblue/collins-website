@@ -1,6 +1,6 @@
 ---
 /**
- * "Which machine" — the twelve categories plus the one that is not a machine.
+ * "Which machine" — the thirteen categories plus the one that is not a machine.
  *
  *   <CategoryPicker instance={id} categories={categories} />
  *
@@ -11,14 +11,14 @@
  * (docs/site-expansion/14 §5).
  *
  * What replaces the photo on a phone is not nothing: it is the `rangeLabel`
- * ("10 kVA to 1,250 kVA, diesel"). At ~160px wide a machine photo is
- * decorative rather than informative, and twelve of them is roughly 1.5 MB and
+ * ("10 KVA to 1250 KVA, diesel"). At ~160px wide a machine photo is
+ * decorative rather than informative, and thirteen of them is roughly 1.5 MB and
  * four screens of scroll before the customer can begin — while the range is
  * the actual disambiguator between a generator and a compressor, and it is
  * text.
  *
  * **The family headings are the mobile list's structure and nothing else.**
- * Twelve rows under five headings is about 750px — under two phone screens,
+ * Thirteen rows under six headings is about 810px — under two phone screens,
  * everything reachable by scroll. Deliberately not an accordion: an accordion
  * hides the thing the customer is looking for and charges them a tap to find
  * out it was not there. Above 600px the headings are simply not displayed, and
@@ -41,7 +41,7 @@ import { OTHER_CATEGORY, type QuoteCategory } from "@/lib/quote/schema";
 interface Props {
   /** Per-instance id prefix — two forms on one page must not collide. */
   instance: string;
-  /** The twelve, in catalogue order. Shaped by the composition layer. */
+  /** The thirteen, in catalogue order. Shaped by the composition layer. */
   categories: QuoteCategory[];
   /** The radio group's `name`. */
   name?: string;

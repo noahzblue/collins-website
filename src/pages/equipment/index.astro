@@ -4,7 +4,7 @@
  *
  * Level 1 of the IA. Every category gets a full-width row rather than a card:
  * photo one side, pitch the other, sides alternating down the page. A sticky
- * rail keeps the twelve navigable. Pulls straight from the `equipment`
+ * rail keeps the thirteen navigable. Pulls straight from the `equipment`
  * collection in `sortOrder`, so adding a category to categories.json puts it
  * here, numbered, in the rail.
  */
@@ -46,7 +46,7 @@ const all = (await getCollection("equipment")).sort(
     </div>
   </header>
 
-  <!-- The twelve -->
+  <!-- The thirteen -->
   <Section class="pt-0">
     <RailSections
       items={all.map((c) => ({ id: c.id, label: c.data.name }))}

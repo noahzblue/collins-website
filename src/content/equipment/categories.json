@@ -3,11 +3,11 @@
     "id": "generators",
     "name": "Generators",
     "family": "Power & air",
-    "rangeLabel": "10 kVA to 1,250 kVA, diesel",
+    "rangeLabel": "10 KVA to 1250 KVA, diesel",
     "cardLine": "Prime and standby power, site offices to full industrial load.",
-    "summary": "Power a site with no mains supply, or hold a building's essential load when the grid drops. We size on the largest starting load rather than the running total, so the set you get starts what you actually run.",
+    "summary": "Power a site with no mains supply, or hold a building's essential load when the grid drops. We size on the largest starting load rather than the running total.",
     "highlights": [
-      "Twelve ratings, 10 kVA through 1,250 kVA",
+      "Twelve ratings, 10 KVA through 1250 KVA",
       "Prime and standby duty, canopied for site noise limits",
       "Sized on starting load, not running load",
       "Tanks, cabling and distribution supplied with the set"
@@ -20,82 +20,82 @@
     "sortOrder": 1,
     "ranges": [
       {
-        "label": "10 kVA",
+        "label": "10 KVA",
         "powerType": "Diesel",
         "typicalDuty": "Site office, single container, tools",
         "availability": "yard"
       },
       {
-        "label": "20 kVA",
+        "label": "20 KVA",
         "powerType": "Diesel",
         "typicalDuty": "Two offices plus lighting",
         "availability": "yard"
       },
       {
-        "label": "30 kVA",
+        "label": "30 KVA",
         "powerType": "Diesel",
         "typicalDuty": "Small welding set, portable plant",
         "availability": "yard"
       },
       {
-        "label": "50 kVA",
+        "label": "50 KVA",
         "powerType": "Diesel",
         "typicalDuty": "Accommodation block, mixed small tools",
         "availability": "yard"
       },
       {
-        "label": "100 kVA",
+        "label": "100 KVA",
         "powerType": "Diesel",
         "typicalDuty": "Site cabins plus a tower crane on light duty",
         "availability": "yard"
       },
       {
-        "label": "150 kVA",
+        "label": "150 KVA",
         "powerType": "Diesel",
         "typicalDuty": "Batching support, multiple welders",
         "availability": "yard"
       },
       {
-        "label": "250 kVA",
+        "label": "250 KVA",
         "powerType": "Diesel",
         "typicalDuty": "Tower crane plus offices, no mains supply",
         "availability": "yard"
       },
       {
-        "label": "400 kVA",
+        "label": "400 KVA",
         "powerType": "Diesel",
         "typicalDuty": "Full site power, medium contractor",
         "availability": "on_request"
       },
       {
-        "label": "500 kVA",
+        "label": "500 KVA",
         "powerType": "Diesel",
         "typicalDuty": "Concrete plant, pumping, mixed loads",
-        "availability": "on_request"
+        "availability": "yard"
       },
       {
-        "label": "750 kVA",
+        "label": "750 KVA",
         "powerType": "Diesel",
         "typicalDuty": "Large site or standby for a facility",
         "availability": "on_request"
       },
       {
-        "label": "1000 kVA",
+        "label": "1000 KVA",
         "powerType": "Diesel",
         "typicalDuty": "Industrial standby, sustained load",
-        "availability": "sourced"
+        "availability": "on_request"
       },
       {
-        "label": "1250 kVA",
+        "label": "1250 KVA",
         "powerType": "Diesel",
         "typicalDuty": "Maximum output, prime or standby duty",
-        "availability": "sourced"
+        "availability": "on_request"
       }
     ],
     "dutyGuide": [
       {
         "situation": "Powering a site with no mains supply",
-        "advice": "Size for the largest single starting load, not the total. A tower crane starting draws several times its running current — a site running a crane plus offices usually lands at 250 kVA even though the running load looks like 120."
+        "advice": "Size for the largest single starting load, not the total. A tower crane starting draws several times its running current — a site running a crane plus offices usually lands at 250 KVA even though the running load looks like 120."
       },
       {
         "situation": "Standby for a building already on mains",
@@ -108,7 +108,7 @@
     ],
     "related": ["tower-lights", "air-compressors", "excavators"],
     "seoTitle": "Generators for Sale & Hire in Dubai | Collins",
-    "seoDescription": "10 kVA to 1,250 kVA diesel generators. Buy or hire from our Sajjah yard. Delivery, commissioning and breakdown support across the UAE."
+    "seoDescription": "10 KVA to 1250 KVA diesel generators. Buy or hire across the UAE and the wider GCC. Delivery, commissioning and breakdown support."
   },
   {
     "id": "forklifts",
@@ -182,13 +182,13 @@
         "label": "15 ton",
         "powerType": "Diesel",
         "typicalDuty": "Port and heavy industrial handling",
-        "availability": "sourced"
+        "availability": "on_request"
       }
     ],
     "dutyGuide": [],
     "related": ["telehandlers", "skid-steer-loaders", "excavators"],
     "seoTitle": "Forklifts for Sale & Hire in Dubai | Collins",
-    "seoDescription": "Diesel and electric forklifts from 1.4 to 15 ton. Buy or hire from our Sajjah yard. Delivery, commissioning and breakdown support across the UAE."
+    "seoDescription": "Diesel and electric forklifts from 1.4 to 15 ton. Buy or hire across the UAE and the wider GCC. Delivery, commissioning and breakdown support."
   },
   {
     "id": "mobile-cranes",
@@ -214,19 +214,19 @@
         "label": "50 ton",
         "powerType": "Mobile",
         "typicalDuty": "Steel erection, general lifting",
-        "availability": "on_request"
+        "availability": "yard"
       },
       {
         "label": "80 ton",
         "powerType": "Mobile",
         "typicalDuty": "Mid-rise structural work",
-        "availability": "on_request"
+        "availability": "yard"
       },
       {
         "label": "100 ton",
         "powerType": "Mobile",
         "typicalDuty": "Precast panels, plant placement",
-        "availability": "on_request"
+        "availability": "yard"
       },
       {
         "label": "160 ton",
@@ -238,25 +238,25 @@
         "label": "250 ton",
         "powerType": "Mobile",
         "typicalDuty": "Heavy plant, bridge sections",
-        "availability": "sourced"
+        "availability": "on_request"
       },
       {
         "label": "400 ton",
         "powerType": "Mobile",
         "typicalDuty": "Industrial and refinery lifts",
-        "availability": "sourced"
+        "availability": "on_request"
       },
       {
         "label": "600 ton",
         "powerType": "Mobile",
         "typicalDuty": "Major project heavy lift",
-        "availability": "sourced"
+        "availability": "on_request"
       }
     ],
     "dutyGuide": [],
     "related": ["crawler-cranes", "telehandlers", "boom-lifts"],
     "seoTitle": "Mobile Cranes for Sale & Hire in Dubai | Collins",
-    "seoDescription": "Mobile cranes from 50 to 600 ton. Buy or hire from our Sajjah yard. Delivery, commissioning and breakdown support across the UAE."
+    "seoDescription": "Mobile cranes from 50 to 600 ton. Buy or hire across the UAE and the wider GCC. Delivery, commissioning and breakdown support."
   },
   {
     "id": "crawler-cranes",
@@ -280,33 +280,33 @@
       {
         "label": "200 ton",
         "typicalDuty": "Sustained lifting on soft or prepared ground",
-        "availability": "sourced"
+        "availability": "yard"
       },
       {
         "label": "400 ton",
         "typicalDuty": "Heavy structural and plant work",
-        "availability": "sourced"
+        "availability": "yard"
       },
       {
         "label": "600 ton",
         "typicalDuty": "Major project heavy lift, long duration",
-        "availability": "sourced"
+        "availability": "yard"
       }
     ],
     "dutyGuide": [],
     "related": ["mobile-cranes", "excavators", "telehandlers"],
     "seoTitle": "Crawler Cranes for Sale & Hire in Dubai | Collins",
-    "seoDescription": "Crawler cranes at 200, 400 and 600 ton. Buy or hire from our Sajjah yard. Delivery, commissioning and breakdown support across the UAE."
+    "seoDescription": "Crawler cranes at 200, 400 and 600 ton. Buy or hire across the UAE and the wider GCC. Delivery, commissioning and breakdown support."
   },
   {
     "id": "air-compressors",
     "name": "Air compressors",
     "family": "Power & air",
-    "rangeLabel": "135 CFM to 1,050 CFM",
+    "rangeLabel": "135 CFM to 1050 CFM",
     "cardLine": "Site air for breakers, blasting and drilling spreads.",
     "summary": "Site air for breakers, rock drills and blasting spreads. Tell us the tools running at once and we size the CFM with enough margin for the hose run.",
     "highlights": [
-      "135 to 1,050 CFM, skid and trailer mounted",
+      "135 to 1050 CFM, skid and trailer mounted",
       "Sized on total tool consumption plus hose loss",
       "After-coolers and filtration for blasting and painting",
       "Hoses, manifolds and breaker sets available with the unit"
@@ -346,29 +346,29 @@
       {
         "label": "900 CFM",
         "typicalDuty": "Large blasting and drilling spreads",
-        "availability": "sourced"
+        "availability": "on_request"
       },
       {
         "label": "1050 CFM",
         "typicalDuty": "Maximum output, industrial duty",
-        "availability": "sourced"
+        "availability": "on_request"
       }
     ],
     "dutyGuide": [],
     "related": ["generators", "tower-lights", "excavators"],
     "seoTitle": "Air Compressors for Sale & Hire in Dubai | Collins",
-    "seoDescription": "Air compressors from 135 to 1,050 CFM. Buy or hire from our Sajjah yard. Delivery, commissioning and breakdown support across the UAE."
+    "seoDescription": "Air compressors from 135 to 1050 CFM. Buy or hire across the UAE and the wider GCC. Delivery, commissioning and breakdown support."
   },
   {
     "id": "scissor-lifts",
     "name": "Scissor lifts",
     "family": "Access",
-    "rangeLabel": "9 to 16 metre working height",
-    "cardLine": "Stable working platforms, indoor electric and rough terrain.",
-    "summary": "A stable platform where the work is straight up and the deck needs room for two people and their material. Electric slab machines indoors, four-wheel-drive rough terrain outside.",
+    "rangeLabel": "9 to 16 meter working height",
+    "cardLine": "Stable working platforms, electric indoors and diesel outside.",
+    "summary": "A stable platform where the work is straight up and the deck needs room for two people and their material. Electric slab machines indoors, four-wheel-drive diesel outside.",
     "highlights": [
-      "9 to 16 metre working height",
-      "Electric for finished floors, rough terrain for open site",
+      "9 to 16 meter working height",
+      "Electric for finished floors, diesel for open site",
       "Wide decks and extension platforms for two-man work",
       "Inspected, certified and function tested before dispatch"
     ],
@@ -398,19 +398,19 @@
       },
       {
         "label": "12 m",
-        "powerType": "Rough terrain",
+        "powerType": "Diesel",
         "typicalDuty": "Outdoor, uneven ground",
-        "availability": "on_request"
+        "availability": "yard"
       },
       {
         "label": "14 m",
-        "powerType": "Rough terrain",
+        "powerType": "Diesel",
         "typicalDuty": "Facade and external work",
-        "availability": "on_request"
+        "availability": "yard"
       },
       {
         "label": "16 m",
-        "powerType": "Rough terrain",
+        "powerType": "Diesel",
         "typicalDuty": "Maximum reach, outdoor duty",
         "availability": "on_request"
       }
@@ -418,7 +418,7 @@
     "dutyGuide": [],
     "related": ["boom-lifts", "telehandlers", "tower-lights"],
     "seoTitle": "Scissor Lifts for Sale & Hire in Dubai | Collins",
-    "seoDescription": "Scissor lifts from 9 to 16 metre working height, electric and rough terrain. Buy or hire from our Sajjah yard, with delivery across the UAE."
+    "seoDescription": "Scissor lifts from 9 to 16 meter working height, electric and diesel. Buy or hire across the UAE and the wider GCC, with delivery and support."
   },
   {
     "id": "telehandlers",
@@ -458,13 +458,13 @@
       {
         "label": "20 m+",
         "typicalDuty": "Long reach placement",
-        "availability": "sourced"
+        "availability": "on_request"
       }
     ],
     "dutyGuide": [],
     "related": ["forklifts", "boom-lifts", "skid-steer-loaders"],
     "seoTitle": "Telehandlers for Sale & Hire in Dubai | Collins",
-    "seoDescription": "Telehandlers in all standard reaches. Buy or hire from our Sajjah yard. Delivery, commissioning and breakdown support across the UAE."
+    "seoDescription": "Telehandlers in all standard reaches. Buy or hire across the UAE and the wider GCC. Delivery, commissioning and breakdown support."
   },
   {
     "id": "boom-lifts",
@@ -501,31 +501,31 @@
         "label": "20 m",
         "powerType": "Articulated",
         "typicalDuty": "Facade access with obstructions",
-        "availability": "on_request"
+        "availability": "yard"
       },
       {
         "label": "20 m",
         "powerType": "Telescopic",
         "typicalDuty": "Straight reach, open site",
-        "availability": "on_request"
+        "availability": "yard"
       },
       {
         "label": "28 m",
         "powerType": "Telescopic",
         "typicalDuty": "High facade, tank and plant work",
-        "availability": "sourced"
+        "availability": "on_request"
       },
       {
         "label": "40 m",
         "powerType": "Telescopic",
         "typicalDuty": "Maximum reach, specialist access",
-        "availability": "sourced"
+        "availability": "on_request"
       }
     ],
     "dutyGuide": [],
     "related": ["scissor-lifts", "telehandlers", "tower-lights"],
     "seoTitle": "Boom Lifts for Sale & Hire in Dubai | Collins",
-    "seoDescription": "Articulated and telescopic boom lifts. Buy or hire from our Sajjah yard. Delivery, commissioning and breakdown support across the UAE."
+    "seoDescription": "Articulated and telescopic boom lifts. Buy or hire across the UAE and the wider GCC. Delivery, commissioning and breakdown support."
   },
   {
     "id": "excavators",
@@ -576,19 +576,19 @@
         "label": "20 ton",
         "powerType": "Tracked",
         "typicalDuty": "Bulk excavation, main site duty",
-        "availability": "on_request"
+        "availability": "yard"
       },
       {
         "label": "30 ton+",
         "powerType": "Tracked",
         "typicalDuty": "Heavy bulk earthworks",
-        "availability": "sourced"
+        "availability": "yard"
       }
     ],
     "dutyGuide": [],
     "related": ["backhoe-loaders", "skid-steer-loaders", "telehandlers"],
     "seoTitle": "Excavators for Sale & Hire in Dubai | Collins",
-    "seoDescription": "Tracked and wheeled excavators from 1.5 ton upwards. Buy or hire from our Sajjah yard, with delivery and support across the UAE."
+    "seoDescription": "Tracked and wheeled excavators from 1.5 ton upwards. Buy or hire across the UAE and the wider GCC, with delivery and support."
   },
   {
     "id": "tower-lights",
@@ -601,7 +601,7 @@
       "Diesel and solar-hybrid masts",
       "LED heads — lower draw, longer run between refuels",
       "Solar units run with no fuel logistics at all",
-      "Manual and hydraulic mast lift, 7 to 9 metres"
+      "Manual and hydraulic mast lift, 7 to 9 meters"
     ],
     "h1": "Tower lights for sale and hire in the UAE",
     "heroImage": "/images/equipment/tower-lights-hero.jpg",
@@ -626,13 +626,13 @@
         "label": "High mast",
         "powerType": "Diesel",
         "typicalDuty": "Wide area coverage, large sites",
-        "availability": "on_request"
+        "availability": "yard"
       }
     ],
     "dutyGuide": [],
     "related": ["generators", "air-compressors", "scissor-lifts"],
     "seoTitle": "Tower Lights for Sale & Hire in Dubai | Collins",
-    "seoDescription": "Diesel and solar tower lights for night shift work. Buy or hire from our Sajjah yard, with delivery and support across the UAE."
+    "seoDescription": "Diesel and solar tower lights for night shift work. Buy or hire across the UAE and the wider GCC, with delivery and support."
   },
   {
     "id": "backhoe-loaders",
@@ -662,13 +662,13 @@
       {
         "label": "Site spec",
         "typicalDuty": "Site-specific attachments and configuration",
-        "availability": "on_request"
+        "availability": "yard"
       }
     ],
     "dutyGuide": [],
     "related": ["excavators", "skid-steer-loaders", "telehandlers"],
     "seoTitle": "Backhoe Loaders for Sale & Hire in Dubai | Collins",
-    "seoDescription": "Standard and site spec backhoe loaders. Buy or hire from our Sajjah yard. Delivery, commissioning and breakdown support across the UAE."
+    "seoDescription": "Standard and site spec backhoe loaders. Buy or hire across the UAE and the wider GCC. Delivery, commissioning and breakdown support."
   },
   {
     "id": "skid-steer-loaders",
@@ -709,6 +709,60 @@
     "dutyGuide": [],
     "related": ["backhoe-loaders", "telehandlers", "excavators"],
     "seoTitle": "Skid Steer Loaders for Sale & Hire in Dubai | Collins",
-    "seoDescription": "Bobcat and skid steer loaders with a full attachment range. Buy or hire from our Sajjah yard, with delivery across the UAE."
+    "seoDescription": "Bobcat and skid steer loaders with a full attachment range. Buy or hire across the UAE and the wider GCC, with delivery and support."
+  },
+  {
+    "id": "trailers",
+    "name": "Trailers",
+    "family": "Transport",
+    "rangeLabel": "Flatbed, low bed and extendable",
+    "cardLine": "Plant and cargo moved across the UAE and the GCC.",
+    "summary": "Moving the machine is half the job. Tell us the type of trailer you need and where the load is going, and we quote the movement with permits and escorts where the load needs them.",
+    "highlights": [
+      "Flatbed, low bed, extendable and hydraulic axle",
+      "Permits and escorts for out-of-gauge loads",
+      "Point to point across the UAE and the wider GCC",
+      "Loading, lashing and offloading handled"
+    ],
+    "h1": "Trailers for hire across the UAE and the GCC",
+    "heroImage": "/images/service-logistics.jpg",
+    "availableHire": true,
+    "availableSale": true,
+    "featured": false,
+    "attachments": false,
+    "rangeHeading": "Trailer type",
+    "askQuantity": false,
+    "sortOrder": 13,
+    "ranges": [
+      {
+        "label": "Flatbed",
+        "typicalDuty": "Containers, generators and general site cargo",
+        "availability": "yard"
+      },
+      {
+        "label": "Low bed",
+        "typicalDuty": "Excavators, cranes and tracked plant",
+        "availability": "yard"
+      },
+      {
+        "label": "Extendable low bed",
+        "typicalDuty": "Long loads and out-of-gauge machinery",
+        "availability": "yard"
+      },
+      {
+        "label": "Hydraulic axle",
+        "typicalDuty": "Heavy lift and super-heavy movements",
+        "availability": "on_request"
+      },
+      {
+        "label": "Tipper trailer",
+        "typicalDuty": "Aggregate, spoil and bulk material",
+        "availability": "on_request"
+      }
+    ],
+    "dutyGuide": [],
+    "related": ["mobile-cranes", "excavators", "forklifts"],
+    "seoTitle": "Trailers for Hire in Dubai | Flatbed & Low Bed | Collins",
+    "seoDescription": "Flatbed, low bed, extendable and hydraulic axle trailers for plant and cargo movement across the UAE and the wider GCC, with permits and escorts arranged."
   }
 ]

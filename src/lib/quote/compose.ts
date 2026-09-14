@@ -59,7 +59,7 @@ export const toPayload = (
     otherItem:
       state.category === OTHER_CATEGORY ? trimmed(state.otherItem) : null,
     // Both the key and the label travel, because the label is the quotable
-    // string — "250 kVA" is what goes on the quotation.
+    // string — "250 KVA" is what goes on the quotation.
     rating:
       context.rating && state.rating !== UNSURE_RATING
         ? {
@@ -131,7 +131,7 @@ export const toMessage = (state: QuoteState, context: QuoteContext): string => {
             state.timeframe && `When: ${labelOf(TIMEFRAMES, state.timeframe)}`,
             state.destination &&
               `Destination: ${labelOf(DESTINATIONS, state.destination)}`,
-            state.docs && "Documentation for finance or insurance: yes",
+            state.docs && "Full documentation pack: yes",
           ]
         : [];
 

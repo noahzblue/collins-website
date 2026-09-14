@@ -297,6 +297,12 @@ export function initQuoteForm(
       find('[data-conditional="attachments"]'),
       !!panel?.hasAttribute("data-attachments"),
     );
+    // Trailers: which one, and where it is going. "How many" is not a
+    // question a movement has an answer to.
+    show(
+      find('[data-conditional="quantity"]'),
+      !panel?.hasAttribute("data-no-quantity"),
+    );
 
     /* 03 — one panel per mode, and never two. */
     show(find("[data-terms-empty]"), !state.mode);
@@ -700,7 +706,7 @@ export function initQuoteForm(
   /**
    * A rating given as a key, or as the label a hand-written link would use.
    *
-   * §9 shows `rating=250%20kVA` — a label — and the radios are keyed on
+   * §9 shows `rating=250%20KVA` — a label — and the radios are keyed on
    * `rangeKey()`, so both have to resolve. A label that matches two ranges
    * (forklifts have two "3 ton") resolves to the first, which is better than
    * refusing a link that a person wrote by hand.

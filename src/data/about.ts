@@ -15,30 +15,38 @@
  *  actually does. Use all three paragraphs; do not compress them. */
 export const whoWeAre = {
   eyebrow: "Who we are",
-  title: ["A small team,", "close to the yard."],
+  title: ["Hands on,", "close to the yards."],
   paragraphs: [
-    "Collins Equipments Sales & Rental L.L.C sells, hires and maintains the machines that keep projects moving across the United Arab Emirates: power generation, material handling, earthmoving, lifting and heavy haulage.",
-    "Generators, forklifts, cranes, compressors, access equipment and earthmoving plant are supplied outright, sourced direct from manufacturers and authorised distributors, and handed over commissioned, documented and ready to work. Where a contractor needs the same machine for weeks rather than years, it is available from the identical fleet on hire, supported by the same engineers and held to the same standard.",
-    "Our licence covers construction equipment, heavy and light machinery, lifting and loading plant, and alternative energy equipment. That is the full spread a live site actually needs, from a single tower light to a 1,250 KVA generator set on a flatbed.",
+    "Collins Equipments Sales & Rental L.L.C sells, hires and maintains the machines that keep projects moving across the UAE and the wider GCC: power generation, material handling, earthmoving, lifting and heavy transport.",
+    "Generators, forklifts, cranes, compressors, access equipment and earthmoving plant are supplied outright, sourced direct from manufacturers and authorised distributors, and handed over commissioned, documented and ready to work. Where a contractor needs the same machine for weeks rather than years, it is available on hire, supported by the same engineers and held to the same standard.",
+    "Our licence covers construction equipment, heavy and light machinery, lifting and loading plant, and alternative energy equipment. That is the full spread a live site actually needs, from a single tower light to a 1250 KVA generator set on a flatbed.",
   ],
   /** Pulled out as a display line between paragraphs 1 and 2. */
-  pullQuote: "Sales are the core of the business.",
-  image: "/images/hero-yard.jpg",
+  pullQuote:
+    "Sales, hire and service — the same machines, held to the same standard.",
+  image: "/images/yard/fleet-wide.jpg",
   imageAlt:
-    "Mixed plant standing in the Collins yard at Sajjah — generators, forklifts and a telehandler lined up ready for dispatch.",
+    "A Hangcha forklift and a JCB backhoe loader standing side by side in the Collins yard.",
 };
 
-/** profile p.3. */
+/** profile p.3, cut to the bone.
+ *
+ *  The profile's own wording ran to three clauses each and said the same
+ *  thing twice. One sentence per block is the whole of it — a site manager
+ *  reads it once and remembers it, which a paragraph nobody finishes cannot
+ *  claim. `closer` renders a second line in brand colour beneath the body
+ *  when it has one; both are deliberately empty, because a claim this short
+ *  does not need a line underneath repeating it. */
 export const missionVision = [
   {
     label: "Our mission",
-    body: "To deliver high performance power solutions and heavy machinery engineered to exceed industrial standards, and to keep them running long after the invoice is settled. Durability, precision and uptime are what we sell, the machine is how we deliver it.",
-    /** Rendered on its own line. */
+    body: "Machines that work the day they arrive, and keep working long after the invoice is paid.",
+    /** Rendered on its own line, in brand colour. */
     closer: "",
   },
   {
     label: "Our vision",
-    body: "To be the first call in the Emirates for equipment that has to work on the day it arrives. We grow by being the supplier a site manager trusts on a tight programme, not by being the cheapest quote in the inbox.",
+    body: "To be the first call in the GCC when the equipment has to work.",
     closer: "",
   },
 ];
@@ -50,8 +58,24 @@ export interface Leader {
   remit: string;
 }
 
+/** Two sentences: who they are, and what that gets you.
+ *
+ *  The middle sentence this used to carry — "between them they cover
+ *  ownership, commercial direction, operations, fleet condition and
+ *  procurement" — is the remit column of the table directly below it, written
+ *  out as a list of job functions. Saying it twice cost the reader the one
+ *  line that actually matters to them.
+ *
+ *  **No turnaround time here, deliberately.** It used to end "come back the
+ *  same day rather than the same week", which is a commitment a customer can
+ *  hold the company to on a bad week, and the only unhedged one on the site —
+ *  every other timing claim says "wherever possible", "usually" or "most".
+ *  The structural fact underneath it is the real differentiator and is true
+ *  on every week: these five decide, so nothing is referred upward. Keep it
+ *  that way. If a turnaround ever goes back in, hedge it and get it signed
+ *  off by operations first (see the same note in `data/yard.ts`). */
 export const leadershipIntro =
-  "A small, hands on team that stays close to the yard. Between them they cover ownership, commercial direction, operations, fleet condition and procurement. That is why decisions on a hire, a price or a replacement machine come back the same day rather than the same week.";
+  "A hands on team that stays close to the yards. A hire, a price or a replacement machine is decided by the people you are already talking to, not referred somewhere else.";
 
 export const leadership: Leader[] = [
   {
@@ -90,7 +114,7 @@ export const leadership: Leader[] = [
  *  too good to bury inside the leadership grid. */
 export const onePointOfContact = {
   title: "One point of contact",
-  body: "Every account is assigned a named contact from this team. You will not be passed between departments during a project.",
+  body: "Every account is assigned a named contact from our team. You will not be passed between departments during a project.",
 };
 
 /** profile p.2 — the eight licensed activities, which pair cleanly into four
@@ -118,11 +142,12 @@ export const licensedActivities: { sale: string; rental: string }[] = [
   },
 ];
 
-/** The page's five blocks, in order — feeds the sticky index rail. */
+/** The page's blocks, in order — feeds the sticky index rail. Credentials is
+ *  absent because that article is commented out in `pages/about.astro`; put
+ *  both back together or the rail scrolls to nothing. */
 export const aboutBlocks = [
   { id: "who-we-are", label: "Who we are" },
   { id: "mission-vision", label: "Mission & vision" },
   { id: "leadership", label: "Leadership" },
-  { id: "the-yard", label: "The yard" },
-  { id: "credentials", label: "Credentials" },
+  { id: "the-yard", label: "The yards" },
 ];

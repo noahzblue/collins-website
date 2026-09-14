@@ -42,7 +42,7 @@ export type QuoteVariant = "dialog" | "inline";
 /** The four sections. Their order is `QuoteForm`'s decision, not this file's. */
 export type SectionId = "need" | "size" | "terms" | "contact";
 
-/** `category` when the machine is not one of the twelve (docs 14 §10a). */
+/** `category` when the machine is not one of the thirteen (docs 14 §10a). */
 export const OTHER_CATEGORY = "other";
 
 /** `rating` when no listed size fits — opens the duty field (docs 14 §10b). */
@@ -61,11 +61,11 @@ export interface QuoteState {
   category: string | null;
   /** Free text, required when `category` is `OTHER_CATEGORY`. */
   otherItem: string;
-  /** One of the five families, to route an "something else" enquiry. */
+  /** One of the six families, to route an "something else" enquiry. */
   family: string;
 
   /* 02 — what size */
-  /** A range `label` as quoted ("250 kVA"), or `UNSURE_RATING`. */
+  /** A range `label` as quoted ("250 KVA"), or `UNSURE_RATING`. */
   rating: string | null;
   /** The duty description, required when `rating` is `UNSURE_RATING`. */
   duty: string;
@@ -150,7 +150,7 @@ export const availabilityMode = (mode: QuoteMode | null) =>
 export interface QuoteCategory {
   id: string;
   name: string;
-  /** One of the five families. Groups the picker's rows on a phone. */
+  /** One of the six families. Groups the picker's rows on a phone. */
   family: string;
   /** The spec line that replaces the photo below 600px (docs 14 §5). */
   rangeLabel: string;
@@ -160,7 +160,7 @@ export interface QuoteCategory {
 /** One quotable size. The collection's shape, restated so a presentation
  *  component never has to import `astro:content` to be typed. */
 export interface QuoteRange {
-  /** The rating as it is quoted — "250 kVA", "5 ton", "12 m". */
+  /** The rating as it is quoted — "250 KVA", "5 ton", "12 m". */
   label: string;
   powerType?: string;
   typicalDuty?: string;
@@ -169,11 +169,17 @@ export interface QuoteRange {
 
 /** What section 02 needs on top of what the picker does. */
 export interface QuoteCategoryDetail extends QuoteCategory {
+  /** What this category calls its list of ranges — "Size / rating" for every
+   *  machine, "Trailer type" for trailers. */
+  rangeHeading: string;
   ranges: QuoteRange[];
-  /** Sizing advice. One of the twelve has any, so nothing may depend on it. */
+  /** Sizing advice. One of the thirteen has any, so nothing may depend on it. */
   dutyGuide: { situation: string; advice: string }[];
-  /** Whether to ask about attachments — four of the twelve (docs 14 §7). */
+  /** Whether to ask about attachments — four of the thirteen (docs 14 §7). */
   attachments: boolean;
+  /** Whether to ask "how many". False for trailers, where the request is a
+   *  movement — which trailer, and where to — not a headcount. */
+  askQuantity: boolean;
 }
 
 /**

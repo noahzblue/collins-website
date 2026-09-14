@@ -413,7 +413,7 @@
      has nothing to draw an outline, so it stays white instead of painting a
      grey block. That matters because almost nothing here divides evenly — the
      picker is thirteen tiles across four, three and two columns, and seven of
-     the twelve categories have an odd number of ranges. Counting items and
+     the thirteen categories have an odd number of ranges. Counting items and
      padding the last row per breakpoint is a rule callers would have to
      remember at every call site, which is the kind of rule that gets
      forgotten.

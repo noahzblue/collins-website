@@ -58,7 +58,7 @@ const { points, class: extra = "" } = Astro.props;
     {
       points.map((point, i) => (
         <li
-          class="point flex min-h-[62svh] flex-col justify-center border-b border-line py-12 last:border-0 max-nav:min-h-0 max-nav:py-9 max-cmp:py-6"
+          class="point flex min-h-[62svh] flex-col justify-center py-12 max-nav:min-h-0 max-nav:py-9 max-cmp:py-6"
           data-point={i}
         >
           {/* The pin loses its point below `nav` — a shared photo slot

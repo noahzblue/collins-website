@@ -24,20 +24,21 @@ import {
   aboutBlocks,
   leadership,
   leadershipIntro,
-  licensedActivities,
+  // licensedActivities — only the Credentials article below uses it, and that
+  // article is commented out. Restore both together.
   missionVision,
   onePointOfContact,
   whoWeAre,
 } from "@/data/about";
 
-const { office, yard } = site.places;
+const { dubai, sharjah } = site.places;
 
 /** The mono detail row under the banner heading — the instrument-panel
  *  register. One line, entirely verifiable, and worth more than a paragraph. */
 const bannerDetail = [
   "Est. Dubai",
-  office.address.replace(", U.A.E.", ""),
-  `Yard: ${yard.address.replace(", U.A.E.", "")}`,
+  dubai.address.replace(", U.A.E.", ""),
+  `Yards: ${dubai.city} & ${sharjah.city}`,
   `Register ${site.register}`,
 ];
 
@@ -184,10 +185,10 @@ const initials = (name: string) =>
                and a grid of stock faces is the exact tell that would undo the
                credentials block below. */
         }
-        <ul class="mt-11 border-t border-line">
+        <ul class="mt-11">
           {
             leadership.map((person, i) => (
-              <li class="lead-row grid grid-cols-[auto_auto_1fr_1.2fr] items-start gap-6 border-b border-line px-4 py-7 transition-colors duration-200 max-nav:grid-cols-[auto_auto_1fr] max-nav:gap-x-5 max-xs:px-0">
+              <li class="lead-row grid grid-cols-[auto_auto_1fr_1.2fr] items-start gap-6 border-b border-line px-4 py-7 transition-colors duration-200 last-of-type:border-b-0 max-nav:grid-cols-[auto_auto_1fr] max-nav:gap-x-5 max-xs:px-0">
                 <span class="mt-[14px] font-mono text-micro tracking-[0.5px] text-faint">
                   {String(i + 1).padStart(2, "0")}
                 </span>
@@ -217,38 +218,59 @@ const initials = (name: string) =>
           title={onePointOfContact.title}
           body={onePointOfContact.body}
           cta={{ label: "Talk to your contact", href: "/contact" }}
-          class="mt-12"
+          class="mt-12 lg:mt-32"
         />
       </article>
 
       <hr class="my-[96px] border-0 border-t border-line max-mob:my-[64px]" />
 
-      <!-- 04 — The yard -->
+      <!-- 04 — The yards -->
       <article id="the-yard">
         <div
           class="grid grid-cols-[0.9fr_1.1fr] items-center gap-14 max-nav:grid-cols-1 max-nav:gap-9"
         >
-          <ParallaxImage
-            src="/images/why-readiness.jpg"
-            alt="Serviced plant standing in the Sajjah yard, fuelled and ready for dispatch."
-            shift="4%"
-            zoom={1.1}
-            class="aspect-[4/3] rounded-md"
-          />
+          {
+            /* Two photographs, because there are two yards and the section
+               says so three lines to the right. One image here would be the
+               page arguing "two" while showing one. They stack on a phone
+               with the grid, so the pair never competes for width. */
+          }
+          <div class="flex flex-col gap-4 max-cmp:gap-3">
+            {
+              [dubai, sharjah].map((place, i) => (
+                <figure class="m-0">
+                  <ParallaxImage
+                    src={`/images/yard/${i === 0 ? "dubai-office" : "sharjah-gate"}.jpg`}
+                    alt={
+                      i === 0
+                        ? "The Collins Equipments office in Dubai, the wall logo reading Sales, Rental, Service behind the desk."
+                        : "The gate of the Collins yard in Sharjah, the company signboard mounted on the wall above it."
+                    }
+                    shift="3%"
+                    zoom={1.08}
+                    class="aspect-[3/2] rounded-md"
+                  />
+                  <figcaption class="mt-[10px] font-mono text-caption tracking-[0.5px] text-faint uppercase">
+                    {place.city} — {place.tag}
+                  </figcaption>
+                </figure>
+              ))
+            }
+          </div>
           <div>
-            <Eyebrow class="mb-[16px]">The yard</Eyebrow>
+            <Eyebrow class="mb-[16px]">The yards</Eyebrow>
             <h2 class="text-h2 leading-[1.06]" data-reveal>
-              One yard. Ready stock.
+              Two yards. Ready stock.
             </h2>
             <p class="mt-6 text-lead leading-relaxed text-muted" data-reveal>
               Generators, forklifts, telehandlers, cranes and trailers stand in
-              the same yard at Sajjah, so a mixed order arrives on one delivery,
-              on one agreement — serviced, fuelled and function tested before it
-              leaves.
+              Dubai and Sharjah, so a mixed order is still one agreement and one
+              point of contact — every unit serviced, fuelled and function
+              tested before it leaves.
             </p>
             <div class="mt-8" data-reveal>
               <Button variant="outline" href="/yard" class="press">
-                Inside the yard
+                Inside the yards
               </Button>
             </div>
           </div>
@@ -258,7 +280,7 @@ const initials = (name: string) =>
       <hr class="my-[96px] border-0 border-t border-line max-mob:my-[64px]" />
 
       <!-- 05 — Credentials -->
-      <article id="credentials">
+      <!-- <article id="credentials">
         <Eyebrow class="mb-[16px]">Credentials</Eyebrow>
         <h2 class="max-w-[640px] text-h2 leading-[1.06]" data-reveal>
           Licensed, registered, checkable.
@@ -274,8 +296,8 @@ const initials = (name: string) =>
           {
             [
               { label: "Licensed name", value: site.legalName },
-              { label: "Head office", value: office.address },
-              { label: "Yard", value: yard.address },
+              { label: dubai.tag, value: dubai.address },
+              { label: sharjah.tag, value: sharjah.address },
             ].map((cell, i) => (
               <div
                 class:list={[
@@ -336,7 +358,7 @@ const initials = (name: string) =>
         >
           Register {site.register} · Licensed by the {site.licensingAuthority}
         </p>
-      </article>
+      </article> -->
     </RailSections>
   </Section>
 

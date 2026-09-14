@@ -9,7 +9,7 @@
  */
 
 export const hero = {
-  eyebrow: "Sales & Rental · Dubai & Sharjah · UAE",
+  eyebrow: "Sales & Rental",
   /** Title is split so the closing phrase can be colour-emphasised. The dash
    *  opens the blue run rather than closing the white one — it is the hinge
    *  between the two halves of the sentence, and reading white it looks like
@@ -21,7 +21,7 @@ export const hero = {
     emphasis: "— for sale and for hire.",
     tail: "",
   },
-  sub: "Generators to 1,250 kVA, forklifts, cranes and compressors — supplied outright or on hire from our Sajjah yard, across the UAE.",
+  sub: "Generators up to 1250 KVA, forklifts, cranes and compressors — supplied outright or on hire, across the UAE and the GCC.",
   ctas: [
     {
       label: "Request a quote",
@@ -39,8 +39,7 @@ export const hero = {
 /** "Why Collins" — big statement + tabbed proof card. */
 export const trust = {
   eyebrow: "What drives us",
-  statement:
-    "The first call in the Emirates for equipment that has to work on the day it arrives.",
+  statement: "Reliable equipment, ready when you need it.",
   /** Constant headline over the photo card; tabs swap image + copy below it. */
   cardTitle: ["Built to keep", "your site moving."],
 };
@@ -49,36 +48,34 @@ export const trust = {
  *  nowhere on the site. Sales is listed first because it is the main business. */
 export const supplyModes = {
   eyebrow: "How we supply",
-  title: ["Buy it, or hire", "the same machine."],
+  title: ["Equipment to buy.", "Equipment to hire.", "One trusted partner."],
   modes: [
     {
       label: "Sales",
-      lead: "Our main business",
-      body: "Supplied outright, sourced direct from manufacturers and authorised distributors, handed over commissioned, documented and ready to work.",
+      lead: "SOURCE. SUPPLY. DELIVER",
+      body: "From project-specific requirements to complete equipment purchases, we source the right machine through trusted supply channels and deliver it ready for work.",
       cta: { label: "Buy", href: "/services#equipment-sales" },
     },
     {
       label: "Rental",
-      lead: "The same fleet",
-      body: "Day, week, month or project duration — delivery and collection included in the rate, supported by the same engineers and held to the same standard.",
+      lead: "HIRE. DEPLOY. GET TO WORK",
+      body: "Day, week, month or project duration — flexible hire for projects of every length, on straightforward terms, with reliable delivery and responsive support.",
       cta: { label: "Hire terms", href: "/services#equipment-rental" },
     },
   ],
   /** profile p.8, verbatim. */
-  footnote:
-    "Move from a trial hire to a purchase, or straight to a purchase, without changing supplier, paperwork or point of contact.",
+  footnote: "Whatever the requirement — buy it, hire it, or let us source it.",
 };
 
 /** Equipment categories grid. */
 export const fleet = {
   eyebrow: "Equipment",
   title: ["Built for the job,", "ready when you are."],
-  intro:
-    "Sourced direct from manufacturers and authorised distributors, supplied with commissioning, operator handover and parts support — to buy or to hire. Six of the twelve categories below.",
-  viewAll: { label: "View all 12 categories", href: "/equipment" },
+  intro: "Machines that work on day one — to buy or to hire.",
+  viewAll: { label: "View all 13 categories", href: "/equipment" },
 };
 
-/** /equipment hub — the full twelve, listed in sortOrder. */
+/** /equipment hub — the full thirteen, listed in sortOrder. */
 export const equipmentHub = {
   eyebrow: "Equipment",
   title: ["Everything we supply,", "to buy or to hire."],
@@ -86,10 +83,10 @@ export const equipmentHub = {
     "Every category below is sourced direct from manufacturers and authorised distributors, supplied with commissioning, operator handover and parts support — and available for outright purchase or for hire.",
   seoTitle: "Equipment for Sale & Hire in the UAE | Collins Equipments",
   seoDescription:
-    "Twelve categories of industrial and heavy equipment to buy or hire — generators, forklifts, cranes, access platforms, earthmoving and material handling, delivered across the UAE.",
+    "Thirteen categories of industrial and heavy equipment to buy or hire — generators, forklifts, cranes, access platforms, earthmoving, material handling and trailers, delivered across the UAE and the GCC.",
   closing: {
     title: "Not seeing the machine you need?",
-    body: "The twelve above are what we carry day to day. Tell us the job and we'll source to spec — most enquiries come back the same day.",
+    body: "The thirteen above are what we carry day to day. Tell us the job and we'll source to spec — most enquiries come back the same day.",
   },
 };
 
@@ -102,10 +99,10 @@ export const servicesSection = {
   viewAll: { label: "View all services", href: "/services" },
   seoTitle: "Equipment Sales, Rental, Transport & Maintenance | Collins",
   seoDescription:
-    "Six services across the life of a machine — equipment sales, rental, sourcing and procurement, transport and haulage, maintenance and spares, logistics and export, across the UAE and the wider region.",
+    "Six services across the life of a machine — equipment sales, rental, sourcing and procurement, transport and trailers, maintenance and spares, logistics and export, across the UAE and the wider GCC.",
   /** The band that ties /services back to the catalogue. */
   crossSell: {
-    body: "Every service above runs on the same twelve categories — 10 kVA to 1,250 kVA of generation, 1.4 to 15 ton of handling, 50 to 600 ton of lift.",
+    body: "Every service above runs on the same thirteen categories — 10 KVA to 1250 KVA of generation, 1.4 to 15 ton of handling, 50 to 600 ton of lift.",
     cta: { label: "View the equipment", href: "/equipment" },
   },
 };
@@ -122,7 +119,7 @@ export const industriesSection = {
   viewAll: { label: "View all industries", href: "/industries" },
   seoTitle: "Industries We Supply | Collins Equipments UAE",
   seoDescription:
-    "Eight sectors supplied from one yard — construction, oil and gas, marine and ports, events, facilities, mining, infrastructure and manufacturing. Equipment sales and rental across the UAE.",
+    "Eight sectors supplied from two yards — construction, oil and gas, marine and ports, events, facilities, mining, infrastructure and manufacturing. Equipment sales and rental across the UAE and the GCC.",
   /** The industry × category coverage table — the hub's real payload. */
   matrix: {
     eyebrow: "Coverage",
@@ -143,14 +140,14 @@ export const aboutSection = {
   eyebrow: "About Collins",
   /* Rendered as one paragraph (`.join(" ")`), not as fixed lines — the array
      is only here because the rest of this file uses one. It is written long
-     on purpose: at the statement size in AboutTeaser it has to run to a third
-     line, or the block reads as a banner rather than as prose. */
-  title: [
-    "A partner built for uptime,",
-    "sized for scale,",
-    "and measured by the machines still running.",
-  ],
-  body: "We deliver high-performance power solutions and heavy machinery engineered to exceed industrial standards — and we keep them running long after the invoice is settled.",
+     enough to run to a third line at the statement size in AboutTeaser, or the
+     block reads as a banner rather than as prose.
+
+     The three words are the business: buy, sell, service. Everything else on
+     the homepage is detail underneath them, so this is the one place that
+     says them plainly and stops. */
+  title: ["Buy. Sell. Service.", "One supplier,", "start to finish."],
+  body: "Buy the machine outright or hire it by the day — either way we service it, and you deal with one person throughout.",
   cta: { label: "Read our story", href: "/about" },
   office: {
     tag: "Head Office",
@@ -162,7 +159,7 @@ export const aboutSection = {
 export const aboutPage = {
   seoTitle: "About Collins Equipments | Sales & Rental L.L.C, Dubai",
   seoDescription:
-    "Who we are: licensed activities, the Sajjah yard, our leadership team and register 2766346, licensed by the Dubai Department of Economy & Tourism.",
+    "Who we are: licensed activities, our yards in Dubai and Sharjah, our leadership team, and what Collins sells, hires and services across the UAE and the GCC.",
   /** profile p.1 cover — the best one-liner in the document. */
   tagline:
     "Heavy equipment, power generation and transport for sale and for hire.",

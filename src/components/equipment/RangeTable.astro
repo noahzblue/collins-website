@@ -38,15 +38,24 @@ type Ranges = CollectionEntry<"equipment">["data"]["ranges"];
 
 interface Props {
   ranges: Ranges;
-  /** Category name — words the enquiry message ("a 250 kVA generator"). */
+  /** Category name — words the enquiry message ("a 250 KVA generator"). */
   name: string;
   /** Category id. Lets a row open the quote form on this exact size; omit it
    *  and the row falls back to the WhatsApp enquiry alone (docs 14 §9a). */
   categoryId?: string;
+  /** Head of the first column. "Trailer type" for trailers, which have no
+   *  rating; every machine keeps the default. */
+  heading?: string;
   mode?: Mode;
 }
 
-const { ranges, name, categoryId, mode = "hire" } = Astro.props;
+const {
+  ranges,
+  name,
+  categoryId,
+  heading = "Size / rating",
+  mode = "hire",
+} = Astro.props;
 
 /* Columns only appear when the data fills them — crawler cranes and
    compressors carry no power type, so that column would sit empty. */
@@ -62,7 +71,7 @@ const td = "px-6 py-[17px] align-middle max-nav:p-0 max-xs:px-5";
   <table class="w-full border-collapse text-left max-nav:block">
     <thead class="max-nav:hidden">
       <tr class="border-b border-line bg-surface">
-        <th scope="col" class={th}>Size / rating</th>
+        <th scope="col" class={th}>{heading}</th>
         {
           hasPowerType && (
             <th scope="col" class={th}>

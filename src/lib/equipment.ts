@@ -2,26 +2,24 @@
  * Display strings for the equipment slice.
  *
  * These live here rather than in categories.json so a wording change is one
- * edit instead of twelve — the JSON carries facts, this file carries copy.
+ * edit instead of thirteen — the JSON carries facts, this file carries copy.
  */
 
 import { site } from "@/config/site";
 import { slug } from "@/lib/forms";
 
 export type Mode = "hire" | "buy";
-export type Availability = "yard" | "on_request" | "sourced";
+export type Availability = "yard" | "on_request";
 
-/** Same three states, read differently depending on whether you're hiring or buying. */
+/** Same two states, read differently depending on whether you're hiring or buying. */
 export const AVAILABILITY_LABEL: Record<Mode, Record<Availability, string>> = {
   hire: {
     yard: "In yard",
     on_request: "On request",
-    sourced: "To order",
   },
   buy: {
     yard: "Ready stock",
-    on_request: "Short lead",
-    sourced: "Sourced to spec",
+    on_request: "On request",
   },
 };
 
@@ -29,7 +27,6 @@ export const AVAILABILITY_LABEL: Record<Mode, Record<Availability, string>> = {
 export const AVAILABILITY_TONE: Record<Availability, string> = {
   yard: "bg-brand",
   on_request: "bg-muted",
-  sourced: "bg-faint",
 };
 
 /**
@@ -47,7 +44,6 @@ export const availabilityBadges = (
 
 export const INCLUDED: Record<Mode, readonly string[]> = {
   hire: [
-    "Delivery and collection included in the rate",
     "Serviced, fuelled and function tested before dispatch",
     "Signed condition report at handover",
     "Breakdown response and scheduled servicing during hire",
@@ -57,7 +53,7 @@ export const INCLUDED: Record<Mode, readonly string[]> = {
     "Sourced direct from manufacturers and authorised distributors",
     "Commissioned and handed over ready to work",
     "Operator handover on site",
-    "Documentation for finance or insurance",
+    "Full documentation pack at handover",
     "Parts inventory and servicing after handover",
   ],
 };
@@ -67,15 +63,28 @@ export const INCLUDED_HEADING: Record<Mode, string> = {
   buy: "What comes with the purchase",
 };
 
+/**
+ * What the rate explicitly does not carry.
+ *
+ * It sits with the inclusions rather than in the small print because the
+ * inclusions list is the one place a customer looks for it, and not finding it
+ * there is how transport becomes a surprise on the invoice. Empty for `buy`,
+ * where the movement is quoted with the machine anyway.
+ */
+export const EXCLUDED: Record<Mode, readonly string[]> = {
+  hire: ["Delivery and collection are quoted separately, on top of the rate."],
+  buy: [],
+};
+
 export const CTA_LABEL: Record<Mode, string> = {
   hire: "Check availability",
   buy: "Request quotation",
 };
 
 /**
- * "Generators" -> "generator". Every one of the twelve category names is a
+ * "Generators" -> "generator". Every one of the thirteen category names is a
  * plain plural, so dropping the trailing "s" is enough to make an enquiry read
- * "a 250 kVA generator" rather than "a 250 kVA generators".
+ * "a 250 KVA generator" rather than "a 250 KVA generators".
  */
 export const singular = (name: string) => name.toLowerCase().replace(/s$/, "");
 
@@ -107,7 +116,7 @@ export const enquireHref = (name: string, mode: Mode, rangeLabel?: string) => {
  * and it is the only thing that ever does.
  *
  * The label still travels in the payload beside this — it is the quotable
- * string, and "250 kVA" is what goes on the quotation (docs 14 §12).
+ * string, and "250 KVA" is what goes on the quotation (docs 14 §12).
  */
 export const rangeKey = (range: { label: string; powerType?: string }) =>
   slug([range.label, range.powerType].filter(Boolean).join(" "));
@@ -117,9 +126,9 @@ export const rangeKey = (range: { label: string; powerType?: string }) =>
  *
  * Families come out in the order they first appear, so a list already sorted
  * by `sortOrder` produces Power & air, Material handling, Lifting, Access,
- * Earthmoving — the catalogue's own order, with no second list to keep in
- * step with it. Used by the quote form's picker, which groups under five
- * headings on a phone (docs/site-expansion/14 §5).
+ * Earthmoving, Transport — the catalogue's own order, with no second list to
+ * keep in step with it. Used by the quote form's picker, which groups under
+ * six headings on a phone (docs/site-expansion/14 §5).
  */
 export const groupByFamily = <T extends { family: string }>(categories: T[]) =>
   categories.reduce<{ family: string; items: T[] }[]>((groups, category) => {

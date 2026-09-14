@@ -1,13 +1,13 @@
 ---
 /**
- * /yard — "One yard. Ready stock."
+ * /yard — "Two yards. Ready stock."
  *
  * The only page that says where the machines physically are, what happens to
  * them before dispatch and how fast they leave. Everything else on the site is
  * a claim a competitor could also make.
  *
  * The photography here is placeholder — see the note at the top of
- * data/yard.ts. This page is only as credible as its pictures, so the Sajjah
+ * data/yard.ts. This page is only as credible as its pictures, so the yard
  * shoot is the thing that finishes it.
  */
 import Base from "@/layouts/Base.astro";
@@ -33,7 +33,7 @@ import {
   <PageHeader
     image={yardPage.banner}
     trail={[{ label: "Home", href: "/" }]}
-    current="The yard"
+    current="The yards"
     title={yardPage.title}
   >
     <p
@@ -53,7 +53,7 @@ import {
     <RailSections items={yardBlocks} ariaLabel="On this page">
       <!-- 01 — the five points against one pinned photograph -->
       <article id="the-yard">
-        <Eyebrow class="mb-[16px]">The yard</Eyebrow>
+        <Eyebrow class="mb-[16px]">The yards</Eyebrow>
         <h2 class="mb-14 max-w-[640px] text-h2 leading-[1.06]" data-reveal>
           What happens here before anything leaves.
         </h2>
@@ -66,7 +66,7 @@ import {
       <article id="the-fleet">
         <Eyebrow class="mb-[16px]">The fleet</Eyebrow>
         <h2 class="max-w-[560px] text-h2 leading-[1.06]" data-reveal>
-          Leaving the Sajjah yard.
+          Leaving the yards.
         </h2>
         <p
           class="mt-6 max-w-[620px] text-lead leading-relaxed text-muted"
@@ -96,7 +96,7 @@ import {
                           note on `axis`. */}
                   <ParallaxImage
                     src={group.image}
-                    alt={`${group.label} standing in the Collins yard at Sajjah, ${group.range}.`}
+                    alt={`${group.label} standing in the Collins yard, ${group.range}.`}
                     loading={i === 0 ? "eager" : "lazy"}
                     axis="inline"
                     class="aspect-[4/3] w-full transition-transform duration-500 ease-out group-hover:scale-[1.04]"

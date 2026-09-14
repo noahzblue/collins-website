@@ -64,8 +64,8 @@ const jsonLd = {
   },
   geo: {
     "@type": "GeoCoordinates",
-    latitude: site.places.office.geo.lat,
-    longitude: site.places.office.geo.lng,
+    latitude: site.places.dubai.geo.lat,
+    longitude: site.places.dubai.geo.lng,
   },
   openingHours: site.hoursSchema,
   areaServed: "United Arab Emirates",
@@ -74,17 +74,24 @@ const jsonLd = {
     name: `Trade licence register — ${site.licensingAuthority}`,
     value: site.register,
   },
-  // The yard is a second real place doing a different job, not a duplicate.
-  location: {
+  // Both yards are real places holding real stock. `address` above is the
+  // Dubai head office, so Dubai appears here too — as a yard this time, which
+  // is a different claim about the same coordinates, not a duplicate of it.
+  location: Object.values(site.places).map((place) => ({
     "@type": "Place",
-    name: `${site.name} — yard`,
+    name: `${site.name} — ${place.city}`,
     address: {
       "@type": "PostalAddress",
-      streetAddress: "Sajjah",
-      addressLocality: "Sharjah",
+      streetAddress: place.address.replace(`, ${place.city}, U.A.E.`, ""),
+      addressLocality: place.city,
       addressCountry: "AE",
     },
-  },
+    geo: {
+      "@type": "GeoCoordinates",
+      latitude: place.geo.lat,
+      longitude: place.geo.lng,
+    },
+  })),
   sameAs: site.social.filter((s) => s.href !== "#").map((s) => s.href),
 };
 ---

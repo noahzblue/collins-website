@@ -52,7 +52,7 @@ export const site = {
 
   /** Short description used in the footer brand column. */
   blurb:
-    "Heavy equipment, power generation and transport for sale and for hire across the UAE — generators, forklifts, cranes, compressors and more.",
+    "Heavy equipment, power generation and transport for sale and for hire across the UAE and the GCC — generators, forklifts, cranes, compressors and more.",
 
   /** All three numbers from the profile, in the profile's order. */
   phones,
@@ -79,16 +79,23 @@ export const site = {
 
   locations: "Dubai · Sharjah",
 
-  /** Two real places doing two different jobs — the site used to imply one. */
+  /** Two yards, one of which is also the head office.
+   *
+   *  **Keyed by city, not by function.** These used to be `office` and `yard`,
+   *  which encoded the one thing that is no longer the difference between
+   *  them: both hold equipment. A key called `office` for a place with stock
+   *  on the ground is the kind of name that quietly misleads the next person
+   *  to read it. `dubai` carries the commercial function on top, and says so
+   *  in its `tag` and `role` rather than in its key. */
   places: {
-    office: {
-      tag: "Head office",
+    dubai: {
+      tag: "Head office & yard",
       city: "Dubai",
       address: "Ras Al Khor 2, Dubai, U.A.E.",
-      role: "Commercial, quotations and accounts.",
+      role: "Commercial, quotations and accounts, with stock on the ground.",
       geo: { lat: "25.1776", lng: "55.3488" },
     },
-    yard: {
+    sharjah: {
       tag: "Yard",
       city: "Sharjah",
       address: "Sajjah, Sharjah, U.A.E.",
@@ -126,7 +133,7 @@ export const site = {
   seo: {
     title: "Collins Equipments | Heavy Machinery Sales & Rental in the UAE",
     description:
-      "Heavy equipment, power generation and transport for sale and for hire — generators to 1,250 kVA, forklifts, cranes and compressors, supplied outright or on hire from our Sajjah yard across the UAE.",
+      "Heavy equipment, power generation and transport for sale and for hire — generators to 1250 KVA, forklifts, cranes and compressors, supplied outright or on hire across the UAE and the GCC.",
   },
 } as const;
 

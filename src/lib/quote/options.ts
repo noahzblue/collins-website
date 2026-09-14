@@ -11,7 +11,7 @@
  * `value` is a stable key. `label` is what the customer reads. They are never
  * the same string.
  *
- * Not here: the five equipment families and the twelve categories. Those are
+ * Not here: the six equipment families and the thirteen categories. Those are
  * facts in `content/equipment/categories.json` and reach the form through the
  * composition layer, because a second hand-written copy is exactly how the
  * prototype's catalogue drifted before anyone reviewed it (docs 14 §13).
@@ -45,16 +45,16 @@ export const MODES: Option[] = [
   {
     value: "hire",
     label: "Hire",
-    hint: "Day, week, month or project duration — delivery included.",
+    hint: "Day, week, month or project duration.",
   },
 ];
 
 /**
- * The thirteenth tile, last in the picker.
+ * The fourteenth tile, last in the picker.
  *
  * Not an error state — a service. `services.ts` sells specification-led
  * sourcing "direct from manufacturers and authorised distributors when the
- * unit you need is not standard stock", so a machine outside the twelve is
+ * unit you need is not standard stock", so a machine outside the thirteen is
  * something Collins does, not something the form cannot take (docs 14 §10a).
  */
 export const OTHER_TILE = {
@@ -194,7 +194,7 @@ export const FIELD_COPY = {
   condition: { label: "Condition" },
   timeframe: { label: "When" },
   destination: { label: "Destination" },
-  docs: { label: "Documentation for finance or insurance" },
+  docs: { label: "Send the full documentation pack" },
   name: { label: "Name", placeholder: "Your name" },
   company: { label: "Company", hint: "Optional." },
   phone: { label: "Phone", placeholder: "+971 …" },
@@ -272,7 +272,7 @@ export const SUMMARY = {
 
 /**
  * The chip that appears when a trigger answered sections 01 and 02 for the
- * customer — "Generators · 250 kVA · Hire   [change]".
+ * customer — "Generators · 250 KVA · Hire   [change]".
  *
  * Below 900px only. Above it the summary rail already says all of this, and
  * two summaries of one request is one too many (docs 14 §9a).

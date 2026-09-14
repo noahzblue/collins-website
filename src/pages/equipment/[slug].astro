@@ -48,6 +48,7 @@ const {
   h1,
   rangeLabel,
   heroImage,
+  rangeHeading,
   ranges,
   dutyGuide,
   related,
@@ -114,6 +115,7 @@ if (relatedEntries.length !== related.length) {
         ranges={ranges}
         name={name}
         categoryId={category.id}
+        heading={rangeHeading}
         mode="hire"
       />
 
@@ -121,9 +123,7 @@ if (relatedEntries.length !== related.length) {
         <strong class="font-medium text-muted">In yard</strong> — on the ground and
         ready to dispatch. <strong class="font-medium text-muted"
           >On request</strong
-        > — short lead, usually within the week. <strong
-          class="font-medium text-muted">To order</strong
-        > — sourced to your spec.
+        > — short lead, usually within the week.
       </p>
     </div>
   </Section>
@@ -142,7 +142,7 @@ if (relatedEntries.length !== related.length) {
           </h3>
           <p class="mb-7 text-base leading-relaxed text-muted">
             Tell us the load, the location and the dates — we'll come back with
-            the size that fits and what it costs, usually the same day.
+            what fits and what it costs, usually the same day.
           </p>
 
           <div class="mb-7 flex flex-wrap gap-3">

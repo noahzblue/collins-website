@@ -48,7 +48,7 @@ import { site, directionsHref } from "@/config/site";
 import { contactPage } from "@/data/content";
 import { DIALOG } from "@/lib/quote/options";
 
-const { office, yard } = site.places;
+const { dubai, sharjah } = site.places;
 
 /** The licence facts, as rail rows. Data, not markup — the closing rail and
  *  the masthead rail are the same three elements with different contents. */
@@ -117,7 +117,7 @@ const registration = [
               <span
                 class="rail-value flex items-center gap-[6px] font-medium transition-colors group-hover:text-brand"
               >
-                Message the yard
+                Message the yards
                 <Icon
                   name="arrow-up-right"
                   size={14}
@@ -206,7 +206,7 @@ const registration = [
           </h2>
           <div class="grid grid-cols-2 gap-6 max-cmp:grid-cols-1">
             {
-              [office, yard].map((place) => (
+              [dubai, sharjah].map((place) => (
                 <div class="card flex flex-col p-9 max-xs:p-7">
                   <span class="font-mono text-micro tracking-[1.6px] text-brand uppercase">
                     {place.tag}
