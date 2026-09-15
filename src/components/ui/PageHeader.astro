@@ -28,6 +28,15 @@ import Breadcrumb from "./Breadcrumb.astro";
 interface Props {
   /** Omit and the panel falls back to flat ink — no broken-image gap. */
   image?: string;
+  /** Parallax travel, passed through to `ParallaxImage`.
+   *
+   *  It defaults to that component's own 15%, which is what every caller got
+   *  before this prop existed — and 15% of travel forces the overscale up to
+   *  1.30, so nearly a third of the photograph is cropped away before anyone
+   *  sees it. That is fine for a photo with room to spare and wrong for one
+   *  framed deliberately. The house style elsewhere is 3–6%; reach for that
+   *  when the crop is doing real work. */
+  shift?: `${number}%`;
   trail: { label: string; href: string }[];
   current: string;
   title: string;
@@ -36,7 +45,15 @@ interface Props {
   class?: string;
 }
 
-const { image, trail, current, title, intro, class: extra = "" } = Astro.props;
+const {
+  image,
+  trail,
+  current,
+  title,
+  intro,
+  shift = "15%",
+  class: extra = "",
+} = Astro.props;
 ---
 
 <section
@@ -54,7 +71,12 @@ const { image, trail, current, title, intro, class: extra = "" } = Astro.props;
     >
       {
         image && (
-          <ParallaxImage src={image} loading="eager" class="absolute inset-0" />
+          <ParallaxImage
+            src={image}
+            shift={shift}
+            loading="eager"
+            class="absolute inset-0"
+          />
         )
       }
     </div>

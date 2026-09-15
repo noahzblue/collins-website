@@ -10,19 +10,31 @@
  * Copy is verbatim from the company profile, pages 6 and 8. The headline and
  * kicker are the profile's own and better than anything we'd write.
  *
- * ── PHOTOGRAPHY ──────────────────────────────────────────────────────────
- * Every `image` below is now a real photograph of Collins plant, shot on a
- * phone in the yards (`public/images/yard/`). That clears the stock-photo
- * debt this page carried, and it is the page where it mattered most — a page
- * about a physical place is only as credible as its photographs.
+ * ── PHOTOGRAPHY DEBT ─────────────────────────────────────────────────────
+ * Every `image` below is still a placeholder from `public/images/`. This is
+ * the page where the photographs ARE the argument — a page about a physical
+ * place is only as credible as its pictures — so the debt matters most here.
  *
- * Two things still outstanding, both resolution rather than authenticity:
- * `mixed-plant.jpg` is 720px on its long edge (it is the only wide shot of
- * both yards' stock together) and `sharjah-gate.jpg` is 960px. Neither can be
- * AI-upscaled — the models rewrite the signboard and the fleet decals into
- * nonsense, inventing phone numbers and manufacturer names. They need
- * re-shooting, not enhancing. The brief (docs/site-expansion/09) still stands
- * for the rest: one morning at each yard, consistent time of day.
+ * The raw material now exists: real phone photographs of both yards sit in
+ * `public/images/yard/`, and three of them are already live on /about. They
+ * are NOT wired in here yet, on purpose. Dropped in as shot they are worse
+ * than the placeholders — a close crop of one generator where the page needs
+ * an establishing view of the yard. They are being worked through one at a
+ * time; wire each one in only once it earns its slot.
+ *
+ * **Do not reach for an AI upscaler on them.** It was tried at both 2K and
+ * 4K: the model rewrites any text too small to resolve and invents
+ * replacements, turning the gate signboard into "Collins IOWPMUCS WVHIVI",
+ * changing a published phone number by three digits, and relabelling a Kaeser
+ * compressor "Teblie6". Collins brands its whole fleet, so almost every frame
+ * is exposed. Only the Dubai office survived, because its wall lettering is
+ * large. Resize, crop and colour-grade freely; do not let a model redraw
+ * anything with a word on it.
+ *
+ * The brief (docs/site-expansion/09) still stands: one morning at each yard,
+ * one wide establishing shot, five point images, 8–16 fleet frames, two
+ * workshop details, one loaded flatbed at the gate. Consistent time of day
+ * matters more than count.
  * ─────────────────────────────────────────────────────────────────────────
  */
 
@@ -30,7 +42,7 @@ export const yardPage = {
   /** profile p.8. */
   title: "Two yards. Ready stock.",
   kicker: "Yards: Dubai & Sharjah, U.A.E.",
-  banner: "/images/yard/workshop-genset.jpg",
+  banner: "/images/hero-yard.jpg",
   seoTitle:
     "Our Yards in Dubai & Sharjah | Ready Stock, Inspected Before Dispatch",
   seoDescription:
@@ -42,32 +54,32 @@ export const yardPoints = [
   {
     title: "One fleet, two yards.",
     body: "Generators, forklifts, telehandlers, cranes and trailers stand across both yards, so a mixed order is still one agreement, one quotation and one point of contact.",
-    image: "/images/yard/stacker-scissor.jpg",
-    alt: "An electric pallet stacker, a scissor lift and a canopied generator standing together in the Collins yard.",
+    image: "/images/hero-yard.jpg",
+    alt: "Wide view of the Collins yard with generators, forklifts and a telehandler standing in the same compound.",
   },
   {
     title: "Inspected before dispatch.",
     body: "Units are serviced, fuelled and function tested in our workshop, and handed over with a signed condition report.",
-    image: "/images/yard/genset-engine.jpg",
-    alt: "A generator set with its side panel open on the diesel engine, fuel lines and filters in view before dispatch.",
+    image: "/images/why-reliability.jpg",
+    alt: "An engineer running a function test on a canopied generator set in the workshop before it leaves the yard.",
   },
   {
     title: "Fast mobilisation.",
     body: "Dubai and Sharjah put stock within reach of the main construction corridors, Jebel Ali and the northern Emirates.",
-    image: "/images/yard/sharjah-gate.jpg",
-    alt: "The gate of the Collins yard in Sharjah, the company signboard mounted on the wall above it.",
+    image: "/images/why-delivery.jpg",
+    alt: "A loaded flatbed carrying plant out through the yard gate at first light.",
   },
   {
     title: "Buy or hire.",
     body: "Move from a trial hire to a purchase, or straight to a purchase, without changing supplier, paperwork or point of contact.",
-    image: "/images/yard/scissor-lift.jpg",
-    alt: "A scissor lift folded down in the yard beside an electric stacker, available either to buy or on hire.",
+    image: "/images/why-brands.jpg",
+    alt: "A line of branded machines standing ready in the yard, available either to buy or on hire.",
   },
   {
     title: "Support after handover.",
     body: "Breakdown response, scheduled servicing and parts held for the equipment we supply.",
-    image: "/images/yard/rating-plate.jpg",
-    alt: "The rating plate on a Collins generator set, listing model, serial number and prime and standby output.",
+    image: "/images/equipment-spare-parts.jpg",
+    alt: "Parts shelving in the workshop stocked for the generators, forklifts and compressors Collins supplies.",
   },
 ];
 
@@ -80,25 +92,25 @@ export const fleetGroups = [
   {
     label: "Generators",
     range: "10 KVA – 1250 KVA",
-    image: "/images/yard/generator-150kva.jpg",
+    image: "/images/equipment/generators-hero.jpg",
     href: "/equipment/generators",
   },
   {
     label: "Forklifts",
     range: "1.4 – 15 ton",
-    image: "/images/yard/forklift.jpg",
+    image: "/images/equipment/forklifts-hero.jpg",
     href: "/equipment/forklifts",
   },
   {
     label: "Air compressors",
     range: "135 – 1050 CFM",
-    image: "/images/yard/compressor.jpg",
+    image: "/images/equipment/air-compressors-hero.jpg",
     href: "/equipment/air-compressors",
   },
   {
     label: "Cranes & plant",
     range: "Telehandlers, excavators & skid steers",
-    image: "/images/yard/mixed-plant.jpg",
+    image: "/images/equipment/telehandlers-hero.jpg",
     href: "/equipment/telehandlers",
   },
 ];

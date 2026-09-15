@@ -52,7 +52,8 @@ const initials = (name: string) =>
 
 <Base title={aboutPage.seoTitle} description={aboutPage.seoDescription}>
   <PageHeader
-    image={whoWeAre.image}
+    image={aboutPage.banner}
+    shift="5%"
     trail={[{ label: "Home", href: "/" }]}
     current="About"
     title="About us"
@@ -225,55 +226,78 @@ const initials = (name: string) =>
       <hr class="my-[96px] border-0 border-t border-line max-mob:my-[64px]" />
 
       <!-- 04 — The yards -->
+      {
+        /* Copy over a full-width pair, not the side-by-side grid the other
+           articles use. Two photographs stacked in one column of that grid
+           ran to roughly three times the height of the text beside them, so
+           the other half of the row was empty — the layout was being asked to
+           balance one block against two. Side by side they also get real
+           width, which an office interior and a gate sign both need to read.
+
+           `src` is written out per entry rather than built from the place
+           key. These photographs are being replaced one at a time, and a path
+           assembled in a template literal is a path nobody can grep for when
+           it is their turn. */
+      }
       <article id="the-yard">
+        <div class="max-w-[640px]">
+          <Eyebrow class="mb-[16px]">The yards</Eyebrow>
+          <h2 class="text-h2 leading-[1.06]" data-reveal>
+            Two yards. Ready stock.
+          </h2>
+          {
+            /* Two sentences, and it stays two.
+               No equipment list here, deliberately. "Who we are" names the
+               fleet twice already and the reader has not moved since; a third
+               recital is the section repeating the page back at it. What a
+               yard is FOR is the argument: the machine exists, today, and the
+               only open question is the date. "One agreement, one point of
+               contact" went for the same reason — the ClosingNote in the
+               leadership block above is titled exactly that. */
+          }
+          <p class="mt-6 text-lead leading-relaxed text-muted" data-reveal>
+            What we quote you is already standing in a yard, not sitting in a
+            catalogue. Fuelled, serviced, function tested — waiting on your
+            date, not on an order.
+          </p>
+          <div class="mt-8" data-reveal>
+            <Button variant="outline" href="/yard" class="press">
+              Inside the yards
+            </Button>
+          </div>
+        </div>
+
         <div
-          class="grid grid-cols-[0.9fr_1.1fr] items-center gap-14 max-nav:grid-cols-1 max-nav:gap-9"
+          class="mt-12 grid grid-cols-2 gap-8 max-mob:mt-9 max-mob:grid-cols-1 max-mob:gap-6"
+          data-reveal
         >
           {
-            /* Two photographs, because there are two yards and the section
-               says so three lines to the right. One image here would be the
-               page arguing "two" while showing one. They stack on a phone
-               with the grid, so the pair never competes for width. */
+            [
+              {
+                place: dubai,
+                src: "/images/yard/dubai-office.jpg",
+                alt: "The Collins Equipments office in Dubai, the wall logo reading Sales, Rental, Service behind the desk.",
+              },
+              {
+                place: sharjah,
+                src: "/images/yard/sharjah-gate.jpg",
+                alt: "The gate of the Collins yard in Sharjah, the company signboard mounted on the wall above it.",
+              },
+            ].map(({ place, src, alt }) => (
+              <figure class="m-0">
+                <ParallaxImage
+                  src={src}
+                  alt={alt}
+                  shift="3%"
+                  zoom={1.08}
+                  class="aspect-[3/2] rounded-md"
+                />
+                <figcaption class="mt-[10px] font-mono text-caption tracking-[0.5px] text-faint uppercase">
+                  {place.city} — {place.tag}
+                </figcaption>
+              </figure>
+            ))
           }
-          <div class="flex flex-col gap-4 max-cmp:gap-3">
-            {
-              [dubai, sharjah].map((place, i) => (
-                <figure class="m-0">
-                  <ParallaxImage
-                    src={`/images/yard/${i === 0 ? "dubai-office" : "sharjah-gate"}.jpg`}
-                    alt={
-                      i === 0
-                        ? "The Collins Equipments office in Dubai, the wall logo reading Sales, Rental, Service behind the desk."
-                        : "The gate of the Collins yard in Sharjah, the company signboard mounted on the wall above it."
-                    }
-                    shift="3%"
-                    zoom={1.08}
-                    class="aspect-[3/2] rounded-md"
-                  />
-                  <figcaption class="mt-[10px] font-mono text-caption tracking-[0.5px] text-faint uppercase">
-                    {place.city} — {place.tag}
-                  </figcaption>
-                </figure>
-              ))
-            }
-          </div>
-          <div>
-            <Eyebrow class="mb-[16px]">The yards</Eyebrow>
-            <h2 class="text-h2 leading-[1.06]" data-reveal>
-              Two yards. Ready stock.
-            </h2>
-            <p class="mt-6 text-lead leading-relaxed text-muted" data-reveal>
-              Generators, forklifts, telehandlers, cranes and trailers stand in
-              Dubai and Sharjah, so a mixed order is still one agreement and one
-              point of contact — every unit serviced, fuelled and function
-              tested before it leaves.
-            </p>
-            <div class="mt-8" data-reveal>
-              <Button variant="outline" href="/yard" class="press">
-                Inside the yards
-              </Button>
-            </div>
-          </div>
         </div>
       </article>
 

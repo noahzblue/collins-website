@@ -160,6 +160,20 @@ export const aboutPage = {
   seoTitle: "About Collins Equipments | Sales & Rental L.L.C, Dubai",
   seoDescription:
     "Who we are: licensed activities, our yards in Dubai and Sharjah, our leadership team, and what Collins sells, hires and services across the UAE and the GCC.",
+  /** The photograph over the page heading.
+   *
+   *  Separate from `whoWeAre.image` on purpose: the two used to be one field,
+   *  so the banner and the "Who we are" block showed the identical picture a
+   *  screen apart. That reads as a page with one photograph, not as a page
+   *  with a point of view.
+   *
+   *  **Rendered, not photographed** — which is why it sits in `images/` with
+   *  the rest of the site's generated imagery rather than in `images/yard/`,
+   *  where every file is a real photograph of the real yards. Keep that split:
+   *  it is the only thing recording which pictures are evidence and which are
+   *  decoration. The machines here are deliberately unbranded, as the rest of
+   *  the rendered set is — a generated logo is a fabricated one. */
+  banner: "/images/about-banner.jpg",
   /** profile p.1 cover — the best one-liner in the document. */
   tagline:
     "Heavy equipment, power generation and transport for sale and for hire.",
