@@ -11,8 +11,8 @@
  * kicker are the profile's own and better than anything we'd write.
  *
  * ── PHOTOGRAPHY ──────────────────────────────────────────────────────────
- * The five `yardPoints` images are **AI-rendered, not photographs of the real
- * yards.** Read that again before you treat them as documentary. They were
+ * The banner and the five `yardPoints` images are **AI-rendered, not
+ * photographs of the real yards.** Read that again before you treat them as documentary. They were
  * generated on 2026-09-15 (Higgsfield, `gpt_image_2_5`, 4:5, 2K) from the real
  * phone photographs in this folder, plus the brand wordmark, as references — `mixed-plant`, `forklift`,
  * `workshop-genset`, `genset-engine`, `compressor` and `sharjah-gate` — so the
@@ -75,7 +75,17 @@ export const yardPage = {
   /** profile p.8. */
   title: "Two yards. Ready stock.",
   kicker: "Yards: Dubai & Sharjah, U.A.E.",
-  banner: "/images/hero-yard.jpg",
+  /** Rendered, like the five point images below — see the photography note
+   *  at the top. Not `hero-yard.jpg`: that file is the homepage hero's
+   *  poster frame and video still, and this page wanted a wide
+   *  establishing view of stock rather than a single machine.
+   *
+   *  Shipped as rendered — warm sunrise, full contrast. Two quieter versions
+   *  were tried and both rejected: a darkened, cooled curve applied here, and
+   *  a re-prompted flat-haze relight from the model. Chosen deliberately, so
+   *  don't "fix" the warmth on the grounds that it is louder than the rest of
+   *  the palette. */
+  banner: "/images/yard/yard-banner.jpg",
   seoTitle:
     "Our Yards in Dubai & Sharjah | Ready Stock, Inspected Before Dispatch",
   seoDescription:
