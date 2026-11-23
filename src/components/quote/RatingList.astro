@@ -38,10 +38,9 @@
  * the same field as a dot plus a label on the category pages, so the two
  * renderings of these 68 ranges agree rather than diverge.
  *
- * On a phone the list caps its height and scrolls — four or five ratings
- * visible, the rest a thumb away, instead of twelve rows of section 02 pushing
- * everything else off the screen. The escape row is `sticky` inside that
- * scroller, so "size it for me" cannot scroll out of reach.
+ * On a phone (`scroll="mobile"`, the default) the list caps at about three
+ * and a half rows and scrolls on its own. The escape row sits under the
+ * list, outside the cap, so "size it for me" is always on screen with it.
  *
  * Not here yet: the duty textarea that "Not sure — size it for me" opens, and
  * the `dutyGuide` accordion beneath the list. Both are behaviour, and behaviour
@@ -144,127 +143,139 @@ const scrolls: Record<NonNullable<Props["scroll"]>, string> = {
 ---
 
 <div
-  class:list={["mesh grid", columns[variant], scrolls[scroll], extra]}
+  class:list={["rating-group", extra]}
   role="radiogroup"
-  data-lenis-prevent
   aria-label={legend}
   aria-required={required ? "true" : undefined}
-  data-rating-list
-  data-variant={variant}
 >
-  {
-    ranges.map((range) => {
-      /* Keyed on the range, not on its label — "3 ton" appears twice in the
+  <div
+    class:list={["mesh grid", columns[variant], scrolls[scroll]]}
+    data-lenis-prevent
+    data-rating-list
+    data-variant={variant}
+  >
+    {
+      ranges.map((range) => {
+        /* Keyed on the range, not on its label — "3 ton" appears twice in the
          forklift list and only the power type tells them apart. */
-      const key = rangeKey(range);
-      const id = scopedId(instance, name, key);
-      return (
-        <label
-          class:list={["rating", cells[variant]]}
-          for={id}
-          data-rating-row={key}
-        >
-          <input
-            type="radio"
-            class="sr-only"
-            id={id}
-            name={name}
-            value={key}
-            checked={key === value}
-            required={required}
-          />
+        const key = rangeKey(range);
+        const id = scopedId(instance, name, key);
+        return (
+          <label
+            class:list={["rating", cells[variant]]}
+            for={id}
+            data-rating-row={key}
+          >
+            <input
+              type="radio"
+              class="sr-only"
+              id={id}
+              name={name}
+              value={key}
+              checked={key === value}
+              required={required}
+            />
 
-          <span class="flex items-center gap-[10px]">
-            <span class={mark} />
-            <span class="text-cell font-medium text-ink">{range.label}</span>
-            {variant === "list" && range.powerType && (
-              <span class={`${meta} text-faint`}>{range.powerType}</span>
-            )}
-            {variant === "list" && (
-              <span
-                class={`${meta} ml-auto flex shrink-0 items-center gap-[7px] text-body`}
-              >
+            <span class="flex items-center gap-[10px]">
+              <span class={mark} />
+              <span class="text-cell font-medium text-ink">{range.label}</span>
+              {variant === "list" && range.powerType && (
+                <span class={`${meta} text-faint`}>{range.powerType}</span>
+              )}
+              {variant === "list" && (
                 <span
-                  class:list={[
-                    "h-[6px] w-[6px] rounded-full",
-                    AVAILABILITY_TONE[range.availability],
-                  ]}
-                />
-                {vocabulary(range.availability).map((word) => (
-                  <span class={word.cls}>{word.text}</span>
-                ))}
-              </span>
-            )}
-          </span>
-
-          {variant === "grid" && (
-            <span
-              class={`${meta} mt-[7px] flex flex-wrap items-center gap-x-[10px] gap-y-[3px] pl-[26px] text-body`}
-            >
-              <span class="flex items-center gap-[7px]">
-                <span
-                  class:list={[
-                    "h-[6px] w-[6px] rounded-full",
-                    AVAILABILITY_TONE[range.availability],
-                  ]}
-                />
-                {vocabulary(range.availability).map((word) => (
-                  <span class={word.cls}>{word.text}</span>
-                ))}
-              </span>
-              {range.powerType && (
-                <span class="text-faint">{range.powerType}</span>
+                  class={`${meta} ml-auto flex shrink-0 items-center gap-[7px] text-body`}
+                >
+                  <span
+                    class:list={[
+                      "h-[6px] w-[6px] rounded-full",
+                      AVAILABILITY_TONE[range.availability],
+                    ]}
+                  />
+                  {vocabulary(range.availability).map((word) => (
+                    <span class={word.cls}>{word.text}</span>
+                  ))}
+                </span>
               )}
             </span>
-          )}
 
-          {range.typicalDuty && (
-            <span
-              class:list={[
-                "mt-[6px] pl-[26px] text-note leading-snug text-muted",
-                variant === "grid" && "line-clamp-2",
-              ]}
-            >
-              {range.typicalDuty}
-            </span>
-          )}
-        </label>
-      );
-    })
-  }
+            {variant === "grid" && (
+              <span
+                class={`${meta} mt-[7px] flex flex-wrap items-center gap-x-[10px] gap-y-[3px] pl-[26px] text-body`}
+              >
+                <span class="flex items-center gap-[7px]">
+                  <span
+                    class:list={[
+                      "h-[6px] w-[6px] rounded-full",
+                      AVAILABILITY_TONE[range.availability],
+                    ]}
+                  />
+                  {vocabulary(range.availability).map((word) => (
+                    <span class={word.cls}>{word.text}</span>
+                  ))}
+                </span>
+                {range.powerType && (
+                  <span class="text-faint">{range.powerType}</span>
+                )}
+              </span>
+            )}
+
+            {range.typicalDuty && (
+              <span
+                class:list={[
+                  "mt-[6px] pl-[26px] text-note leading-snug text-muted",
+                  variant === "grid" && "line-clamp-2",
+                ]}
+              >
+                {range.typicalDuty}
+              </span>
+            )}
+          </label>
+        );
+      })
+    }
+  </div>
 
   {
     /* The escape. The prototype had this row and nothing happened when you
        picked it, which broke the form's own promise (docs 14 §10b).
-       `col-span-full` rather than a number, so it closes the row whatever the
-       variant's column count is. */
+
+       It sits under the list, outside the part that scrolls, for two
+       reasons: it can never scroll out of reach, and picking it opens a box
+       to describe the duty right here, under the answer that asked for it.
+       That box is one field shared by every machine's list, so it is not
+       rendered here: `scripts/quote/form.ts` moves it into the
+       `data-unsure-slot` of whichever list is showing. */
   }
-  <label
-    class:list={["rating rating-unsure col-span-full", cells[variant]]}
-    for={scopedId(instance, name, RATING_UNSURE.value)}
-    data-rating-row={RATING_UNSURE.value}
-  >
-    <input
-      type="radio"
-      class="sr-only"
-      id={scopedId(instance, name, RATING_UNSURE.value)}
-      name={name}
-      value={RATING_UNSURE.value}
-      checked={RATING_UNSURE.value === value}
-      required={required}
-    />
-    <span class="flex items-center gap-[10px]">
-      <span class={mark}></span>
-      <span class="text-cell font-medium text-ink">{RATING_UNSURE.label}</span>
-    </span>
-    {
-      RATING_UNSURE.hint && (
-        <span class="mt-[6px] pl-[26px] text-note leading-snug text-muted">
-          {RATING_UNSURE.hint}
-        </span>
-      )
-    }
-  </label>
+  <div class="rating-unsure" data-rating-row={RATING_UNSURE.value}>
+    <label
+      class:list={["rating", cells[variant]]}
+      for={scopedId(instance, name, RATING_UNSURE.value)}
+    >
+      <input
+        type="radio"
+        class="sr-only"
+        id={scopedId(instance, name, RATING_UNSURE.value)}
+        name={name}
+        value={RATING_UNSURE.value}
+        checked={RATING_UNSURE.value === value}
+        required={required}
+      />
+      <span class="flex items-center gap-[10px]">
+        <span class={mark}></span>
+        <span class="text-cell font-medium text-ink">{RATING_UNSURE.label}</span
+        >
+      </span>
+      {
+        RATING_UNSURE.hint && (
+          <span class="mt-[6px] pl-[26px] text-note leading-snug text-muted">
+            {RATING_UNSURE.hint}
+          </span>
+        )
+      }
+    </label>
+    <div class="rating-unsure-slot" data-unsure-slot></div>
+  </div>
 </div>
 
 <style>
@@ -283,13 +294,29 @@ const scrolls: Record<NonNullable<Props["scroll"]>, string> = {
 
   .rating {
     cursor: pointer;
-    transition: background-color 160ms var(--ease-out-expo);
+    transition:
+      background-color 180ms var(--ease-out-expo),
+      box-shadow 180ms var(--ease-out-expo);
   }
-  .rating:hover {
+  /* Hover for a mouse only: on a phone a touched row kept the grey and read
+     as half-picked. A finger gets the grey while it is down instead. */
+  @media (hover: hover) and (pointer: fine) {
+    .rating:hover {
+      background: var(--color-surface);
+    }
+    .rating:hover .mark {
+      border-color: var(--color-ink);
+    }
+  }
+  .rating:active {
     background: var(--color-surface);
   }
-  .rating:hover .mark {
-    border-color: var(--color-ink);
+  /* The dot fills in rather than appearing. */
+  .mark {
+    transition:
+      border-color 180ms var(--ease-out-expo),
+      background-color 180ms var(--ease-out-expo),
+      box-shadow 180ms var(--ease-out-expo);
   }
 
   .rating:has(input:checked) {
@@ -317,27 +344,61 @@ const scrolls: Record<NonNullable<Props["scroll"]>, string> = {
      a cut-off row is the clearest possible "there is more below", and a cap
      that happened to land on a whole row would read as the end of the list. */
   [data-rating-list] {
-    --rating-max: 340px;
-    overscroll-behavior: contain;
+    --rating-max: 280px;
     scrollbar-width: thin;
   }
+  /* Overscroll chains on to the sheet. With `contain`, a swipe that reached
+     the end of the list stopped dead and the sheet never moved, so a thumb
+     on the list was stuck there (reported on an iPhone, 2026-11-23). Lenis's
+     stylesheet sets `contain` on every `[data-lenis-prevent]`, so this rule
+     names the group as well to outrank it. */
+  .rating-group > [data-rating-list] {
+    overscroll-behavior: auto;
+  }
 
-  /* The escape reads as an option, not as another size — quieter ground, and
-     it sits under a full-width rule rather than beside a rating.
-
-     `sticky` pins it to the bottom of the scroller so it cannot scroll out of
-     reach; where nothing scrolls it is inert. Doubled class because
-     `.rating:has(input:checked)` sets `position: relative` and would otherwise
-     win on specificity the moment it is the chosen answer. */
-  .rating.rating-unsure {
-    position: sticky;
-    bottom: 0;
-    z-index: 2;
+  /* The escape reads as an option, not as another size: quieter ground,
+     joined to the foot of the list as its last cell. The list's bottom
+     corners square off so the two read as one block. */
+  .rating-group > [data-rating-list] {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+  .rating-unsure {
+    border: 1px solid var(--color-line);
+    border-top: 0;
+    border-radius: 0 0 var(--radius-sm) var(--radius-sm);
     background: var(--color-surface);
+    transition:
+      background-color 160ms var(--ease-out-expo),
+      box-shadow 160ms var(--ease-out-expo);
+  }
+  .rating-unsure > .rating:hover,
+  .rating-unsure > .rating:active {
+    background: transparent;
+  }
+  /* Picked, the whole block takes the picked look, the box to type in
+     included, so the answer and its detail read as one thing. */
+  .rating-unsure:has(input:checked) {
+    background: var(--color-brand-tint);
+    box-shadow: inset 0 0 0 1px var(--color-brand);
+  }
+  .rating-unsure > .rating:has(input:checked) {
+    background: transparent;
+    box-shadow: none;
+  }
+  /* Lines the box up under the label text: the cell's 20px plus the
+     mark's 26px. */
+  .rating-unsure-slot {
+    padding: 0 20px 0 46px;
+  }
+  .rating-unsure-slot :global(> :not([hidden])) {
+    padding-bottom: 18px;
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .rating {
+    .rating,
+    .rating-unsure,
+    .mark {
       transition-duration: 1ms;
     }
   }

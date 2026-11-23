@@ -83,20 +83,19 @@ export const validate = (state: QuoteState, today?: string): QuoteError[] => {
     if (!state.timeframe) fail("timeframe", "terms", "When do you need it?");
   }
 
-  /* 04 — where to send it. Phone is required and email is not, because this
-     trade runs on phone and WhatsApp — unless email is the chosen reply
-     channel, in which case it is the only way we can answer. */
+  /* 04 — where to send it. Name, phone and email are all required since
+     2026-11-23: the quotation goes out as a written document, and email is
+     the one channel it can always be sent on, whichever way the customer
+     asked to be answered. */
   if (blank(state.name)) fail("name", "contact", "We need a name.");
   if (blank(state.phone))
     fail("phone", "contact", "We need a number to reach you on.");
   else if (!PHONE.test(state.phone.trim()))
     fail("phone", "contact", "Check the number: digits only, 7 to 15 of them.");
-  if (state.channel === "email" && blank(state.email)) {
-    fail("email", "contact", "Add an email, or pick another way to reply.");
-  }
-  if (!blank(state.email) && !EMAIL.test(state.email.trim())) {
+  if (blank(state.email))
+    fail("email", "contact", "We need an email to send the quotation to.");
+  else if (!EMAIL.test(state.email.trim()))
     fail("email", "contact", "Check the email address.");
-  }
 
   return errors;
 };

@@ -86,8 +86,10 @@ const hintId = hint ? `${id}-hint` : undefined;
 const errorId = `${id}-error`;
 const describedBy = [hintId, errorId].filter(Boolean).join(" ");
 
+/* The placeholder is lighter than the faint token on purpose: in faint it
+   read as a typed answer, and the label above it as the hint. */
 const control = [
-  "ctl w-full rounded-none border-0 border-b border-line-strong bg-transparent px-0 py-[14px] font-sans text-intro text-ink transition-colors placeholder:text-faint",
+  "ctl w-full rounded-none border-0 border-b border-line-strong bg-transparent px-0 py-[14px] font-sans text-intro text-ink transition-colors placeholder:text-[#8a919c]",
   error && "ctl-error",
   element === "textarea" && "resize-y",
 ].filter(Boolean);
@@ -104,7 +106,7 @@ const shared = {
 ---
 
 <div class:list={["flex flex-col", extra]}>
-  <label for={id} class="mb-[6px] text-caption text-faint">
+  <label for={id} class="mb-[6px] text-note font-medium text-ink">
     {label}{required && " *"}
   </label>
 
@@ -155,6 +157,15 @@ const shared = {
 </div>
 
 <style>
+  /* Never under 16px. iOS Safari zooms the page into any field smaller than
+     that when it takes focus, and on a phone `--text-intro` drops to 15.5px.
+     The zoom shifted the whole quote sheet and showed the page behind it
+     (reported 2026-11-23). This floors the size rather than turning zoom
+     off in the viewport tag, so pinch zoom still works. */
+  .ctl {
+    font-size: max(16px, var(--text-intro));
+  }
+
   /* The global `:focus-visible` outline is a box, which is the wrong shape for
      a field whose only edge is the rule beneath it — so it is replaced with a
      focus treatment of the same shape rather than dropped. */

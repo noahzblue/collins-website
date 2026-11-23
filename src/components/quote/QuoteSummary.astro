@@ -18,11 +18,12 @@
  * greyed, an answered one is inked.
  *
  * It sticks to the **panel's** scroll container, not the page's. Inside the
- * dialog `top: 0` is right; the inline variant on /contact has to clear the
+ * dialog `top: 0` is right; the inline variant has to clear the
  * fixed site header instead, which is what `--q-sticky-top` is for — the
  * prototype used `0` in both places and would have slid under the header.
  */
 import Button from "@/components/ui/Button.astro";
+import SubmitLabel from "@/components/quote/SubmitLabel.astro";
 import { SUMMARY } from "@/lib/quote/options";
 
 interface Props {
@@ -79,7 +80,7 @@ const slots = Object.entries(SUMMARY.labels) as [string, string][];
         data-quote-submit
         id={`${instance}-submit`}
       >
-        <span data-submit-label>{SUMMARY.submit}</span>
+        <SubmitLabel label={SUMMARY.submit} />
       </Button>
       <p class="q-rail-promise">{promise}</p>
     </div>
@@ -155,6 +156,13 @@ const slots = Object.entries(SUMMARY.labels) as [string, string][];
     font-weight: 500;
   }
 
+  /* The button and the line under it are a pair, not one block: the gap is
+     what keeps the promise from reading as the button's caption. */
+  .q-rail-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
   .q-rail-promise {
     margin: 0;
     font-size: var(--text-caption);

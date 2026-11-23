@@ -27,6 +27,11 @@
  * offices, no mains supply" is what lets a site manager who does not know KVA
  * pick 250, so it stays at every viewport — `RatingList` owns that.
  *
+ * On a phone the rating list caps at about three and a half rows and scrolls
+ * on its own, with "Not sure" fixed under it (RatingList.astro), so the
+ * whole choice fits on one screen. The list does not hold on to a swipe once
+ * it reaches its end: the sheet scrolls on.
+ *
  * The `dutyGuide` accordion is an exception, not a fixture: one of the thirteen
  * categories has one. Nothing in this layout may depend on it being there.
  */
@@ -83,7 +88,7 @@ const {
             data-no-quantity={category.askQuantity ? undefined : ""}
             hidden
           >
-            <p class="mb-[10px] text-caption text-faint">
+            <p class="mb-[10px] text-note font-medium text-ink">
               {category.rangeHeading} *
             </p>
             {/* One slot per panel, under its heading; the hidden panels'
@@ -124,7 +129,8 @@ const {
     {
       /* Opened by "Not sure — size it for me", which is the one row the
         prototype had and did nothing with — breaking the form's own promise
-        (docs 14 §10b). */
+        (docs 14 §10b). Rendered once here and moved by scripts/quote/form.ts
+        into that answer's own box in whichever list is showing. */
     }
     <div data-conditional="duty" hidden>
       <Field

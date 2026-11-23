@@ -243,6 +243,13 @@ Escape then closes both. See `scripts/quote/picker.ts`.
 Client-side rotating panels (tab cards, accordions, sliders) use
 `@/scripts/rotator.ts` — do not hand-roll another timer/hover/reduced-motion loop.
 
+Anything inside the quote form that appears or disappears goes through
+`setShown` in `scripts/quote/motion.ts`, never a bare `element.hidden = …`:
+`grow` for something that opens in the flow, `fade` for a panel that replaces
+another, `dissolve` for a swap that must not move. Text that changes in place
+goes through `setText` from the same file. Hover styles on form controls sit
+behind `(hover: hover) and (pointer: fine)`; a finger gets `:active` instead.
+
 ## Component contracts: keep them dumb
 
 Five layers, and **only the composition layer may read data**:
@@ -293,8 +300,9 @@ at once, the boundary is in the wrong place.
   Every chip list and every string the form shows is there.
 - **Make a button open the quote form** → `{...quoteTrigger(categoryId, mode, range)}`
   from `lib/equipment.ts`, or a bare `data-quote-open` where nothing is known
-  yet. Keep the `href` — it is the no-JS fallback. On `/contact` the same
-  attribute scrolls to the inline form instead of opening a second copy.
+  yet. Keep the `href` — it is the no-JS fallback; `/contact?quote=1` opens
+  the dialog on arrival. Every page opens the dialog, `/contact` and the
+  homepage included: there is no inline copy of the form on the site.
 - **Add an equipment category** → one object in `src/content/equipment/categories.json`.
   The homepage grid (`featured: true`), the `/equipment` hub, its own page, the
   quote-form dropdown and the index rail all pick it up. The Zod schema in

@@ -9,8 +9,7 @@
  * rent" where the site says *hire* and the form offers a third answer, because
  * customers move between the two. Its WhatsApp message was a different shape
  * as well, so the yard read two lead formats. Removed 2026-08-22; the real
- * form now lives in a dialog on every page and inline on /contact
- * (docs/site-expansion/14 §2).
+ * form now lives in a dialog on every page (docs/site-expansion/14 §2).
  *
  * What replaced it is the form's own opening question. Buy or hire is the
  * site's core distinction and the cheapest possible thing to ask — one tap, no
@@ -44,6 +43,7 @@ import Eyebrow from "@/components/ui/Eyebrow.astro";
 import Icon from "@/components/ui/Icon.astro";
 import { site } from "@/config/site";
 import { contactSection } from "@/data/content";
+import { quoteTrigger, type Mode } from "@/lib/equipment";
 import { MODES } from "@/lib/quote/options";
 ---
 
@@ -80,19 +80,21 @@ import { MODES } from "@/lib/quote/options";
     </div> -->
 
     {
-      /* Links, not radios: choosing one is a navigation into the form, not an
-        answer held on this page — and here it is a navigation in the plainest
-        sense. The homepage does not open the dialog (`scripts/quote/dialog.ts`
-        header), so these two are ordinary links to the page that is
-        entirely the form, and the answer travels in the URL for /contact to
-        pick up. No JavaScript is involved in any part of that, which is the
-        other reason it is the right shape for the closing band. */
+      /* Links, not radios: choosing one opens the quote dialog with section
+        01 half answered (`quoteTrigger`). The href is the fallback for a
+        middle-click or no JavaScript: /contact with the dialog marked open
+        and the answer in the URL, which opens it on arrival. Until
+        2026-11-23 these were plain links to an inline form on /contact. */
     }
     <ul class="grid grid-cols-2 max-nav:grid-cols-1">
       {
         MODES.map((option) => (
           <li class="mode-item flex">
-            <a href={`/contact?mode=${option.value}#quote`} class="mode-cell">
+            <a
+              href={`/contact?quote=1&mode=${option.value}`}
+              {...quoteTrigger(undefined, option.value as Mode)}
+              class="mode-cell"
+            >
               <span class="mode-top">
                 <span class="mode-face">{option.label}</span>
                 <span class="mode-arrow shrink-0">

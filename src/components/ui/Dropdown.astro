@@ -80,7 +80,7 @@ const describedBy = [hintId, errorId].filter(Boolean).join(" ") || undefined;
   aria-describedby={describedBy}
 >
   <summary class:list={["dd-trigger", error && "dd-error"]}>
-    <span class="mb-[6px] block text-caption text-faint">
+    <span class="mb-[6px] block text-note font-medium text-ink">
       {label}{required && " *"}
     </span>
     <span class="flex items-center gap-4 py-[14px]">

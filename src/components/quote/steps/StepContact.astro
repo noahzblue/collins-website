@@ -3,11 +3,11 @@
  * Section 04 — where to send it.
  *
  * **Friction on the final step is where enquiries die**, so this asks for four
- * things and only two of them are required. Company is optional because a
- * one-person contractor is a real customer. Email is optional because this
- * trade runs on phone and WhatsApp — it becomes required only when email is
- * the chosen reply channel, which is the one case where it is the only way we
- * can answer (docs/site-expansion/14 §7, §8).
+ * things and three of them are required. Company is optional because a
+ * one-person contractor is a real customer. Email is required (since
+ * 2026-11-23): the quotation is a written document and email is where it is
+ * always sent, so the reply channel defaults to it too
+ * (docs/site-expansion/14 §7, §8, and its top note).
  *
  * `channel` is how the customer wants to be answered, and nothing more: every
  * request is emailed to Collins whichever one is picked (§12).
@@ -71,6 +71,7 @@ const pair = "grid grid-cols-2 gap-12 max-cmp:grid-cols-1 max-cmp:gap-10";
         type="email"
         placeholder={FIELD_COPY.email.placeholder}
         autocomplete="email"
+        required
       />
     </div>
 
@@ -80,7 +81,7 @@ const pair = "grid grid-cols-2 gap-12 max-cmp:grid-cols-1 max-cmp:gap-10";
       legend={FIELD_COPY.channel.label}
       options={CHANNELS}
       variant="segment"
-      value="whatsapp"
+      value="email"
     />
 
     <Field

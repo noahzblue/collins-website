@@ -127,11 +127,15 @@ const heights: Record<NonNullable<Props["height"]>, string> = {
     {
       subtitle && (
         <div class="dlg-head-note">
-          <span
-            class="mt-[6px] block h-2 w-2 shrink-0 bg-brand"
-            aria-hidden="true"
-          />
-          <p class="mb-0 text-note leading-relaxed text-muted">{subtitle}</p>
+          {/* The cell centres the note; inside it the square sits on the
+              first line, however many lines the note wraps to. */}
+          <span class="flex items-start gap-[14px]">
+            <span
+              class="mt-[7px] block h-2 w-2 shrink-0 bg-brand"
+              aria-hidden="true"
+            />
+            <p class="mb-0 text-note leading-relaxed text-muted">{subtitle}</p>
+          </span>
         </div>
       )
     }
@@ -381,9 +385,20 @@ const heights: Record<NonNullable<Props["height"]>, string> = {
       --dlg-rise: 16px;
       --dlg-close: 60px;
       width: 100dvw;
-      height: 100dvh;
+      /* The visual viewport while open (scripts/quote/dialog.ts), so the
+         foot clears Safari's bottom bar and the keyboard. */
+      height: var(--vv-height, 100dvh);
       max-height: none;
+      margin: 0;
+      inset: var(--vv-top, 0px) 0 auto 0;
       box-shadow: none;
+    }
+    /* The sheet stops where the visual viewport stops, and iOS Safari draws
+       its own translucent bar between that and the keyboard. A see-through
+       scrim showed the page behind in that strip. The sheet covers the
+       screen anyway, so the backdrop here is the sheet's own white. */
+    .dlg::backdrop {
+      background: #ffffff;
     }
     .dlg-head-title {
       padding: 16px var(--dlg-gutter);

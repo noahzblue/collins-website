@@ -100,16 +100,32 @@ const slots: [string, string][] = Object.entries(SUMMARY.labels);
       }
     </dl>
 
-    <div class="mt-10 flex flex-wrap items-center gap-6">
-      <Button variant="outline" size="lg" data-quote-restart>
-        {SUCCESS.again}
-      </Button>
-      <ContactRows rows={rows} />
+    {
+      /* Two rows, not one: the ways to reach the yard read across under their
+        own label, and the restart button sits on its own line beneath. Side
+        by side, a one-line button against a three-line list had nothing to
+        line up with. */
+    }
+    <div class="q-success-direct">
+      <p class="q-recap-title">{SUCCESS.direct}</p>
+      <ContactRows rows={rows} layout="inline" />
     </div>
+    <Button variant="outline" size="lg" class="mt-10" data-quote-restart>
+      {SUCCESS.again}
+    </Button>
   </div>
 </div>
 
 <style>
+  .q-success-direct {
+    margin-top: 40px;
+    padding-top: 28px;
+    border-top: 1px solid var(--color-line);
+  }
+  .q-success-direct .q-recap-title {
+    margin: 0 0 14px;
+  }
+
   .q-success-inner {
     padding: clamp(56px, 6vw, 104px) var(--dlg-gutter, 36px);
     max-width: 900px;

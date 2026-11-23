@@ -7,6 +7,10 @@
  * so `form.ts` can call it from `sync()` — a draft, a prefill or a reset ticks
  * radios without firing `change`, and the field has to follow anyway.
  *
+ * Every visible change eases through `motion.ts`: the field's photo
+ * dissolves, its words ease in, and the viewer's big photo dissolves as the
+ * eye moves down the list.
+ *
  * Copy comes from the markup's `data-*` attributes (lib/quote/options.ts
  * renders them), never from here.
  *
@@ -14,6 +18,8 @@
  * clears the old rating and re-checks errors) runs as if the radio had been
  * clicked.
  */
+
+import { setShown, setText } from "./motion";
 
 export interface CategoryPickerApi {
   /** Repaint the field from whichever radio is checked. */
@@ -57,7 +63,9 @@ export function initCategoryPicker(
     current = (index + radios.length) % radios.length;
     const id = radios[current].value;
     for (const figure of figures)
-      figure.hidden = figure.dataset.pickerFigure !== id;
+      setShown(figure, figure.dataset.pickerFigure === id, {
+        kind: "dissolve",
+      });
     rows.forEach((row, i) =>
       row?.toggleAttribute("data-current", i === current),
     );
@@ -72,17 +80,17 @@ export function initCategoryPicker(
     let shown = false;
     for (const thumb of thumbs) {
       const match = thumb.dataset.pickerThumb === id;
-      thumb.hidden = !match;
+      setShown(thumb, match, { kind: "dissolve" });
       shown ||= match;
     }
-    if (thumbEmpty) thumbEmpty.hidden = shown;
+    setShown(thumbEmpty, !shown, { kind: "dissolve" });
 
-    if (name) name.textContent = row?.dataset.name ?? name.dataset.empty ?? "";
-    if (meta) meta.textContent = row?.dataset.meta ?? meta.dataset.empty ?? "";
+    if (name) setText(name, row?.dataset.name ?? name.dataset.empty ?? "");
+    if (meta) setText(meta, row?.dataset.meta ?? meta.dataset.empty ?? "");
     if (cta)
-      cta.textContent = (row ? cta.dataset.change : cta.dataset.browse) ?? "";
+      setText(cta, (row ? cta.dataset.change : cta.dataset.browse) ?? "");
     if (picked)
-      picked.textContent = row?.dataset.name ?? picked.dataset.empty ?? "";
+      setText(picked, row?.dataset.name ?? picked.dataset.empty ?? "");
     for (const button of quick)
       button.setAttribute(
         "aria-pressed",

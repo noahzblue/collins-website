@@ -3,8 +3,8 @@
  * neither of which is specific to any one feature.
  *
  * The quote form is why this exists (docs/site-expansion/14 §2: the dialog
- * stays mounted in `Base.astro` while `/contact` renders an inline copy of the
- * same form), but nothing here knows about it.
+ * stays mounted in `Base.astro` while an inline mount can render a second copy
+ * of the same form), but nothing here knows about it.
  */
 
 /**

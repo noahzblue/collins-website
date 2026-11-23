@@ -120,7 +120,7 @@ const faces: Record<NonNullable<Props["variant"]>, string> = {
   <legend
     id={legendId}
     class:list={[
-      "mb-[10px] p-0 text-caption text-faint",
+      "mb-[10px] p-0 text-note font-medium text-ink",
       hideLegend && "sr-only",
     ]}
   >
@@ -186,9 +186,11 @@ const faces: Record<NonNullable<Props["variant"]>, string> = {
      the mode pills on /contact. */
   .chip-face {
     transition:
-      color 200ms var(--ease-out-expo),
-      border-color 200ms var(--ease-out-expo),
-      background-color 200ms var(--ease-out-expo);
+      color 180ms var(--ease-out-expo),
+      border-color 180ms var(--ease-out-expo),
+      background-color 180ms var(--ease-out-expo),
+      box-shadow 180ms var(--ease-out-expo),
+      transform 160ms var(--ease-out-expo);
   }
   /* The visually-hidden input keeps the focus, so the face has to show it. */
   .chip input:focus-visible + .chip-face {
@@ -200,9 +202,11 @@ const faces: Record<NonNullable<Props["variant"]>, string> = {
      The buy/hire control at chip scale. Nothing fills — the rule under the
      label is the entire signal, which is what keeps a step with four of these
      groups in it from reading as a wall of boxes. */
-  [data-variant="rule"] .chip:hover .chip-face {
-    color: var(--color-ink);
-    border-color: var(--color-line-strong);
+  @media (hover: hover) and (pointer: fine) {
+    [data-variant="rule"] .chip:hover .chip-face {
+      color: var(--color-ink);
+      border-color: var(--color-line-strong);
+    }
   }
   [data-variant="rule"] .chip input:checked + .chip-face {
     color: var(--color-ink);
@@ -213,10 +217,12 @@ const faces: Record<NonNullable<Props["variant"]>, string> = {
      Square, a rule above and below, and the tint arriving on hover — the same
      move `ui/Button.astro`'s outline variant makes, so a chip and a secondary
      button belong to one family. */
-  [data-variant="bar"] .chip:hover .chip-face {
-    background: var(--color-brand-tint);
-    border-color: transparent;
-    color: var(--color-ink);
+  @media (hover: hover) and (pointer: fine) {
+    [data-variant="bar"] .chip:hover .chip-face {
+      background: var(--color-brand-tint);
+      border-color: transparent;
+      color: var(--color-ink);
+    }
   }
   [data-variant="bar"] .chip input:checked + .chip-face {
     background: var(--color-brand-tint);
@@ -228,9 +234,11 @@ const faces: Record<NonNullable<Props["variant"]>, string> = {
      The mesh draws the hairlines between cells, so the faces carry no border
      of their own and the chosen one fills. Best on a short closed set, where
      the options are alternatives to each other rather than a list. */
-  [data-variant="segment"] .chip:hover .chip-face {
-    background: var(--color-surface);
-    color: var(--color-ink);
+  @media (hover: hover) and (pointer: fine) {
+    [data-variant="segment"] .chip:hover .chip-face {
+      background: var(--color-surface);
+      color: var(--color-ink);
+    }
   }
   [data-variant="segment"] .chip input:checked + .chip-face {
     background: var(--color-brand-tint);
@@ -242,9 +250,11 @@ const faces: Record<NonNullable<Props["variant"]>, string> = {
   /* ── display · buy / hire ──────────────────────────────────────
      No tint fill: at this size a wash reads as highlighted text, not as a
      chosen answer, so the rule does all of it. */
-  [data-variant="display"] .chip:hover .chip-face {
-    border-color: var(--color-line-strong);
-    color: var(--color-ink);
+  @media (hover: hover) and (pointer: fine) {
+    [data-variant="display"] .chip:hover .chip-face {
+      border-color: var(--color-line-strong);
+      color: var(--color-ink);
+    }
   }
   [data-variant="display"] .chip input:checked + .chip-face {
     border-color: var(--color-brand);
@@ -257,9 +267,21 @@ const faces: Record<NonNullable<Props["variant"]>, string> = {
     border-color: var(--color-error);
   }
 
+  /* ── Press ─────────────────────────────────────────────────────
+     Hover is for a mouse only (above): on a phone a tapped chip kept its
+     hover colour and read as picked. A press dips the face to 97% so the
+     tap registers the moment the finger lands, and the picked colour then
+     eases in (reported as lag on step 03, 2026-11-23). */
+  .chip:active .chip-face {
+    transform: scale(0.97);
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .chip-face {
       transition-duration: 1ms;
+    }
+    .chip:active .chip-face {
+      transform: none;
     }
   }
 </style>

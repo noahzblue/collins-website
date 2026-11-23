@@ -195,6 +195,8 @@ export const contactPage = {
   eyebrow: "Contact",
   title: "Let's talk about your next project.",
   body: "Send us the machine, the duty and the dates, or just describe the job and we will specify it for you.",
+  /** Opens the quote dialog. */
+  cta: "Request a quotation",
   seoTitle: "Contact Collins Equipments | Dubai & Sharjah",
   seoDescription:
     "Three lines, two locations and Mon–Sat 8:00–18:30. Quotations are issued the same working day wherever possible.",

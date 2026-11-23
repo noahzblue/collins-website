@@ -121,7 +121,7 @@ export const EMPTY_STATE: QuoteState = {
   company: "",
   phone: "",
   email: "",
-  channel: "whatsapp",
+  channel: "email",
   notes: "",
 };
 

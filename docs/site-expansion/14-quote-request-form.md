@@ -23,6 +23,19 @@ what it looks like at each viewport**. It does not write code.
 > before. Chosen from three directions on `/lab/machine-picker` (A: Viewer,
 > B: Strip, C: Index). The same day, section heads were pinned while their
 > section scrolls, and each section lists its errors in a box at its top.
+>
+> **2026-11-23 — no inline form on /contact.** /contact shows one "Request a
+> quotation" button under its intro, which opens the same dialog. The inline
+> mount of §2 and §6 is retired from the site (the `inline` variant stays, for
+> `/lab/quote`). With it went both page exceptions in
+> `scripts/quote/dialog.ts`: CTAs no longer scroll to an inline form, and the
+> homepage's CTAs open the dialog instead of linking to /contact. The closing
+> band's Buy and Hire open it with section 01 half answered.
+>
+> **2026-11-23 — email is required.** Section 04 now requires name, phone and
+> email, and "How should we reply?" defaults to Email (listed first). The
+> server (`parse.ts`) refuses a request without an email whatever the
+> channel. This overrides §7 and §8, which kept email optional.
 
 ---
 

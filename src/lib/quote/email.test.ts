@@ -107,7 +107,7 @@ describe("toEmail", () => {
     expect(text).not.toContain("CUSTOMER'S NOTES");
   });
 
-  test("actions: preferred first, email only when given", () => {
+  test("actions: preferred first", () => {
     const html = toEmail(payload()).html;
     const wa = html.indexOf('href="https://wa.me/971501234567"');
     const call = html.indexOf(">Call<");
@@ -117,9 +117,7 @@ describe("toEmail", () => {
     expect(html).toContain("mailto:ahmed@example.com?subject=");
     expect(html).toContain("Preferred");
 
-    const noEmail = toEmail(payload((b) => (b.contact.email = null)));
-    expect(noEmail.html).not.toContain("mailto:");
-    expect(noEmail.replyTo).toBeUndefined();
+    // No email-less case: parse.ts refuses a request without one (2026-11-23).
 
     const text = toText(payload((b) => (b.contact.channel = "call")));
     expect(text.indexOf("Call (Preferred)")).toBeLessThan(

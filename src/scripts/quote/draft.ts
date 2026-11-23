@@ -12,7 +12,7 @@
  * blank form, not last week's half-answered one.
  *
  * **Keyed per instance.** Two copies of this form can exist in one document —
- * the inline one on /contact plus the dialog still mounted from `Base` — and
+ * an inline mount plus the dialog still mounted from `Base` — and
  * they are two drafts, not one (§2).
  *
  * Every call is guarded: Safari's private mode throws on write, and a form

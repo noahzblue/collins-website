@@ -342,9 +342,8 @@ function build(body: unknown, now: Date): QuotePayload {
     email: email(c.email),
     channel: choice(c.channel, "contact.channel", CHANNELS, true) as Channel,
   };
-  if (contact.channel === "email" && !contact.email) {
-    return fail("contact.email", "required to reply by email");
-  }
+  // Required whatever the channel, as the form requires it (validate.ts).
+  if (!contact.email) return fail("contact.email", "required");
 
   return {
     v: PAYLOAD_VERSION,

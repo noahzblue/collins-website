@@ -145,10 +145,11 @@ export const DESTINATIONS: Option[] = [
 /* ── 04 · Where to send it ──────────────────────────────────────── */
 
 /** WhatsApp first — in the UAE plant trade it is the channel, not a fallback. */
+/** Email first: it is the default reply, and the one every request carries. */
 export const CHANNELS: Option[] = [
+  { value: "email", label: "Email" },
   { value: "whatsapp", label: "WhatsApp" },
   { value: "call", label: "Call" },
-  { value: "email", label: "Email" },
 ];
 
 /* ── Copy ───────────────────────────────────────────────────────── */
@@ -278,6 +279,15 @@ export const SUMMARY = {
   title: "Your request",
   submit: "Send request",
   submitting: "Sending…",
+  /** What the send button says while the request is in flight, one after
+   *  another (scripts/quote/form.ts). Plain steps, so a wait of a few
+   *  seconds reads as progress rather than as a frozen button. */
+  sending: [
+    "Sending…",
+    "Checking your answers…",
+    "Emailing the yard…",
+    "Almost there…",
+  ],
   /** Under the button, so the promise sits with the action. */
   labels: {
     mode: "Buy or hire",
@@ -334,6 +344,8 @@ export const SUCCESS = {
   recapTitle: "What you sent",
   refLabel: "Reference",
   again: "Send another request",
+  /** Over the phone, WhatsApp and email lines under the confirmation. */
+  direct: "Need it sooner? Reach the yard directly",
 };
 
 /** In-flight failure, with the manual routes offered rather than described. */

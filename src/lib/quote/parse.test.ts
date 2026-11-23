@@ -305,18 +305,20 @@ describe("rejects", () => {
     );
   });
 
-  test("a bad email, or email chosen without one", () => {
+  test("a bad email, or none at all, whatever the channel", () => {
     rejects(
       edit((b) => (b.contact.email = "not-an-email")),
       "contact.email",
     );
-    rejects(
-      edit((b) => {
-        (b.contact as Record<string, unknown>).email = null;
-        b.contact.channel = "email";
-      }),
-      "contact.email",
-    );
+    for (const channel of ["email", "whatsapp", "call"] as const) {
+      rejects(
+        edit((b) => {
+          (b.contact as Record<string, unknown>).email = null;
+          b.contact.channel = channel;
+        }),
+        "contact.email",
+      );
+    }
   });
 
   test("a bad phone", () => {

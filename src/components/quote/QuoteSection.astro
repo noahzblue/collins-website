@@ -84,7 +84,7 @@ const titleId = scopedId(instance, "section", id);
   .q-section {
     /* The horizontal gutter is the panel's, inherited — head, sections and
        foot line up down the whole dialog from one number. The fallback is
-       what the inline variant on /contact will use, where there is no panel
+       what the inline variant will use, where there is no panel
        (docs 14 §6). */
     padding: clamp(48px, 5vw, 88px) var(--dlg-gutter, 36px);
   }
@@ -185,7 +185,9 @@ const titleId = scopedId(instance, "section", id);
     line-height: 1.5;
     color: var(--color-ink);
   }
-  .q-errors-list :global(button:hover) {
+  /* The message underlines, not the field name beside it: the name is a
+     label, the message is the thing you click to go and fix. */
+  .q-errors-list :global(button:hover .q-errors-message) {
     text-decoration: underline;
     text-underline-offset: 3px;
   }

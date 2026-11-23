@@ -1,7 +1,8 @@
 ---
 /**
- * Vertical list of icon + line contact details (address, hours, phone).
+ * List of icon + line contact details (address, hours, phone).
  * Rows with an `href` render as links; the rest are plain text.
+ * `stack` runs them down the page; `inline` runs them across and wraps.
  */
 import Icon from "./Icon.astro";
 import type { IconName } from "./icons";
@@ -16,16 +17,27 @@ interface Props {
   rows: ContactRow[];
   /** Colour for rows without a link. Linked rows are always body + hover. */
   tone?: "body" | "muted";
+  layout?: "stack" | "inline";
   class?: string;
 }
 
-const { rows, tone = "body", class: extra = "" } = Astro.props;
+const {
+  rows,
+  tone = "body",
+  layout = "stack",
+  class: extra = "",
+} = Astro.props;
+
+const layouts: Record<NonNullable<Props["layout"]>, string> = {
+  stack: "flex flex-col gap-3",
+  inline: "flex flex-wrap gap-x-8 gap-y-3",
+};
 
 const line = "flex items-center gap-3 text-base";
 const plain = tone === "muted" ? "text-muted" : "text-body";
 ---
 
-<div class:list={["flex flex-col gap-3", extra]}>
+<div class:list={[layouts[layout], extra]}>
   {
     rows.map((row) =>
       row.href ? (

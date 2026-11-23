@@ -22,23 +22,11 @@
  *   they leave the site instead.
  * - **The page behind must not scroll, and must not lose its place.**
  *
- * And two rules that are easy to miss until they look broken. Both are a page
- * saying its CTAs are not dialog triggers:
- *
- * > **If the page already has an inline instance, every CTA on that page
- * > scrolls to it instead of opening the dialog.**
- *
- * Opening a modal containing an identical form on top of the form you are
- * looking at is the kind of thing that makes software feel unattended
- * (docs 14 §2).
- *
- * > **On the homepage, every CTA is a link to /contact and stays one.**
- *
- * The homepage's job is to hand over, not to interrupt: its CTAs are the
- * header button, the footer link and the three answers in the closing band,
- * and all three are the same short journey to a page that is entirely the
- * form. Everywhere else the dialog is the point — it is what keeps someone on
- * the category page they were reading.
+ * Every quote CTA on every page opens this dialog, /contact and the
+ * homepage included. Until 2026-11-23 /contact rendered the form inline and
+ * its CTAs scrolled to it, and the homepage's CTAs were plain links to
+ * /contact. With the inline form gone both exceptions went with it
+ * (docs/site-expansion/14, top note).
  */
 
 import type { QuoteIntent } from "@/lib/quote/schema";
@@ -170,49 +158,6 @@ export function initQuoteDialog(
     };
   };
 
-  /**
-   * The inline copy of the same form, if this page renders one. `/contact`
-   * does; nothing else does yet.
-   *
-   * Deliberately looked up per call rather than cached: the client router
-   * swaps the body under this script's feet, and a stale element reference
-   * would point at a form that is no longer in the document.
-   */
-  const inlineForm = () =>
-    document.querySelector<HTMLElement>(
-      '[data-quote-form][data-variant="inline"]',
-    );
-
-  /**
-   * Is this the homepage?
-   *
-   * Sibling rule to the inline one above, and the same shape: a page can say
-   * that its quote CTAs are not dialog triggers. The homepage says so because
-   * every one of its CTAs — the header button, the footer link, the three
-   * answers in the closing band — is a link to /contact, and the page reads
-   * better handing the visitor over than opening a fifteen-field form on top
-   * of the thing they were still reading.
-   *
-   * Read per call, not cached, for the reason `inlineForm()` is: the router
-   * swaps pages under this script and the answer changes when it does.
-   */
-  const isLanding = () => location.pathname.replace(/\/+$/, "") === "";
-
-  /**
-   * Take the customer to the form that is already on the page.
-   *
-   * Instant, not smooth: Lenis owns the document's scroll animation, and a
-   * native smooth scroll running at the same time is a fight the reader
-   * watches. `html { scroll-padding-top }` lands it clear of the fixed header
-   * (styles/global.css).
-   */
-  const revealInline = (form: HTMLElement) => {
-    form.scrollIntoView({ behavior: "auto", block: "start" });
-    form
-      .querySelector<HTMLInputElement>('input[name="mode"]')
-      ?.focus({ preventScroll: true });
-  };
-
   const pushEntry = (intent: QuoteIntent) => {
     // Already marked — this is a link that arrived with the parameter on it,
     // so the entry exists and pushing a second one would stack duplicates.
@@ -245,6 +190,61 @@ export function initQuoteDialog(
 
   /* ── Open and close ───────────────────────────────────────────── */
 
+  /* ── Fit to what the phone can see ────────────────────────────────
+     A modal is positioned against the layout viewport, but what the
+     customer sees is the visual viewport: smaller while Safari's bottom bar
+     sits over the page or the keyboard is up, and panned after iOS scrolls
+     a focused field into view. Sized to `100dvh` alone, the sheet's foot
+     (Back / Continue) ended up under Safari's bar and its head above the
+     screen. While open, the sheet follows the visual viewport through two
+     custom properties that ui/Dialog.astro reads below 900px. */
+  let unfit: (() => void) | null = null;
+  const fitToViewport = () => {
+    const view = window.visualViewport;
+    if (!view) return;
+    let height = -1;
+    let top = -1;
+    const fit = () => {
+      if (view.height === height && view.offsetTop === top) return false;
+      height = view.height;
+      top = view.offsetTop;
+      dialog.style.setProperty("--vv-height", `${height}px`);
+      dialog.style.setProperty("--vv-top", `${top}px`);
+      return true;
+    };
+    /* iOS reports the viewport in events that can trail the keyboard by a
+       frame or more, and the sheet jumped as it caught up. So around
+       anything that moves the viewport (a focus change, a resize) the sheet
+       reads it every frame until it has held still for a few frames. */
+    let frame = 0;
+    let still = 0;
+    const follow = () => {
+      still = 0;
+      if (frame) return;
+      const tick = () => {
+        still = fit() ? 0 : still + 1;
+        frame = still < 12 ? requestAnimationFrame(tick) : 0;
+      };
+      frame = requestAnimationFrame(tick);
+    };
+    fit();
+    view.addEventListener("resize", follow);
+    view.addEventListener("scroll", follow);
+    dialog.addEventListener("focusin", follow);
+    dialog.addEventListener("focusout", follow);
+    unfit = () => {
+      cancelAnimationFrame(frame);
+      frame = 0;
+      view.removeEventListener("resize", follow);
+      view.removeEventListener("scroll", follow);
+      dialog.removeEventListener("focusin", follow);
+      dialog.removeEventListener("focusout", follow);
+      dialog.style.removeProperty("--vv-height");
+      dialog.style.removeProperty("--vv-top");
+      unfit = null;
+    };
+  };
+
   const open = (from?: HTMLElement | null, intent: QuoteIntent = {}) => {
     if (dialog.open) return;
     opener = from ?? null;
@@ -254,6 +254,7 @@ export function initQuoteDialog(
     pushEntry(intent);
     freezePage();
     dialog.showModal();
+    fitToViewport();
     // The heading, not the first input: a screen reader user should hear what
     // this is before being dropped into a text field. `autofocus` in the
     // markup does the same job on first open; this re-asserts it on every
@@ -275,6 +276,7 @@ export function initQuoteDialog(
   };
 
   dialog.addEventListener("close", () => {
+    unfit?.();
     hideGuard();
     thawPage();
     if (pushed) {
@@ -353,22 +355,10 @@ export function initQuoteDialog(
       const target = node.closest<HTMLElement>(trigger);
       if (!target) return;
 
-      // The homepage does not open the dialog: its CTAs are links to
-      // /contact and they stay links. Returning before `preventDefault()` is
-      // the whole implementation — the anchor's own href takes over, and the
-      // router picks it up exactly as it would any other link on the page.
-      if (isLanding() && target.closest("a[href]")) return;
-
       // A trigger is usually a link to /contact, so the anchor still works
       // with no JavaScript — which is why the default has to be stopped here
       // rather than left off the markup.
       event.preventDefault();
-
-      const inline = inlineForm();
-      if (inline) {
-        revealInline(inline);
-        return;
-      }
       open(target, intentOf(target));
     },
     // Capture, and this is load-bearing. The client router listens for clicks
@@ -426,14 +416,6 @@ export function initQuoteDialog(
    * correct if it is ever restored.
    */
   const openWhenArrived = () => {
-    // On a page that already shows the form, the parameter scrolls to it and
-    // does not open a second copy (docs 14 §9).
-    const inline = inlineForm();
-    if (inline) {
-      revealInline(inline);
-      repairEntry();
-      return;
-    }
     const root = document.documentElement;
     if (!root.hasAttribute("data-intro")) {
       open(null, intentFromUrl());

@@ -1,0 +1,116 @@
+---
+/**
+ * The face of a "Send request" button: its label, and the loader that shows
+ * while the request is in flight.
+ *
+ *   <Button type="submit" data-quote-submit>
+ *     <SubmitLabel label={SUMMARY.submit} />
+ *   </Button>
+ *
+ * There are two send buttons (the summary rail's and the phone footer's), so
+ * the loader lives here once rather than twice. `scripts/quote/form.ts` sets
+ * `aria-busy="true"` on the button and swaps the label text; everything you
+ * see change is CSS keyed off that attribute, so there is no second piece of
+ * state to keep in step.
+ *
+ * The loader is three square lamps lighting in turn, the site's square
+ * language rather than a round spinner, plus a light that sweeps along the
+ * foot of the button. The button keeps its colour while busy: a send that
+ * goes pale reads as broken, not as working.
+ */
+interface Props {
+  /** The resting label. form.ts swaps the text while sending. */
+  label: string;
+  class?: string;
+}
+
+const { label, class: extra = "" } = Astro.props;
+---
+
+<span class:list={["sl", extra]}>
+  <span class="sl-lamps" aria-hidden="true">
+    <span></span><span></span><span></span>
+  </span>
+  <span data-submit-label>{label}</span>
+</span>
+
+<style>
+  .sl {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .sl-lamps {
+    display: none;
+    gap: 4px;
+  }
+  .sl-lamps span {
+    width: 6px;
+    height: 6px;
+    background: currentColor;
+    opacity: 0.3;
+    animation: sl-lamp 900ms var(--ease-in-out-strong, ease-in-out) infinite;
+  }
+  .sl-lamps span:nth-child(2) {
+    animation-delay: 150ms;
+  }
+  .sl-lamps span:nth-child(3) {
+    animation-delay: 300ms;
+  }
+  @keyframes sl-lamp {
+    0%,
+    100% {
+      opacity: 0.3;
+    }
+    40% {
+      opacity: 1;
+    }
+  }
+
+  /* ── The busy button ──────────────────────────────────────────
+     `:global` because the button belongs to ui/Button.astro; this file only
+     owns what is inside it. `:has(.sl)` keeps the rule to send buttons. */
+  :global(button[aria-busy="true"]:has(.sl)) {
+    position: relative;
+    overflow: hidden;
+    cursor: progress;
+    /* Hold the resting colours: Button's hover turns a primary white, which
+       on a disabled button would look like it had switched off. */
+    background: var(--color-brand-bright);
+    color: #ffffff;
+    box-shadow: none;
+  }
+  :global(button[aria-busy="true"]:has(.sl)) .sl-lamps {
+    display: inline-flex;
+  }
+  :global(button[aria-busy="true"]:has(.sl)::after) {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 40%;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.85);
+    animation: sl-sweep 1200ms var(--ease-in-out-strong, ease-in-out) infinite;
+  }
+  @keyframes sl-sweep {
+    from {
+      translate: -100% 0;
+    }
+    to {
+      translate: 250% 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .sl-lamps span {
+      animation: none;
+      opacity: 1;
+    }
+    :global(button[aria-busy="true"]:has(.sl)::after) {
+      animation: none;
+      width: 100%;
+      opacity: 0.5;
+    }
+  }
+</style>

@@ -9,7 +9,8 @@
  * can see how much is left (docs/site-expansion/14 §1).
  *
  * Both mounts use this: the dialog wraps it in `ui/Dialog.astro`, and
- * `/contact` will render it inline. `variant` is the only thing that differs,
+ * an inline mount renders it in the page (only `/lab/quote` does today;
+ * `/contact` did until 2026-11-23). `variant` is the only thing that differs,
  * and it decides exactly one thing — what the sticky things stick to. Inside
  * the dialog the panel scrolls and `top: 0` is right; inline, the fixed site
  * header is in the way and they have to clear it. The prototype used `0` in
@@ -26,6 +27,7 @@ import Button from "@/components/ui/Button.astro";
 import QuoteProgress from "@/components/quote/QuoteProgress.astro";
 import QuoteSummary from "@/components/quote/QuoteSummary.astro";
 import QuoteSuccess from "@/components/quote/QuoteSuccess.astro";
+import SubmitLabel from "@/components/quote/SubmitLabel.astro";
 import StepNeed from "@/components/quote/steps/StepNeed.astro";
 import StepSize from "@/components/quote/steps/StepSize.astro";
 import StepTerms from "@/components/quote/steps/StepTerms.astro";
@@ -37,7 +39,7 @@ import { site } from "@/config/site";
 interface Props {
   /** Per-instance id prefix for every control inside. */
   instance: string;
-  /** dialog = the global mount · inline = /contact (docs 14 §2). */
+  /** dialog = the global mount · inline = in the page (docs 14 §2). */
   variant?: QuoteVariant;
   class?: string;
 }
@@ -169,7 +171,7 @@ const contactRows = [
         class="press q-nav-send"
         data-quote-submit
       >
-        <span data-submit-label>{SUMMARY.submit}</span>
+        <SubmitLabel label={SUMMARY.submit} />
       </Button>
     </div>
 
@@ -209,6 +211,19 @@ const contactRows = [
     --q-sticky-top: var(--spacing-header-gap);
   }
 
+  /* ── Sending ─────────────────────────────────────────────────────
+     While the request is in flight (`data-sending`, set by
+     scripts/quote/form.ts) the answers settle back and stop taking taps, so
+     the send button is the one thing on the page that is moving. Opacity
+     only: a blur over a whole step costs Safari a frame every frame. */
+  :global(form [data-section]) {
+    transition: opacity 400ms var(--ease-out-expo);
+  }
+  :global(form[data-sending] [data-section]) {
+    opacity: 0.45;
+    pointer-events: none;
+  }
+
   /* ── ≥1240: two columns ─────────────────────────────────────────
      The rail is a real grid column rather than a floated aside, so the steps
      column can never slide under it. */
@@ -230,6 +245,10 @@ const contactRows = [
     .q-layout {
       display: flex;
       flex-direction: column;
+      /* The grid's `align-items: start` would carry over and size each band
+         to its content, and the widest strip in step 03 (Condition) then
+         pushed the steps past the screen edge on a phone. */
+      align-items: stretch;
     }
     /* Here the summary is a bar pinned across the top as well, so a section
        head pins underneath it. `--q-bar-h` is the bar's measured height,

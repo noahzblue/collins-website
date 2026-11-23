@@ -9,7 +9,7 @@
  * (docs/site-expansion/14 §1).
  *
  * Sticky at the top of the panel's own scroll area rather than in the dialog's
- * fixed head, so the inline variant on /contact gets the same behaviour with
+ * fixed head, so the inline variant gets the same behaviour with
  * no second arrangement — it only has to clear the site header, which is what
  * `--q-sticky-top` carries.
  */
@@ -69,9 +69,35 @@ const { instance, class: extra = "" } = Astro.props;
       color: var(--color-faint);
     }
     .q-progress-track {
+      position: relative;
+      overflow: hidden;
       margin-top: 10px;
       height: 2px;
       background: var(--color-line);
+    }
+    /* Sending: a slow light runs along the bar, the same move the send
+       button's foot makes, so the top and the bottom of the sheet both say
+       "working" (scripts/quote/form.ts sets `data-sending`). */
+    :global(form[data-sending]) .q-progress-track::after {
+      content: "";
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 35%;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.9),
+        transparent
+      );
+      animation: q-progress-sweep 1400ms var(--ease-in-out-strong) infinite;
+    }
+    @keyframes q-progress-sweep {
+      from {
+        translate: -100% 0;
+      }
+      to {
+        translate: 300% 0;
+      }
     }
     .q-progress-fill {
       display: block;
@@ -85,6 +111,10 @@ const { instance, class: extra = "" } = Astro.props;
   @media (prefers-reduced-motion: reduce) {
     .q-progress-fill {
       transition-duration: 1ms;
+    }
+    :global(form[data-sending]) .q-progress-track::after {
+      animation: none;
+      display: none;
     }
   }
 </style>

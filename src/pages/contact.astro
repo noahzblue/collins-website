@@ -1,41 +1,34 @@
 ---
 /**
- * /contact — three numbers, two locations, real hours, and the quote form.
+ * /contact — three numbers, two locations, real hours, and the way into the
+ * quote form.
  *
  * Deliberately NO PageBanner. Every other new page opens on a full-bleed
  * photo; opening straight into content signals "this is the functional one"
- * and puts the form higher up the page. It should feel like a desk, not a
+ * and puts the ways in higher up the page. It should feel like a desk, not a
  * brochure.
  *
- * **The form here is the same component the dialog mounts** — one form, two
- * mounts (docs/site-expansion/14 §2). A form that only exists behind a click
- * is invisible to search and to anyone who arrived specifically to enquire,
- * and this page is where that person lands.
- *
- * The consequence the doc named has landed with it: `.q-field` is gone. Two
- * visually different forms on one site is worse than either style, so the
- * boxed 14px fields retire in favour of the underline ones every other part of
- * the form uses (§14.3a).
+ * **The quote form is the dialog, here as everywhere else.** Until
+ * 2026-11-23 this page rendered the form inline as well. It now carries one
+ * button under the intro that opens the same dialog every other page opens:
+ * one form, one place it lives, and a contact page that is short enough to
+ * read the numbers on (docs/site-expansion/14, top note).
  *
  * **One width, and one skeleton, for the whole page.** Every band here sits in
- * `wrap-wide`, because the form does and a page that changes its column width
+ * `wrap-wide`, because a page that changes its column width
  * halfway down reads as two pages stapled together. Widening the rest was not
  * enough on its own: a 1600px band with an 820px headline in the top-left of
  * it is emptier than the narrow column it replaced. So each band is now built
- * the way the form already is above 1240px — **the thing itself on the left, a
+ * the way the quote form is above 1240px — **the thing itself on the left, a
  * hairline rail of supporting facts on the right** (`.mast` + `.rail` below).
  * The masthead runs the headline against the ways in; the closing band runs
- * the two addresses against the licence details. The form between them is
- * untouched and needs no special case, because it was the pattern.
+ * the two addresses against the licence details.
  *
  * That also retires the old full-width contact strip. The three ways in used
  * to be a band across the top that everything else had to step over; beside
- * the headline they are read at the same moment as it, and the form starts
- * higher up the page than it did.
+ * the headline they are read at the same moment as it.
  *
- * Almost no motion, on purpose: one reveal on the header and that is it. A
- * contact page that animates while you fill it in is a contact page that
- * annoys people.
+ * Almost no motion, on purpose: one reveal on the header and that is it.
  */
 import Base from "@/layouts/Base.astro";
 import Section from "@/components/ui/Section.astro";
@@ -43,10 +36,8 @@ import Eyebrow from "@/components/ui/Eyebrow.astro";
 import Button from "@/components/ui/Button.astro";
 import Icon from "@/components/ui/Icon.astro";
 import Breadcrumb from "@/components/ui/Breadcrumb.astro";
-import QuoteForm from "@/components/quote/QuoteForm.astro";
 import { site, directionsHref } from "@/config/site";
 import { contactPage } from "@/data/content";
-import { DIALOG } from "@/lib/quote/options";
 
 const { dubai, sharjah } = site.places;
 
@@ -86,6 +77,19 @@ const registration = [
             {contactPage.body}{" "}
             <strong class="font-normal text-ink">{site.quotePromise}</strong>
           </p>
+          {
+            /* `data-quote-open` opens the dialog. The href is what a
+              middle-click or a page without JavaScript gets: the same page
+              with the dialog marked open, which opens it on arrival. */
+          }
+          <Button
+            href="/contact?quote=1"
+            data-quote-open
+            class="press mt-10 max-mob:mt-8"
+          >
+            {contactPage.cta}
+            <Icon name="arrow-right" size={16} />
+          </Button>
         </div>
 
         {
@@ -171,27 +175,8 @@ const registration = [
     </div>
   </header>
 
-  <!-- 2. The form. `id` is what every quote CTA on this page scrolls to
-       instead of opening the dialog (docs 14 §2).
-
-       The wide band, not the 1200px text column: the form is a four-column
-       picker and a two-column rating table beside a 340px summary rail, and
-       inside `.wrap` the steps column was left with about 750px of that. On
-       `wrap-wide` the steps get more room than a full-width page section
-       would give them, and the rail stops eating the difference. -->
-  <Section id="quote" class="pt-[72px] max-mob:pt-[48px]">
-    <div class="wrap wrap-wide">
-      <div class="q-inline-head rule-brand">
-        <h2 class="q-inline-title">{DIALOG.title}</h2>
-      </div>
-      <div class="border-b border-line-strong">
-        <QuoteForm instance="q-inline" variant="inline" />
-      </div>
-    </div>
-  </Section>
-
   {
-    /* 3. Two locations doing two different jobs, against the licence.
+    /* 2. Two locations doing two different jobs, against the licence.
       The same `.mast` split as the header: the places are the content, the
       registration is marginalia and is finally shaped like it — it used to
       be a tracked mono strip stranded under the cards, which is where copy
@@ -355,61 +340,4 @@ const registration = [
       transition-duration: 1ms;
     }
   }
-
-  /* `.rule-brand` (global.css) is the same device the dialog's head draws, so
-     the inline mount and the modal read as one thing seen twice rather than
-     two arrangements of the same fields. Nothing is inset here — there is no
-     panel, so the rule starts where the title does. */
-  .q-inline-head {
-    padding-bottom: 20px;
-  }
-  .q-inline-title {
-    font-family: var(--font-mono);
-    font-size: var(--text-h3);
-    line-height: 1.05;
-    text-transform: uppercase;
-    letter-spacing: -0.03em;
-  }
 </style>
-
-<script>
-  import { untilPageSwap } from "@/scripts/untilPageSwap";
-  import { initQuoteForm } from "@/scripts/quote/form";
-
-  /**
-   * The inline mount. Same call the dialog makes — the only difference is
-   * which element it is handed (docs/site-expansion/14 §2).
-   *
-   * The dialog is still mounted from `Base` on this page, so two instances of
-   * this form coexist in one document. That is the case every generated id and
-   * every root-scoped query exists for, and this is the page that proves it.
-   */
-  document.addEventListener("astro:page-load", () => {
-    const root = document.querySelector<HTMLElement>(
-      "[data-quote-root]:not(dialog [data-quote-root])",
-    );
-    if (!root) return;
-    const quote = initQuoteForm(root, { signal: untilPageSwap() });
-
-    /**
-     * What the arriving link already answered.
-     *
-     * The homepage's closing band asks buy-or-hire and then sends people
-     * here rather than opening the dialog, so the answer arrives as `?mode=`
-     * — the same parameter name the dialog puts on the URL when it opens
-     * (`scripts/quote/dialog.ts`). Without this the answers would land on one
-     * blank form and the question would have been for nothing.
-     *
-     * `prefill` drops anything it does not recognise in silence, so a hand-
-     * edited parameter is a no-op rather than an error state (docs 14 §9).
-     *
-     * Only `mode`. The other two parameters the dialog understands — the
-     * category and its rating — are never sent here: a link that knows the
-     * machine comes from a page that keeps you on it, and the dialog answers
-     * it in place. Reading them would also mean racing the dialog's own
-     * `?quote=` handling, which strips the URL as it scrolls to this form.
-     */
-    const mode = new URL(location.href).searchParams.get("mode");
-    if (mode) quote?.prefill({ mode });
-  });
-</script>
