@@ -31,7 +31,7 @@ export const whoWeAre = {
   ],
   /** Pulled out as a display line between paragraphs 1 and 2. */
   pullQuote:
-    "Sales, hire and service — the same machines, held to the same standard.",
+    "Sales, hire and service: the same machines, held to the same standard.",
   /** The "Who we are" block only. The page banner is `aboutPage.banner`.
    *
    *  Rendered, like the banner and the rest of the site's non-photographic

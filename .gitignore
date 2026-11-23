@@ -26,3 +26,6 @@ pnpm-debug.log*
 # local tooling
 /.claude
 /.impeccable/
+
+# Vercel adapter build output
+.vercel/

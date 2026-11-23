@@ -169,6 +169,10 @@ const slots = Object.entries(SUMMARY.labels) as [string, string][];
   @media (max-width: 1240px) {
     .q-rail {
       order: -1;
+      /* Full width. \`start\` (the rail's alignment beside the steps) would
+         shrink the bar to its content here, and the photos scrolling under
+         it would show through the empty right-hand side. */
+      align-self: stretch;
       border-left: 0;
       border-bottom: 1px solid var(--color-line);
     }

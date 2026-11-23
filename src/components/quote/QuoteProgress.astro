@@ -48,7 +48,9 @@ const { instance, class: extra = "" } = Astro.props;
       position: sticky;
       top: var(--q-sticky-top, 0px);
       z-index: 6;
-      padding: 12px var(--dlg-gutter, 20px) 0;
+      /* White below the track too, so what scrolls under the bar
+         disappears into it rather than touching the line. */
+      padding: 12px var(--dlg-gutter, 20px) 14px;
       background: #ffffff;
     }
     .q-progress-count {

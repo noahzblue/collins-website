@@ -71,7 +71,7 @@ const jsonLd = {
   areaServed: "United Arab Emirates",
   identifier: {
     "@type": "PropertyValue",
-    name: `Trade licence register — ${site.licensingAuthority}`,
+    name: `Trade licence register: ${site.licensingAuthority}`,
     value: site.register,
   },
   // Both yards are real places holding real stock. `address` above is the
@@ -79,7 +79,7 @@ const jsonLd = {
   // is a different claim about the same coordinates, not a duplicate of it.
   location: Object.values(site.places).map((place) => ({
     "@type": "Place",
-    name: `${site.name} — ${place.city}`,
+    name: `${site.name}, ${place.city}`,
     address: {
       "@type": "PostalAddress",
       streetAddress: place.address.replace(`, ${place.city}, U.A.E.`, ""),

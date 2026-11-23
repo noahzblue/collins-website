@@ -1,47 +1,36 @@
 ---
 /**
- * "Which machine" — the thirteen categories plus the one that is not a machine.
+ * "Which machine?": one line in the form, and a photo viewer behind it.
  *
- *   <CategoryPicker instance={id} categories={categories} />
+ *   <CategoryPicker instance={id} categories={categories} required />
  *
- * **One set of radios, three densities.** Photo tiles four across at 980px and
- * up, three across at 16:9 between 600 and 980, and text rows below 600 —
- * stepped down entirely in CSS, because two copies of the markup would be two
- * radios sharing one `name` and the second would silently win
- * (docs/site-expansion/14 §5).
+ * **The field is a button, not a control.** It shows the machine picked so
+ * far (photo, name, size range) or a prompt, and opens `MachineViewer`, which
+ * holds the actual radios. The radios stay inside this `<form>` even though
+ * the viewer is a nested `<dialog>`, so the form reads `category` the way it
+ * always has (scripts/quote/form.ts needs no special case).
  *
- * What replaces the photo on a phone is not nothing: it is the `rangeLabel`
- * ("10 KVA to 1250 KVA, diesel"). At ~160px wide a machine photo is
- * decorative rather than informative, and thirteen of them is roughly 1.5 MB and
- * four screens of scroll before the customer can begin — while the range is
- * the actual disambiguator between a generator and a compressor, and it is
- * text.
+ * Why a viewer: the 4-across photo grid it replaced was the tallest thing in
+ * section 01, and below 600px it dropped its photos and became fourteen text
+ * rows. The viewer gives the photos the whole panel, and section 01 shrinks
+ * to one line (decided 2026-11-22, `/lab/machine-picker` direction A).
  *
- * **The family headings are the mobile list's structure and nothing else.**
- * Thirteen rows under six headings is about 810px — under two phone screens,
- * everything reachable by scroll. Deliberately not an accordion: an accordion
- * hides the thing the customer is looking for and charges them a tap to find
- * out it was not there. Above 600px the headings are simply not displayed, and
- * the tiles close up into a grid.
+ * The names under the field are quick picks for someone who already knows
+ * what they want. They tick the same radios; they are not a second group.
  *
- * The grouping runs at every width even though only the phone shows it, so the
- * tile grid reads in catalogue order too — one order, not a second one that
- * has to be kept in step.
- *
- * Data comes in as props. This component never calls `getCollection`, which is
- * what lets the same picker render inside the dialog and inline on `/contact`
- * with no branching (docs 14 §15.3b).
+ * Every state change after load is `scripts/quote/picker.ts`'s. Nothing here
+ * is filled at runtime except through the hooks named `data-picker-*`.
  */
-import ChoiceTile from "@/components/ui/ChoiceTile.astro";
-import { groupByFamily } from "@/lib/equipment";
+import Icon from "@/components/ui/Icon.astro";
+import MachineViewer from "@/components/quote/MachineViewer.astro";
 import { scopedId } from "@/lib/forms";
-import { FIELD_COPY, OTHER_TILE } from "@/lib/quote/options";
-import { OTHER_CATEGORY, type QuoteCategory } from "@/lib/quote/schema";
+import { FIELD_COPY, PICKER } from "@/lib/quote/options";
+import type { QuoteCategory } from "@/lib/quote/schema";
 
 interface Props {
   /** Per-instance id prefix — two forms on one page must not collide. */
   instance: string;
-  /** The thirteen, in catalogue order. Shaped by the composition layer. */
+  /** The machines, in catalogue order. Shaped by the composition layer. */
   categories: QuoteCategory[];
   /** The radio group's `name`. */
   name?: string;
@@ -62,13 +51,9 @@ const {
   class: extra = "",
 } = Astro.props;
 
-const groups = groupByFamily(categories);
 const legendId = scopedId(instance, name, "legend");
-
-/* A family heading is a cell of the same lattice, so it sits on the hairline
-   above its rows rather than floating between two grids. */
-const heading =
-  "col-span-full hidden bg-surface px-5 py-[10px] font-mono text-tag font-medium tracking-[1.4px] text-faint uppercase max-cmp:block";
+const errorId = `${legendId}-error`;
+const viewerId = scopedId(instance, name, "viewer");
 ---
 
 <fieldset class:list={["min-w-0 border-0 p-0", extra]} data-category-picker>
@@ -76,59 +61,225 @@ const heading =
     {legend}{required && " *"}
   </legend>
 
-  <div
-    role="radiogroup"
-    aria-labelledby={legendId}
-    aria-required={required ? "true" : undefined}
-    class="mesh grid grid-cols-4 max-nav:grid-cols-3 max-cmp:grid-cols-1"
-  >
-    {
-      groups.map((group) => (
-        <>
-          <p class={heading}>{group.family}</p>
-          {group.items.map((category) => (
-            <ChoiceTile
-              instance={instance}
-              name={name}
-              layout="responsive"
-              ratio="step"
-              value={category.id}
-              label={category.name}
-              meta={category.rangeLabel}
-              image={category.heroImage}
-              checked={category.id === value}
-              required={required}
-            />
-          ))}
-        </>
-      ))
-    }
-
-    {
-      /* Last, and drawn as an escape rather than a machine: no photo, a dashed
-        outline and a `+`. It is a service, not an error state — see §10a. */
-    }
-    <ChoiceTile
-      instance={instance}
-      name={name}
-      layout="responsive"
-      ratio="step"
-      value={OTHER_CATEGORY}
-      label={OTHER_TILE.label}
-      meta={OTHER_TILE.note}
-      icon="plus"
-      dashed
-      checked={value === OTHER_CATEGORY}
-      required={required}
-    />
-  </div>
-
   {/* Always rendered, filled at runtime — see ui/Field.astro for why. */}
   <p
-    id={`${legendId}-error`}
+    id={errorId}
     data-error-for={name}
     hidden
-    class="mt-[10px] mb-0 text-caption text-error"
+    class="mt-0 mb-[10px] text-caption text-error"
   >
   </p>
+
+  {
+    /* `data-field` makes this the control form.ts focuses and marks when the
+      question is unanswered. */
+  }
+  <button
+    type="button"
+    class="pk-field"
+    data-field={name}
+    data-picker-open
+    aria-haspopup="dialog"
+    aria-controls={viewerId}
+    aria-describedby={errorId}
+  >
+    <span class="pk-thumb">
+      {
+        /* One per machine, all hidden until picked. A hidden lazy image is
+          never fetched, so this costs nothing until it is shown. */
+        categories.map(
+          (category) =>
+            category.heroImage && (
+              <img
+                src={category.heroImage}
+                alt=""
+                loading="lazy"
+                decoding="async"
+                data-picker-thumb={category.id}
+                hidden
+              />
+            ),
+        )
+      }
+      <span class="pk-thumb-icon" data-picker-thumb-empty>
+        <Icon name="search" size={20} />
+      </span>
+    </span>
+
+    <span class="flex min-w-0 flex-1 flex-col">
+      <span class="pk-name" data-picker-name data-empty={PICKER.placeholder}>
+        {PICKER.placeholder}
+      </span>
+      <span
+        class="pk-meta"
+        data-picker-meta
+        data-empty={PICKER.meta(categories.length)}
+      >
+        {PICKER.meta(categories.length)}
+      </span>
+    </span>
+
+    <span class="pk-cta">
+      <span
+        data-picker-cta
+        data-browse={PICKER.browse}
+        data-change={PICKER.change}
+      >
+        {PICKER.browse}
+      </span>
+      <Icon name="arrow-right" size={16} />
+    </span>
+  </button>
+
+  <div class="pk-quick">
+    <span class="pk-quick-label">{PICKER.quick}</span>
+    {
+      categories.map((category) => (
+        <button
+          type="button"
+          class="pk-quick-name"
+          data-picker-quick={category.id}
+          aria-pressed="false"
+        >
+          {category.name}
+        </button>
+      ))
+    }
+  </div>
+
+  <MachineViewer
+    id={viewerId}
+    instance={instance}
+    categories={categories}
+    name={name}
+    value={value}
+    legend={legend}
+    required={required}
+  />
 </fieldset>
+
+<style>
+  /* Drawn like every other field in the form: no box, one rule beneath. */
+  .pk-field {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    width: 100%;
+    padding: 14px 0;
+    border: 0;
+    border-bottom: 1px solid var(--color-line-strong);
+    background: none;
+    text-align: left;
+    cursor: pointer;
+    transition:
+      border-color 200ms var(--ease-out-expo),
+      box-shadow 200ms var(--ease-out-expo);
+  }
+  .pk-field:hover,
+  .pk-field:focus-visible {
+    outline: none;
+    border-color: var(--color-brand-bright);
+    box-shadow: 0 1px 0 0 var(--color-brand-bright);
+  }
+  /* Set by form.ts on an unanswered submit. */
+  .pk-field.ctl-error {
+    border-color: var(--color-error);
+    box-shadow: none;
+  }
+
+  .pk-thumb {
+    position: relative;
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 96px;
+    aspect-ratio: 4 / 3;
+    overflow: clip;
+    background: var(--color-surface-2);
+    color: var(--color-faint);
+  }
+  .pk-thumb img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .pk-thumb-icon[hidden],
+  .pk-thumb img[hidden] {
+    display: none;
+  }
+
+  .pk-name {
+    font-size: var(--text-intro);
+    line-height: 1.3;
+    color: var(--color-faint);
+  }
+  .pk-field[data-picked] .pk-name {
+    color: var(--color-ink);
+  }
+  .pk-meta {
+    margin-top: 3px;
+    font-size: var(--text-note);
+    line-height: 1.4;
+    color: var(--color-muted);
+  }
+  .pk-cta {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    color: var(--color-brand);
+  }
+
+  .pk-quick {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 6px 16px;
+    margin-top: 18px;
+  }
+  .pk-quick-label {
+    font-family: var(--font-mono);
+    font-size: var(--text-tag);
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--color-faint);
+  }
+  .pk-quick-name {
+    padding: 2px 0;
+    border: 0;
+    border-bottom: 1px solid transparent;
+    background: none;
+    cursor: pointer;
+    font-size: var(--text-note);
+    color: var(--color-muted);
+    transition:
+      color 200ms var(--ease-out-expo),
+      border-color 200ms var(--ease-out-expo);
+  }
+  .pk-quick-name:hover {
+    color: var(--color-ink);
+    border-color: var(--color-line-strong);
+  }
+  .pk-quick-name[aria-pressed="true"] {
+    color: var(--color-brand);
+    border-color: var(--color-brand);
+  }
+
+  /* A phone gets a smaller photo and loses the word, keeping the arrow. */
+  @media (max-width: 600px) {
+    .pk-field {
+      gap: 14px;
+    }
+    .pk-thumb {
+      width: 72px;
+    }
+    .pk-cta span {
+      display: none;
+    }
+  }
+</style>

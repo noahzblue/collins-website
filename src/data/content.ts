@@ -18,10 +18,10 @@ export const hero = {
    *  the blue run, which at display size reads as a glitch. */
   title: {
     lead: "Heavy equipment, power and transport ",
-    emphasis: "— for sale and for hire.",
+    emphasis: "for sale and for hire.",
     tail: "",
   },
-  sub: "Generators up to 1250 KVA, forklifts, cranes and compressors — supplied outright or on hire, across the UAE and the GCC.",
+  sub: "Generators up to 1250 KVA, forklifts, cranes and compressors supplied outright or on hire, across the UAE and the GCC.",
   ctas: [
     {
       label: "Request a quote",
@@ -53,25 +53,25 @@ export const supplyModes = {
     {
       label: "Sales",
       lead: "SOURCE. SUPPLY. DELIVER",
-      body: "From project-specific requirements to complete equipment purchases, we source the right machine through trusted supply channels and deliver it ready for work.",
+      body: "Buy new or inspected used equipment, sourced from manufacturers and authorised distributors and delivered ready to work.",
       cta: { label: "Buy", href: "/services#equipment-sales" },
     },
     {
       label: "Rental",
       lead: "HIRE. DEPLOY. GET TO WORK",
-      body: "Day, week, month or project duration — flexible hire for projects of every length, on straightforward terms, with reliable delivery and responsive support.",
+      body: "Hire by the day, week, month or project, on clear terms, with delivery to site and support when you need it.",
       cta: { label: "Hire terms", href: "/services#equipment-rental" },
     },
   ],
   /** profile p.8, verbatim. */
-  footnote: "Whatever the requirement — buy it, hire it, or let us source it.",
+  footnote: "Whatever the requirement: buy it, hire it, or let us source it.",
 };
 
 /** Equipment categories grid. */
 export const fleet = {
   eyebrow: "Equipment",
   title: ["Built for the job,", "ready when you are."],
-  intro: "Machines that work on day one — to buy or to hire.",
+  intro: "Machines that work on day one, to buy or to hire.",
   viewAll: { label: "View all 13 categories", href: "/equipment" },
 };
 
@@ -80,13 +80,13 @@ export const equipmentHub = {
   eyebrow: "Equipment",
   title: ["Everything we supply,", "to buy or to hire."],
   intro:
-    "Every category below is sourced direct from manufacturers and authorised distributors, supplied with commissioning, operator handover and parts support — and available for outright purchase or for hire.",
+    "Every category is sourced from manufacturers and authorised distributors, available to buy or hire, and supplied with commissioning, operator handover and parts support.",
   seoTitle: "Equipment for Sale & Hire in the UAE | Collins Equipments",
   seoDescription:
-    "Thirteen categories of industrial and heavy equipment to buy or hire — generators, forklifts, cranes, access platforms, earthmoving, material handling and trailers, delivered across the UAE and the GCC.",
+    "Thirteen categories of industrial and heavy equipment to buy or hire: generators, forklifts, cranes, access platforms, earthmoving, material handling and trailers, delivered across the UAE and the GCC.",
   closing: {
     title: "Not seeing the machine you need?",
-    body: "The thirteen above are what we carry day to day. Tell us the job and we'll source to spec — most enquiries come back the same day.",
+    body: "The thirteen above are what we carry day to day. Tell us the job and we'll source to spec. Most enquiries come back the same day.",
   },
 };
 
@@ -95,14 +95,14 @@ export const servicesSection = {
   eyebrow: "Services",
   title: ["What we do", "beyond the sale."],
   intro:
-    "Six services that cover the whole life of a machine on your project: supplying it, getting it there, keeping it running, and taking it away again.",
+    "Six services for the whole life of a machine on your site: supply, delivery, maintenance and collection.",
   viewAll: { label: "View all services", href: "/services" },
   seoTitle: "Equipment Sales, Rental, Transport & Maintenance | Collins",
   seoDescription:
-    "Six services across the life of a machine — equipment sales, rental, sourcing and procurement, transport and trailers, maintenance and spares, logistics and export, across the UAE and the wider GCC.",
+    "Six services across the life of a machine: equipment sales, rental, sourcing and procurement, transport and trailers, maintenance and spares, logistics and export, across the UAE and the wider GCC.",
   /** The band that ties /services back to the catalogue. */
   crossSell: {
-    body: "Every service above runs on the same thirteen categories — 10 KVA to 1250 KVA of generation, 1.4 to 15 ton of handling, 50 to 600 ton of lift.",
+    body: "Every service above runs on the same thirteen categories: 10 KVA to 1250 KVA of generation, 1.4 to 15 ton of handling, 50 to 600 ton of lift.",
     cta: { label: "View the equipment", href: "/equipment" },
   },
 };
@@ -115,11 +115,11 @@ export const industriesSection = {
   eyebrow: "Industries",
   title: ["Wherever the work is,", "we're already there."],
   intro:
-    "Eight sectors, one supplier — power, lifting, access and parts matched to how your industry actually works.",
+    "Eight sectors, one supplier: power, lifting, access and parts matched to how your industry works.",
   viewAll: { label: "View all industries", href: "/industries" },
   seoTitle: "Industries We Supply | Collins Equipments UAE",
   seoDescription:
-    "Eight sectors supplied from two yards — construction, oil and gas, marine and ports, events, facilities, mining, infrastructure and manufacturing. Equipment sales and rental across the UAE and the GCC.",
+    "Eight sectors supplied from two yards: construction, oil and gas, marine and ports, events, facilities, mining, infrastructure and manufacturing. Equipment sales and rental across the UAE and the GCC.",
   /** The industry × category coverage table — the hub's real payload. */
   matrix: {
     eyebrow: "Coverage",
@@ -147,7 +147,7 @@ export const aboutSection = {
      the homepage is detail underneath them, so this is the one place that
      says them plainly and stops. */
   title: ["Buy. Sell. Service.", "One supplier,", "start to finish."],
-  body: "Buy the machine outright or hire it by the day — either way we service it, and you deal with one person throughout.",
+  body: "Buy the machine outright or hire it by the day. Either way we service it, and you deal with one person throughout.",
   cta: { label: "Read our story", href: "/about" },
   office: {
     tag: "Head Office",
@@ -183,7 +183,7 @@ export const aboutPage = {
 export const contactSection = {
   eyebrow: "Get in touch",
   title: ["Let's get your", "equipment moving."],
-  body: "Send us the machine, the duty and the dates — or just describe the job and we'll specify it for you.",
+  body: "Send us the machine, the duty and the dates, or describe the job and we'll specify it for you.",
   /** Heads the three buy/hire links that open the quote form. The options
    *  themselves are not here — they are `MODES` in `lib/quote/options.ts`, so
    *  the homepage cannot word the question differently to the form. */

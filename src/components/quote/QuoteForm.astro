@@ -111,8 +111,6 @@ const contactRows = [
     data-quote-form
     data-instance={instance}
     data-variant={variant}
-    data-whatsapp={site.whatsapp.href}
-    data-email={site.email}
     id={`${instance}-form`}
     novalidate
   >
@@ -176,8 +174,8 @@ const contactRows = [
     </div>
 
     {
-      /* Surfaced only when nothing else carried the enquiry — a failed POST
-        behind a successful WhatsApp handoff is logged, not shown (§12). */
+      /* Shown when the POST fails. It is the only delivery, so a failure is
+        always surfaced, with the form still filled in (§12). */
     }
     <div class="q-error" data-quote-error hidden>
       <p class="q-error-title">{SUBMIT_ERROR.title}</p>
@@ -232,6 +230,12 @@ const contactRows = [
     .q-layout {
       display: flex;
       flex-direction: column;
+    }
+    /* Here the summary is a bar pinned across the top as well, so a section
+       head pins underneath it. `--q-bar-h` is the bar's measured height,
+       written by scripts/quote/form.ts. */
+    .q-form {
+      --q-head-top: calc(var(--q-sticky-top) + var(--q-bar-h, 0px));
     }
   }
 

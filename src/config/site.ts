@@ -52,7 +52,7 @@ export const site = {
 
   /** Short description used in the footer brand column. */
   blurb:
-    "Heavy equipment, power generation and transport for sale and for hire across the UAE and the GCC — generators, forklifts, cranes, compressors and more.",
+    "Heavy equipment, power generation and transport for sale and for hire across the UAE and the GCC: generators, forklifts, cranes, compressors and more.",
 
   /** All three numbers from the profile, in the profile's order. */
   phones,
@@ -133,7 +133,7 @@ export const site = {
   seo: {
     title: "Collins Equipments | Heavy Machinery Sales & Rental in the UAE",
     description:
-      "Heavy equipment, power generation and transport for sale and for hire — generators to 1250 KVA, forklifts, cranes and compressors, supplied outright or on hire across the UAE and the GCC.",
+      "Heavy equipment, power generation and transport for sale and for hire: generators to 1250 KVA, forklifts, cranes and compressors, supplied outright or on hire across the UAE and the GCC.",
   },
 } as const;
 

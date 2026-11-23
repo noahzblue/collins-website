@@ -7,6 +7,23 @@ which settled the structure but not the responsive behaviour._
 This document decides **what the form asks, in what order, where it lives, and
 what it looks like at each viewport**. It does not write code.
 
+> **2026-11-21 — server side.** The server no longer trusts the browser's
+> composed message: `lib/quote/parse.ts` rebuilds the request against the
+> option lists and the catalogue, and `lib/quote/email.ts` writes the HTML
+> email. A "fold as you go" redesign of the form is parked on the branch
+> `feature/quote-form-fold`; the layout below stands for now.
+>
+> **2026-11-22 — "Which machine?" is a field and a viewer.** The 4-across
+> photo grid of §5 is gone. Section 01 now shows one underline field (photo,
+> name, size range, "Browse") with the machine names under it as quick picks.
+> The field opens `quote/MachineViewer.astro`, a `ui/Dialog` on top of the
+> quote dialog: names down the left and the machine large on the right at
+> 900px and up, a reel of full-width photos below 900px. The radios live in
+> the viewer and stay inside the form, so `form.ts` reads `category` as
+> before. Chosen from three directions on `/lab/machine-picker` (A: Viewer,
+> B: Strip, C: Index). The same day, section heads were pinned while their
+> section scrolls, and each section lists its errors in a box at its top.
+
 ---
 
 ## The numbers this is designed against
@@ -603,6 +620,16 @@ incomplete step did nothing at all — no error, no scroll, no message.
 ---
 
 ## 12. Submission — build the client, leave the backend unplugged
+
+> **Superseded 2026-11-21 — email only.** The backend is built:
+> `src/pages/api/quote.ts` (a Vercel function) saves each request to Neon
+> (`db/migrations/0001_quote_requests.sql`), emails it to Collins over GoDaddy
+> SMTP with retries inside a 20s budget, and records whether it went. The
+> WhatsApp and `mailto:` handoffs below are **removed**: `channel` is now only
+> how the customer wants to be answered, the POST is the only delivery, and a
+> failed POST always shows the error panel. `PUBLIC_QUOTE_ENDPOINT` and
+> `flatten()` are gone. The variables are listed in `.env.example`. The rest
+> of this section is kept as the history of the decision.
 
 **Decided: no email/form service is chosen yet. Build the full client path now
 against a stable contract, so wiring a backend later is one file and one

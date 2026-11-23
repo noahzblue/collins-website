@@ -43,6 +43,10 @@ interface Props {
   closeLabel: string;
   /** Panel width at ≥900px. */
   width?: "md" | "lg";
+  /** Panel height at ≥900px. `full` is the surface a long form needs;
+   *  `short` suits a picker opened on top of it. Below 900px every dialog
+   *  is a full-screen sheet either way. */
+  height?: "full" | "short";
   /**
    * Copy for the discard confirm. Its presence is what arms the dirty guard:
    * with it, Escape and a backdrop click on a dirty dialog ask first; without
@@ -61,6 +65,7 @@ const {
   subtitle,
   closeLabel,
   width = "lg",
+  height = "full",
   discard,
   class: extra = "",
   ...rest
@@ -81,13 +86,18 @@ const widths: Record<NonNullable<Props["width"]>, string> = {
      pinned to a fixed width (see QuoteForm's grid). */
   lg: "[--dlg-width:1760px]",
 };
+
+const heights: Record<NonNullable<Props["height"]>, string> = {
+  full: "[--dlg-height:98dvh]",
+  short: "[--dlg-height:min(760px,92dvh)]",
+};
 ---
 
 <dialog
   id={id}
   data-dialog
   aria-labelledby={titleId}
-  class:list={["dlg", widths[width], extra]}
+  class:list={["dlg", widths[width], heights[height], extra]}
   {...rest}
 >
   {
@@ -197,6 +207,10 @@ const widths: Record<NonNullable<Props["width"]>, string> = {
      max-height computed from the viewport) is overridden here, so the shape is
      ours and not four browsers' opinions of it. */
   .dlg {
+    /* On the base rule, not \`[open]\`: the exit keeps \`display: flex\` for
+       its 260ms (allow-discrete) but loses \`[open]\` at once, and a row
+       layout would flash for the length of the fade. */
+    flex-direction: column;
     /* Zeroed for reduced motion, so the entrance is one token, not a second
        set of rules. */
     --dlg-rise: 10px;
@@ -211,8 +225,8 @@ const widths: Record<NonNullable<Props["width"]>, string> = {
     /* Near the full height on purpose. A short panel floating in the middle
        of a 4K display reads as a widget; this one is the surface, and the
        margin left around it is what keeps it from reading as a page. */
-    height: 98dvh;
-    max-height: 98dvh;
+    height: var(--dlg-height, 98dvh);
+    max-height: var(--dlg-height, 98dvh);
     padding: 0;
     border: 0;
     /* Square. `--radius-md` is right for a card sitting in a page; this is
@@ -235,7 +249,6 @@ const widths: Record<NonNullable<Props["width"]>, string> = {
   }
   .dlg[open] {
     display: flex;
-    flex-direction: column;
     opacity: 1;
     translate: 0 0;
   }

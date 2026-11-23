@@ -2,13 +2,11 @@
  * One state object, two outputs.
  *
  *   toPayload()  stable keys, nested, versioned — for the POST.
- *   toMessage()  human-readable lines — for the WhatsApp handoff and the
- *                email body.
- *   flatten()    the payload as flat key/value, for a hosted form service.
+ *   toMessage()  human-readable lines — the body of the email Collins gets.
  *
  * They are separate because they answer to different readers. The prototype
  * pushed display strings ("1–4 weeks", en dash and all) straight into a URL,
- * which is fine for a person reading WhatsApp and useless to a backend
+ * which is fine for a person reading it and useless to a backend
  * (docs/site-expansion/14 §12).
  *
  * Everything here is pure. The facts the state does not carry — the category's
@@ -105,12 +103,12 @@ export const toMessage = (state: QuoteState, context: QuoteContext): string => {
       : (context.category?.name ?? null);
 
   const size = (() => {
-    if (state.rating === UNSURE_RATING) return "Not sure — please size it";
+    if (state.rating === UNSURE_RATING) return "Not sure, please size it";
     if (!context.rating) return null;
     const { label, powerType, availability } = context.rating;
     const type = powerType ? ` (${powerType})` : "";
     const stock = availability
-      ? ` — ${AVAILABILITY_LABEL[availabilityMode(state.mode)][availability]}`
+      ? ` · ${AVAILABILITY_LABEL[availabilityMode(state.mode)][availability]}`
       : "";
     return `${label}${type}${stock}`;
   })();
@@ -136,7 +134,7 @@ export const toMessage = (state: QuoteState, context: QuoteContext): string => {
         : [];
 
   return [
-    "Quotation request — collinscouae.com",
+    "Quotation request from collinscouae.com",
     state.mode && `Buy or hire: ${labelOf(MODES, state.mode)}`,
     machine && `Equipment: ${machine}`,
     size && `Size: ${size}`,
@@ -219,27 +217,4 @@ export const toSummary = (
     ...terms,
     slot("channel", labelOf(CHANNELS, state.channel)),
   ];
-};
-
-/**
- * The payload as flat `request.mode` / `contact.name` keys.
- *
- * Formspree, Web3Forms and the rest want key/value rather than nested JSON.
- * Swapping to one of them should touch `submit.ts` and nothing else — which is
- * why this lives here rather than being invented at the call site. Add
- * `toMessage()` alongside as `message` if the service emails the fields.
- */
-export const flatten = (
-  payload: QuotePayload,
-  prefix = "",
-): Record<string, string> => {
-  const out: Record<string, string> = {};
-  for (const [key, value] of Object.entries(payload)) {
-    const path = prefix ? `${prefix}.${key}` : key;
-    if (value === null || value === undefined) out[path] = "";
-    else if (typeof value === "object")
-      Object.assign(out, flatten(value as never, path));
-    else out[path] = String(value);
-  }
-  return out;
 };

@@ -29,7 +29,13 @@
       a minimum render-to-submit interval, `validate.ts`, and the panels in
       `QuoteSuccess.astro`. What is left is the endpoint, delivery to
       `info@collinscouae.com`, and deciding whether a returned `ref` is worth
-      showing (the success panel already renders one if the backend sends it).
+      showing (the success panel already renders one if the backend sends it). - [ ] **Failure pipeline — discuss before building.** Today: one POST
+      per submit, one retry on a network error only. Open questions:
+      what happens when the mail send fails server-side, whether the
+      retry can duplicate an email, and whether "Email" keeps its
+      `mailto:` handoff once the endpoint delivers. - [ ] **"Call" enquiries are dropped today.** With no endpoint, the
+      Call channel shows success and nothing is sent. Fixed by any
+      working endpoint; until then, it is a silent loss.
 - [ ] **Hero video optimization** — `public/videos/hero-yard.mp4` is ~15 MB
       (Seedance 1080p / 10 s, standard bitrate). Re-encode to ~3–4 MB before any
       deploy: ffmpeg `-crf 28 -preset slow -movflags +faststart` (no ffmpeg on

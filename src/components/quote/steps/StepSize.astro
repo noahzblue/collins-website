@@ -86,11 +86,19 @@ const {
             <p class="mb-[10px] text-caption text-faint">
               {category.rangeHeading} *
             </p>
+            {/* One slot per panel, under its heading; the hidden panels'
+                slots are filled too and simply not seen. */}
+            <p
+              id={scopedId(instance, "rating-error", category.id)}
+              data-error-for="rating"
+              hidden
+              class="mt-0 mb-[10px] text-caption text-error"
+            />
 
             <RatingList
               instance={`${instance}-${category.id}`}
               ranges={category.ranges}
-              legend={`${category.rangeHeading} — ${category.name}`}
+              legend={`${category.rangeHeading}: ${category.name}`}
               required
             />
 
@@ -111,14 +119,6 @@ const {
           </div>
         ))
       }
-
-      <p
-        id={scopedId(instance, "rating", "error")}
-        data-error-for="rating"
-        hidden
-        class="mt-[10px] mb-0 text-caption text-error"
-      >
-      </p>
     </div>
 
     {

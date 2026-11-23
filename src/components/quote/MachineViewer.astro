@@ -1,0 +1,505 @@
+---
+/**
+ * The photo viewer behind "Which machine?" — the radios themselves.
+ *
+ *   <MachineViewer id={viewerId} instance={id} categories={categories} />
+ *
+ * A `ui/Dialog` opened on top of the quote dialog: native nested modals, so
+ * Escape and the backdrop close this one and leave the form beneath alone.
+ * It sits inside the form's `<fieldset>`, which keeps its radios in the form.
+ *
+ * **Two columns at 900px and up**: names down the left, the machine large on
+ * the right. The stage follows hover, focus and the arrows, and pointing at a
+ * machine never picks it. **Below 900px there is no stage**: the list is the
+ * reel, each row a full-width photo above its name.
+ *
+ * Photos are plain lazy images, never `ParallaxImage`: these are selection
+ * controls, the same exception `ui/ChoiceTile` makes. They load when the
+ * viewer first opens, not with the page.
+ *
+ * Behaviour: `scripts/quote/picker.ts`.
+ */
+import Dialog from "@/components/ui/Dialog.astro";
+import Icon from "@/components/ui/Icon.astro";
+import { groupByFamily } from "@/lib/equipment";
+import { scopedId } from "@/lib/forms";
+import { OTHER_TILE, PICKER } from "@/lib/quote/options";
+import { OTHER_CATEGORY, type QuoteCategory } from "@/lib/quote/schema";
+
+interface Props {
+  /** Element id — what the field's `aria-controls` names. */
+  id: string;
+  /** Per-instance id prefix — two forms on one page must not collide. */
+  instance: string;
+  /** The machines, in catalogue order. */
+  categories: QuoteCategory[];
+  /** The radio group's `name`. */
+  name?: string;
+  /** The selected category id, or `OTHER_CATEGORY`. */
+  value?: string | null;
+  /** The radio group's accessible name. */
+  legend: string;
+  required?: boolean;
+}
+
+const {
+  id,
+  instance,
+  categories,
+  name = "category",
+  value = null,
+  legend,
+  required = false,
+} = Astro.props;
+
+const groups = groupByFamily(categories);
+const total = categories.length + 1;
+const pad = (n: number) => String(n).padStart(2, "0");
+---
+
+<Dialog
+  id={id}
+  title={PICKER.title}
+  closeLabel={PICKER.close}
+  width="md"
+  height="short"
+  data-picker-viewer
+>
+  <div class="mv">
+    <div class="mv-list" role="radiogroup" aria-label={legend}>
+      {
+        groups.map((group) => (
+          <>
+            <p class="mv-family">{group.family}</p>
+            {group.items.map((category) => (
+              <label
+                class="mv-row"
+                for={scopedId(instance, name, category.id)}
+                data-picker-row={category.id}
+                data-name={category.name}
+                data-meta={category.rangeLabel}
+              >
+                <input
+                  type="radio"
+                  class="sr-only"
+                  id={scopedId(instance, name, category.id)}
+                  name={name}
+                  value={category.id}
+                  checked={category.id === value}
+                  required={required}
+                />
+                <span class="mv-photo">
+                  {category.heroImage && (
+                    <img
+                      src={category.heroImage}
+                      alt=""
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  )}
+                </span>
+                <span class="mv-text">
+                  <span class="mv-name">{category.name}</span>
+                  <span class="mv-meta">{category.rangeLabel}</span>
+                </span>
+                <span class="mv-mark" aria-hidden="true" />
+              </label>
+            ))}
+          </>
+        ))
+      }
+
+      {
+        /* Last, and drawn as an escape rather than a machine: a `+` where the
+          photo would be. It is a service, not an error state (docs 14 §10a). */
+      }
+      <label
+        class="mv-row mv-row-other"
+        for={scopedId(instance, name, OTHER_CATEGORY)}
+        data-picker-row={OTHER_CATEGORY}
+        data-name={OTHER_TILE.label}
+        data-meta={OTHER_TILE.note}
+      >
+        <input
+          type="radio"
+          class="sr-only"
+          id={scopedId(instance, name, OTHER_CATEGORY)}
+          name={name}
+          value={OTHER_CATEGORY}
+          checked={value === OTHER_CATEGORY}
+          required={required}
+        />
+        <span class="mv-photo mv-photo-plus">
+          <Icon name="plus" size={18} />
+        </span>
+        <span class="mv-text">
+          <span class="mv-name">{OTHER_TILE.label}</span>
+          <span class="mv-meta">{OTHER_TILE.note}</span>
+        </span>
+        <span class="mv-mark" aria-hidden="true"></span>
+      </label>
+    </div>
+
+    {/* Decorative: the list already names everything the stage shows. */}
+    <div class="mv-stage" aria-hidden="true">
+      {
+        categories.map((category, index) => (
+          <figure class="mv-figure" data-picker-figure={category.id} hidden>
+            <div class="mv-stage-photo">
+              {category.heroImage ? (
+                <img
+                  src={category.heroImage}
+                  alt=""
+                  loading="lazy"
+                  decoding="async"
+                />
+              ) : (
+                <span class="mv-stage-none">
+                  <Icon name="wrench" size={32} />
+                </span>
+              )}
+            </div>
+            <figcaption class="mv-caption">
+              <span class="mv-index">
+                {pad(index + 1)} / {pad(total)} · {category.family}
+              </span>
+              <span class="mv-stage-name">{category.name}</span>
+              <span class="mv-stage-meta">{category.rangeLabel}</span>
+            </figcaption>
+          </figure>
+        ))
+      }
+      <figure class="mv-figure" data-picker-figure={OTHER_CATEGORY} hidden>
+        <div class="mv-stage-photo">
+          <span class="mv-stage-none">
+            <Icon name="plus" size={32} />
+          </span>
+        </div>
+        <figcaption class="mv-caption">
+          <span class="mv-index">{pad(total)} / {pad(total)}</span>
+          <span class="mv-stage-name">{OTHER_TILE.label}</span>
+          <span class="mv-stage-meta">{OTHER_TILE.note}</span>
+        </figcaption>
+      </figure>
+
+      <div class="mv-flip">
+        <button
+          type="button"
+          class="mv-flip-btn"
+          data-picker-step="-1"
+          aria-label={PICKER.previous}
+          tabindex="-1"
+        >
+          <Icon name="arrow-right" size={18} class="rotate-180" />
+        </button>
+        <button
+          type="button"
+          class="mv-flip-btn"
+          data-picker-step="1"
+          aria-label={PICKER.next}
+          tabindex="-1"
+        >
+          <Icon name="arrow-right" size={18} />
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div slot="foot" class="mv-foot">
+    <p class="mv-picked">
+      <span class="mv-picked-label">{PICKER.pickedLabel}</span>
+      <span data-picker-picked data-empty={PICKER.none}>{PICKER.none}</span>
+    </p>
+    <button type="button" class="mv-done" data-picker-done>
+      {PICKER.done}
+    </button>
+  </div>
+</Dialog>
+
+<style>
+  .mv {
+    display: grid;
+    grid-template-columns: minmax(260px, 320px) 1fr;
+    align-items: start;
+  }
+
+  /* ── The list ─────────────────────────────────────────────────── */
+  .mv-list {
+    border-right: 1px solid var(--color-line);
+  }
+  /* Pinned inside the panel's scroll, so the family you are in stays named. */
+  .mv-family {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    margin: 0;
+    padding: 9px 20px;
+    background: var(--color-surface);
+    border-bottom: 1px solid var(--color-line);
+    font-family: var(--font-mono);
+    font-size: var(--text-tag);
+    font-weight: 500;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    color: var(--color-faint);
+  }
+  .mv-row {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--color-line);
+    cursor: pointer;
+    transition: background-color 160ms var(--ease-out-expo);
+  }
+  .mv-row:hover,
+  .mv-row[data-current] {
+    background: var(--color-surface);
+  }
+  .mv-row:has(input:checked) {
+    background: var(--color-brand-tint);
+    box-shadow: inset 2px 0 0 var(--color-brand);
+  }
+  .mv-row:has(input:focus-visible) {
+    outline: 2px solid var(--color-brand-bright);
+    outline-offset: -2px;
+  }
+  .mv-photo {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    aspect-ratio: 4 / 3;
+    overflow: clip;
+    background: var(--color-surface-2);
+    color: var(--color-faint);
+  }
+  .mv-photo img,
+  .mv-stage-photo img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  /* Grey until engaged, the same rule ChoiceTile keeps. */
+  .mv-photo img {
+    filter: grayscale(1);
+    transition: filter 300ms var(--ease-out-expo);
+  }
+  .mv-row:hover .mv-photo img,
+  .mv-row[data-current] .mv-photo img,
+  .mv-row:has(input:checked) .mv-photo img {
+    filter: none;
+  }
+  .mv-text {
+    display: flex;
+    min-width: 0;
+    flex: 1 1 auto;
+    flex-direction: column;
+  }
+  .mv-name {
+    font-size: var(--text-detail);
+    font-weight: 500;
+    line-height: 1.35;
+    color: var(--color-ink);
+  }
+  .mv-meta {
+    margin-top: 2px;
+    font-size: var(--text-caption);
+    line-height: 1.4;
+    color: var(--color-muted);
+  }
+  .mv-mark {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    border: 1px solid var(--color-line-strong);
+    border-radius: 9999px;
+    background: #ffffff;
+  }
+  .mv-row:has(input:checked) .mv-mark {
+    border-color: var(--color-brand);
+    background: var(--color-brand);
+    box-shadow: inset 0 0 0 3px #ffffff;
+  }
+
+  /* ── The stage ────────────────────────────────────────────────── */
+  .mv-stage {
+    position: sticky;
+    top: 0;
+    background: var(--color-surface);
+  }
+  .mv-figure {
+    margin: 0;
+  }
+  .mv-figure[hidden] {
+    display: none;
+  }
+  .mv-stage-photo {
+    aspect-ratio: 4 / 3;
+    overflow: clip;
+    background: var(--color-surface-2);
+  }
+  .mv-figure:not([hidden]) .mv-stage-photo img {
+    animation: mv-in 420ms var(--ease-out-expo);
+  }
+  @keyframes mv-in {
+    from {
+      opacity: 0.4;
+      scale: 1.03;
+    }
+  }
+  .mv-stage-none {
+    display: flex;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-faint);
+  }
+  .mv-caption {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 22px 28px 26px;
+    padding-right: 140px;
+    background: #ffffff;
+    border-top: 1px solid var(--color-line);
+  }
+  .mv-index {
+    font-family: var(--font-mono);
+    font-size: var(--text-tag);
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--color-brand);
+  }
+  .mv-stage-name {
+    font-family: var(--font-mono);
+    font-size: var(--text-h3);
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    text-transform: uppercase;
+    color: var(--color-ink);
+  }
+  .mv-stage-meta {
+    font-size: var(--text-lead);
+    color: var(--color-muted);
+  }
+  /* Out of the tab order: the arrow keys already move through the radios,
+     so these are for the mouse. */
+  .mv-flip {
+    position: absolute;
+    right: 24px;
+    bottom: 28px;
+    display: flex;
+    gap: 1px;
+    background: var(--color-line);
+    border: 1px solid var(--color-line);
+  }
+  .mv-flip-btn {
+    display: flex;
+    width: 46px;
+    height: 46px;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    background: #ffffff;
+    color: var(--color-ink);
+    cursor: pointer;
+    transition:
+      background-color 160ms var(--ease-out-expo),
+      color 160ms var(--ease-out-expo);
+  }
+  .mv-flip-btn:hover {
+    background: var(--color-brand-tint);
+    color: var(--color-brand);
+  }
+
+  /* ── The foot ─────────────────────────────────────────────────── */
+  .mv-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 14px var(--dlg-gutter);
+  }
+  .mv-picked {
+    display: flex;
+    min-width: 0;
+    gap: 10px;
+    align-items: baseline;
+    margin: 0;
+    font-size: var(--text-note);
+    color: var(--color-ink);
+  }
+  .mv-picked-label {
+    font-family: var(--font-mono);
+    font-size: var(--text-tag);
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--color-faint);
+  }
+  /* Square, like everything pressed inside the quote panel. */
+  .mv-done {
+    flex: 0 0 auto;
+    padding: 13px 26px;
+    border: 0;
+    background: var(--color-brand-bright);
+    color: #ffffff;
+    cursor: pointer;
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    transition: background-color 200ms var(--ease-out-expo);
+  }
+  .mv-done:hover {
+    background: var(--color-brand-hover);
+  }
+
+  /* ── The phone: the list is the reel ──────────────────────────── */
+  @media (max-width: 900px) {
+    .mv {
+      display: block;
+    }
+    .mv-list {
+      border-right: 0;
+    }
+    .mv-stage {
+      display: none;
+    }
+    .mv-row {
+      flex-wrap: wrap;
+      gap: 0 14px;
+      padding: 0 var(--dlg-gutter) 14px;
+    }
+    .mv-photo {
+      order: -1;
+      flex: 0 0 calc(100% + 2 * var(--dlg-gutter));
+      margin: 0 calc(-1 * var(--dlg-gutter)) 12px;
+      aspect-ratio: 16 / 9;
+    }
+    .mv-photo img {
+      filter: none;
+    }
+    .mv-photo-plus {
+      aspect-ratio: 6 / 1;
+    }
+    .mv-picked {
+      display: none;
+    }
+    .mv-done {
+      flex: 1 1 auto;
+      min-height: 46px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mv-photo img {
+      transition-duration: 1ms;
+    }
+    .mv-figure:not([hidden]) .mv-stage-photo img {
+      animation: none;
+    }
+  }
+</style>

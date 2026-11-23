@@ -10,7 +10,7 @@ cranes, tower lights, spare parts), to buy or rent.
 
 This machine has **no `node`, `bun`, `npm`, or `npx` on the host PATH**. The full
 toolchain lives inside the OrbStack dev container **`devbox`**, which mounts this
-repo at **`/workspace/paid-to-type/collins-website`** (the container mirrors the
+repo at **`/workspace/paid-to-type/freelance/collins-website`** (the container mirrors the
 host `code-lab/` tree, so the path is nested — not `/workspace/collins-website`).
 Node 22 + bun 1.3 are inside. **This repo uses `bun`, not npm.**
 
@@ -23,9 +23,9 @@ One-shot, non-interactive (preferred for agents — shell state does not persist
 between commands, so an interactive shell won't hold):
 
 ```bash
-docker exec -u node devbox sh -c 'cd /workspace/paid-to-type/collins-website && bun run build'
-docker exec -u node devbox sh -c 'cd /workspace/paid-to-type/collins-website && bun run check'
-docker exec -u node devbox sh -c 'cd /workspace/paid-to-type/collins-website && bun run format'
+docker exec -u node devbox sh -c 'cd /workspace/paid-to-type/freelance/collins-website && bun run build'
+docker exec -u node devbox sh -c 'cd /workspace/paid-to-type/freelance/collins-website && bun run check'
+docker exec -u node devbox sh -c 'cd /workspace/paid-to-type/freelance/collins-website && bun run format'
 ```
 
 Interactive equivalent (human at a terminal): `orb` (alias → `cd ~/code-lab/.orbstack`)
@@ -201,15 +201,14 @@ duplicated:
 Form controls — all take an `instance` prop and generate every id through
 `scopedId`, because two copies of a form can share one document:
 
-| Component    | Use for                                                                   |
-| ------------ | ------------------------------------------------------------------------- |
-| `Field`      | label + control + hint + error. Underline only — there is one field style |
-| `ChipGroup`  | any radio group as chips: `rule` / `bar` / `segment` / `display`          |
-| `ChoiceTile` | photo + radio selection cell; `layout="responsive"` steps tile → row      |
-| `Dropdown`   | `<details>` shell, underline trigger, panel is a slot                     |
-| `Checkbox`   | one square box and a label — the form's only non-radio choice             |
-
-And one that is not a form control but belongs to the same reserve:
+| Component                                                           | Use for                                                                   |
+| ------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| `Field`                                                             | label + control + hint + error. Underline only — there is one field style |
+| `ChipGroup`                                                         | any radio group as chips: `rule` / `bar` / `segment` / `display`          |
+| `ChoiceTile`                                                        | photo + radio selection cell; `layout="responsive"` steps tile → row      |
+| `Dropdown`                                                          | `<details>` shell, underline trigger, panel is a slot                     |
+| `Checkbox`                                                          | one square box and a label — the form's only non-radio choice             |
+| And one that is not a form control but belongs to the same reserve: |
 
 | Component | Use for                                                                 |
 | --------- | ----------------------------------------------------------------------- |
@@ -229,10 +228,17 @@ quotation, never for identity.
 **Nothing in a form is rounded.** `rounded-full` still means a badge or a dot
 (`Pill`), never a control — see `docs/site-expansion/14 §14.3`.
 
-**The one photo that does not drift** is `ChoiceTile`'s: a selection control
-that moves while you are trying to click it is a bug, not a detail. It uses a
-plain lazy `<img>`. That is the only sanctioned exception to `ParallaxImage`;
+**Photos that do not drift** are the ones inside selection controls:
+`ChoiceTile` and the quote form's machine viewer (`quote/MachineViewer.astro`,
+plus the thumbnail in `quote/CategoryPicker.astro`). A selection control that
+moves while you are trying to click it is a bug, not a detail. They use plain
+lazy `<img>`s. Those are the only sanctioned exceptions to `ParallaxImage`;
 anything else that wants a still photo should say why here first.
+
+**A modal opened inside another modal** (the machine viewer inside the quote
+dialog) handles Escape itself and calls `preventDefault()` on the key. Chrome
+groups two modals opened without a user gesture between them, and a native
+Escape then closes both. See `scripts/quote/picker.ts`.
 
 Client-side rotating panels (tab cards, accordions, sliders) use
 `@/scripts/rotator.ts` — do not hand-roll another timer/hover/reduced-motion loop.

@@ -2,9 +2,7 @@
 /** Hero — full-bleed industrial footage, headline over a gradient scrim, and a
  *  glass base panel carrying the manufacturer wordmarks. */
 import Button from "@/components/ui/Button.astro";
-import PartnerStrip from "@/components/ui/PartnerStrip.astro";
 import { hero } from "@/data/content";
-import { site } from "@/config/site";
 ---
 
 <section
@@ -94,24 +92,6 @@ import { site } from "@/config/site";
           </Button>
         ))
       }
-    </div>
-
-    <!-- Base panel — survey-tag coordinates + the drifting wordmarks. -->
-    <div
-      class="reveal reveal-5 mt-14 flex items-center gap-6 rounded-md px-6 py-4 backdrop-blur-sm max-mob:mt-10 max-cmp:mt-7 max-cmp:flex-col max-cmp:items-start max-cmp:gap-3 max-cmp:px-0 max-cmp:py-2"
-    >
-      <!-- <span
-        class="shrink-0 font-mono text-label tracking-[0.5px] text-white/55"
-      >
-        {site.geo.lat}º N&nbsp;&nbsp;{site.geo.lng}º E
-      </span>
-      <span
-        class="h-4 w-px shrink-0 bg-white/15 max-cmp:hidden"
-        aria-hidden="true"></span> -->
-      <PartnerStrip
-        variant="marquee"
-        class="min-w-0 flex-1 max-cmp:w-full max-cmp:flex-none"
-      />
     </div>
   </div>
 </section>

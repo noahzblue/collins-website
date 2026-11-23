@@ -95,15 +95,15 @@
     "dutyGuide": [
       {
         "situation": "Powering a site with no mains supply",
-        "advice": "Size for the largest single starting load, not the total. A tower crane starting draws several times its running current — a site running a crane plus offices usually lands at 250 KVA even though the running load looks like 120."
+        "advice": "Size for the largest starting load, not the total. A tower crane draws several times its running current at start, so a crane plus site offices usually needs 250 KVA even when the running load reads 120."
       },
       {
         "situation": "Standby for a building already on mains",
-        "advice": "Size for the load you cannot lose: lifts, pumps, fire systems. That is usually a smaller set than contractors expect, so send us the schedule of essential loads rather than the building's total."
+        "advice": "Size for the loads you cannot lose: lifts, pumps and fire systems. That is often less than expected, so send us the essential-load schedule, not the building's total."
       },
       {
         "situation": "Long duration on a fixed programme",
-        "advice": "Running hours drive cost more than the rate does. On anything over three months, ask about the fuel curve at 75 percent load before you pick a size."
+        "advice": "Fuel costs more than the hire rate over time. For anything over three months, ask for the fuel curve at 75% load before choosing a size."
       }
     ],
     "related": ["tower-lights", "air-compressors", "excavators"],
@@ -199,7 +199,7 @@
     "summary": "Steel erection, plant installation and precast setting. Send us the load, the radius and the ground conditions and we come back with the chart that covers it.",
     "highlights": [
       "50 to 600 ton, all-terrain and rough-terrain",
-      "Road-mobile — rigged and lifting the same day",
+      "Road-mobile, rigged and lifting the same day",
       "Third-party certified, test certificates on delivery",
       "Licensed operators and rigging crew supplied"
     ],
@@ -426,7 +426,7 @@
     "family": "Material handling",
     "rangeLabel": "All standard reaches",
     "cardLine": "Reach and place material on upper floors.",
-    "summary": "One machine that lifts, reaches and places — loading a slab on the third floor without setting up a crane. Attachments turn it into a loader or a lifting jib on the same shift.",
+    "summary": "One machine that lifts, reaches and places, loading a slab on the third floor without setting up a crane. Attachments turn it into a loader or a lifting jib on the same shift.",
     "highlights": [
       "Standard reaches through to high-lift models",
       "Places material on upper floors from ground level",
@@ -599,7 +599,7 @@
     "summary": "Night shift lighting that does not need a fuel run every second day. Solar-hybrid masts hold a full night on battery, which matters most on sites you cannot reach after dark.",
     "highlights": [
       "Diesel and solar-hybrid masts",
-      "LED heads — lower draw, longer run between refuels",
+      "LED heads: lower draw, longer run between refuels",
       "Solar units run with no fuel logistics at all",
       "Manual and hydraulic mast lift, 7 to 9 meters"
     ],
@@ -676,7 +676,7 @@
     "family": "Earthmoving",
     "rangeLabel": "With attachments",
     "cardLine": "Confined-site work with a full attachment range.",
-    "summary": "Built for sites where nothing bigger will fit. The value is the coupler — one machine sweeps, breaks, augers and trenches across a single day's work.",
+    "summary": "Built for sites where nothing bigger will fit. The value is the coupler: one machine sweeps, breaks, augers and trenches across a single day's work.",
     "highlights": [
       "Turns within its own length",
       "Full attachment range on a quick coupler",

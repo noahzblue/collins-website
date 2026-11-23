@@ -42,10 +42,10 @@ export const industries: Industry[] = [
     slug: "construction",
     name: "Construction",
     tagline: "Power, lifting and light for every stage of the build.",
-    body: "From enabling works to handover, construction sites run on temporary power and reliable lifting. We keep generators, tower lights, forklifts and heavy machinery ready to dispatch from both yards — sized to your load schedule, on terms that flex as the programme moves, to buy or on hire.",
+    body: "From enabling works to handover, construction sites run on temporary power and reliable lifting. We keep generators, tower lights, forklifts and heavy machinery ready to dispatch from both yards, sized to your load schedule, on terms that flex as the programme moves, to buy or on hire.",
     duty: {
       title: "Sized on starting load, not running load",
-      body: "A tower crane and a batching plant draw far more at start-up than they do in service. We specify against the largest starting load on your schedule, so the set you take actually starts what you run — and we re-size free when the programme changes.",
+      body: "A tower crane and a batching plant draw far more at start-up than they do in service. We specify against the largest starting load on your schedule, so the set you take actually starts what you run. We re-size free when the programme changes.",
     },
     image: "/images/industry-construction.jpg",
     imageSwap: "/images/industry-construction-2.jpg",
@@ -71,7 +71,7 @@ export const industries: Industry[] = [
     body: "Port operations can't wait on equipment. We provide heavy-duty forklifts, container-handling machinery and quayside power with fast replacement and service support, so vessels turn around on schedule.",
     duty: {
       title: "Container weight, not pallet weight",
-      body: "Quayside handling starts where general warehouse handling stops. The forklifts we send to ports are specified at the top of our range — up to 15 ton — with the mast and attachment configuration matched to the box, not to a pallet.",
+      body: "Quayside handling starts where general warehouse handling stops. The forklifts we send to ports are specified at the top of our range, up to 15 ton, with the mast and attachment configuration matched to the box, not to a pallet.",
     },
     image: "/images/industry-marine-ports.jpg",
     imageSwap: "/images/industry-marine-ports-2.jpg",
@@ -81,7 +81,7 @@ export const industries: Industry[] = [
     slug: "events-entertainment",
     name: "Events & Entertainment",
     tagline: "Quiet power and lighting for shows, festivals and venues.",
-    body: "Outdoor shows need dependable, low-noise power and lighting that installs fast and disappears faster. Our generators and tower lights cover build-up, show nights and de-rig — with standby units on call for the moments that matter.",
+    body: "Outdoor shows need dependable, low-noise power and lighting that installs fast and disappears faster. Our generators and tower lights cover build-up, show nights and de-rig, with standby units on call for the moments that matter.",
     duty: {
       title: "Low noise, and a set you never hear about",
       body: "Canopied sets and a considered position do most of the work; the rest is redundancy. For show nights we hold a standby unit against the primary, because the failure you plan for is the one that never makes it into the audience's evening.",
@@ -110,7 +110,7 @@ export const industries: Industry[] = [
     body: "Quarries and aggregate operations wear equipment hard. We source and supply excavators, dozers, compressors and site power rated for continuous duty, with the parts backup to keep utilisation high.",
     duty: {
       title: "Wear parts on the shelf, not on order",
-      body: "In abrasive ground the machine is rarely what fails first — the wear parts are. We hold consumables for the plant we supply into quarry work, so a ground engaging tool or a filter set is a same-day collection rather than a two-week lead time.",
+      body: "In abrasive ground the machine is rarely what fails first. The wear parts are. We hold consumables for the plant we supply into quarry work, so a ground engaging tool or a filter set is a same-day collection rather than a two-week lead time.",
     },
     image: "/images/industry-mining.jpg",
     imageSwap: "/images/industry-mining-2.jpg",
@@ -125,7 +125,7 @@ export const industries: Industry[] = [
     slug: "infrastructure-government",
     name: "Infrastructure & Government",
     tagline: "Fleet capacity for roads, bridges and public works at scale.",
-    body: "Public works run to fixed milestones and strict specifications. We provide fleet-scale supply and rental — machinery, site power and lighting — with the compliance paperwork and delivery reliability that government contracts require.",
+    body: "Public works run to fixed milestones and strict specifications. We provide fleet-scale supply and rental of machinery, site power and lighting, with the compliance paperwork and delivery reliability that government contracts require.",
     duty: {
       title: "Paperwork that survives an audit",
       body: "On public works the machine is half the requirement and the file is the other half. Every unit goes out with its condition report, and our trade licence, register number and licensed activities are published on this site so a procurement officer can check them without asking.",
@@ -138,7 +138,7 @@ export const industries: Industry[] = [
     slug: "manufacturing",
     name: "Manufacturing",
     tagline: "Backup power and material handling for production lines.",
-    body: "A production line standing still is money burning. We keep manufacturers running with standby generators, electric and diesel forklifts, and genuine spare parts — delivered and installed around your shift pattern.",
+    body: "A production line standing still is money burning. We keep manufacturers running with standby generators, electric and diesel forklifts, and genuine spare parts, delivered and installed around your shift pattern.",
     duty: {
       title: "Electric indoors, diesel in the yard",
       body: "Indoor handling and yard handling are two different specifications, and running one machine for both costs you either emissions compliance or duty cycle. We split the fleet: electric counterbalance inside, diesel outside, delivered around your shift pattern rather than across it.",

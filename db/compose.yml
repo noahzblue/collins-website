@@ -1,0 +1,41 @@
+# Local Postgres for the quote store. Development only; production uses Neon.
+#
+#   docker compose -f db/compose.yml up -d
+#
+# It joins the dev container's network (`orbstack_devnet`), so code running in
+# devbox reaches it at `collins-pg:5432`. From the Mac it is on localhost:5433
+# (5433, so it cannot collide with another Postgres on 5432).
+#
+# The password is a throwaway local value, not a secret. The matching
+# connection string is in `.env.example`.
+
+name: collins
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: collins-pg
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: collins
+      POSTGRES_PASSWORD: collins_local
+      POSTGRES_DB: collins
+    ports:
+      - "127.0.0.1:5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - devnet
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U collins -d collins"]
+      interval: 2s
+      timeout: 3s
+      retries: 15
+
+networks:
+  devnet:
+    name: orbstack_devnet
+    external: true
+
+volumes:
+  pgdata:

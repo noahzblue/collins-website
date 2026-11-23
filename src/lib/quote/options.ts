@@ -57,6 +57,27 @@ export const MODES: Option[] = [
  * unit you need is not standard stock", so a machine outside the thirteen is
  * something Collins does, not something the form cannot take (docs 14 §10a).
  */
+/**
+ * "Which machine?": a one-line field that opens a photo viewer. The viewer
+ * replaced the 4-across photo grid on 2026-11-22 (docs 14, top note): the
+ * grid was the tallest thing in section 01, and on a phone it lost its
+ * photos altogether.
+ */
+export const PICKER = {
+  placeholder: "Choose a machine",
+  meta: (count: number) => `${count} machines, with photos and size ranges`,
+  browse: "Browse",
+  change: "Change",
+  quick: "Or pick by name",
+  title: "Choose a machine",
+  close: "Close the machine list",
+  previous: "Previous machine",
+  next: "Next machine",
+  pickedLabel: "Picked",
+  none: "Nothing yet",
+  done: "Use this machine",
+};
+
 export const OTHER_TILE = {
   label: "Something else",
   note: "We source to spec",
@@ -67,7 +88,7 @@ export const OTHER_TILE = {
 /** The last row of every rating list — the escape when no listed size fits. */
 export const RATING_UNSURE: Option = {
   value: "unsure",
-  label: "Not sure — size it for me",
+  label: "Not sure? Size it for me",
   hint: "Describe the duty and we'll specify it.",
 };
 
@@ -140,7 +161,7 @@ export const SECTIONS: Record<SectionId, { title: string; hint: string }> = {
   },
   size: {
     title: "What size",
-    hint: "Pick a rating — or describe the duty and we'll size it for you.",
+    hint: "Pick a rating, or describe the duty and we'll size it for you.",
   },
   terms: {
     title: "The terms",
@@ -174,7 +195,7 @@ export const FIELD_COPY = {
   },
   family: {
     label: "Closest to",
-    hint: "Optional — it routes your enquiry to the right desk.",
+    hint: "Optional. It routes your enquiry to the right desk.",
   },
   rating: { label: "Size / rating" },
   duty: {
@@ -233,6 +254,12 @@ export const DIALOG = {
  * on buy or hire, so both can be reached before they have anything in them.
  * An empty panel reads as broken; a line saying what unlocks it does not.
  */
+/** The box at the top of a section with something to fix (docs 14 §11). */
+export const SECTION_ERRORS = {
+  title: (count: number) =>
+    count === 1 ? "One answer needs fixing" : `${count} answers need fixing`,
+};
+
 export const SECTION_EMPTY: Record<"size" | "terms", string> = {
   size: "Pick a machine in section 01 and its sizes appear here.",
   terms:
@@ -267,7 +294,7 @@ export const SUMMARY = {
     channel: "Reply by",
   },
   /** What a slot reads before it is answered. */
-  pending: "—",
+  pending: "Not set",
 };
 
 /**
@@ -294,9 +321,6 @@ export const NAV = {
     `${String(index).padStart(2, "0")} / ${String(total).padStart(2, "0")}`,
 };
 
-/** Subject line when the customer asks to be answered by email (docs 14 §12). */
-export const EMAIL_SUBJECT = "Quotation request";
-
 /** After a successful send. The panel body is replaced by this (docs 14 §12). */
 export const SUCCESS = {
   /** The eyebrow over the confirmation. */
@@ -305,7 +329,7 @@ export const SUCCESS = {
    *  promise is a supporting line underneath, not the headline it used to be
    *  set as. */
   heading: "We have your request.",
-  body: "If WhatsApp opened in another tab, send the message there and we will pick it up straight away.",
+  body: "It has gone to our sales team, and we will reply the way you asked.",
   /** Heads the list of what was actually sent. */
   recapTitle: "What you sent",
   refLabel: "Reference",
@@ -315,7 +339,7 @@ export const SUCCESS = {
 /** In-flight failure, with the manual routes offered rather than described. */
 export const SUBMIT_ERROR = {
   title: "That did not send",
-  body: "Nothing is lost — everything you filled in is still here. Try again, or reach us directly.",
+  body: "Nothing is lost. Everything you filled in is still here. Try again, or reach us directly.",
   retry: "Try again",
 };
 

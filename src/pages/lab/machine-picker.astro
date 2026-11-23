@@ -1,0 +1,1517 @@
+---
+/**
+ * /lab/machine-picker: three directions for the quote form's "Which machine?"
+ * question. DEV ONLY. DELETE BEFORE LAUNCH.
+ *
+ * The question today is a 4-across photo grid of 14 tiles (CategoryPicker).
+ * It is the tallest thing in section 01 and on a phone it becomes 14 text rows
+ * with no photos at all. Each direction below keeps one radio group named
+ * `category`, so whichever wins drops into the form without touching
+ * `scripts/quote/form.ts`:
+ *
+ *   A  Viewer: a one-line field that opens a photo viewer in its own modal.
+ *   B  Strip: family tabs over a sideways photo rail. One row tall.
+ *   C  Index: a two-column spec index with a pinned photo that follows hover.
+ *
+ * Self-contained on purpose: no new component exists until a direction is
+ * picked, so nothing here leaks into the real form.
+ */
+import { getCollection } from "astro:content";
+import Base from "@/layouts/Base.astro";
+import Eyebrow from "@/components/ui/Eyebrow.astro";
+import Icon from "@/components/ui/Icon.astro";
+import { groupByFamily } from "@/lib/equipment";
+import { OTHER_TILE } from "@/lib/quote/options";
+import { OTHER_CATEGORY } from "@/lib/quote/schema";
+
+const isDev = import.meta.env.DEV;
+
+const items = (await getCollection("equipment"))
+  .sort((a, b) => a.data.sortOrder - b.data.sortOrder)
+  .map((entry) => ({
+    id: entry.id,
+    name: entry.data.name,
+    family: entry.data.family,
+    rangeLabel: entry.data.rangeLabel,
+    image: entry.data.heroImage,
+  }));
+
+const groups = groupByFamily(items);
+const total = items.length;
+const pad = (n: number) => String(n).padStart(2, "0");
+
+const directions = [
+  {
+    key: "a",
+    n: "A",
+    title: "Viewer",
+    note: "Section 01 shrinks to one line. Tapping it opens a viewer: names down the left, the machine large on the right, arrow keys or the buttons to flip through. On a phone the viewer is a full-screen sheet of big photos you scroll through.",
+  },
+  {
+    key: "b",
+    n: "B",
+    title: "Strip",
+    note: "Family tabs over one sideways row of photos. Always one row tall, so the buy/hire question and the machine fit on one screen. Swipe on a phone, arrows or shift-scroll on a desktop.",
+  },
+  {
+    key: "c",
+    n: "C",
+    title: "Index",
+    note: "The catalogue as a two-column spec index, grouped by family, with one pinned photo that shows whatever you point at. Dense like a datasheet. On a phone each row carries a small photo.",
+  },
+];
+---
+
+<Base
+  title="Machine picker directions (dev only)"
+  description="Dev-only preview of three directions for the quote form's machine question."
+  noindex
+>
+  <div class="wrap pt-[150px] pb-[140px] max-mob:pt-[120px]">
+    <header class="max-w-[760px]">
+      <Eyebrow class="mb-4">Preview harness · dev only</Eyebrow>
+      <h1 class="text-h1 leading-[1.05]">Which machine?</h1>
+      <p class="mt-6 text-intro leading-relaxed text-muted">
+        Three ways to ask it. Each is a working radio group: pick a machine and
+        the line under it shows what the form would receive.
+      </p>
+      <ul class="mt-8 flex flex-col gap-[6px] border-t border-line pt-6">
+        {
+          directions.map((d) => (
+            <li class="flex gap-4 text-note text-muted">
+              <span class="w-[24px] shrink-0 font-mono text-tag text-brand">
+                {d.n}
+              </span>
+              <a href={`#dir-${d.key}`} class="text-ink underline">
+                {d.title}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </header>
+
+    {
+      !isDev ? (
+        <p class="mt-16 mb-0 text-lead text-muted">
+          This harness only renders in development.
+        </p>
+      ) : (
+        <>
+          {/* ── A · Viewer ─────────────────────────────────────── */}
+          <section id="dir-a" class="lab-sec">
+            <div class="lab-head">
+              <span class="font-mono text-tag text-brand">A</span>
+              <div>
+                <h2 class="text-h3 leading-[1.1]">{directions[0].title}</h2>
+                <p class="lab-note">{directions[0].note}</p>
+              </div>
+            </div>
+
+            <form class="frame" data-lab-form data-picker="a">
+              <p class="legend">Which machine? *</p>
+
+              <button type="button" class="a-field" data-viewer-open>
+                <span class="a-thumb">
+                  <img data-a-thumb alt="" hidden />
+                  <span data-a-thumb-empty class="text-faint">
+                    <Icon name="search" size={20} />
+                  </span>
+                </span>
+                <span class="flex min-w-0 flex-1 flex-col">
+                  <span class="a-name" data-a-name>
+                    Choose a machine
+                  </span>
+                  <span class="a-meta" data-a-meta>
+                    {total} machines, with photos and size ranges
+                  </span>
+                </span>
+                <span class="a-cta">
+                  <span data-a-cta>Browse</span>
+                  <Icon name="arrow-right" size={16} />
+                </span>
+              </button>
+
+              {/* Quick text picks for someone who already knows the name. */}
+              <div class="a-quick">
+                <span class="a-quick-label">Or pick by name</span>
+                {items.map((item) => (
+                  <button
+                    type="button"
+                    class="a-quick-chip"
+                    data-quick={item.id}
+                  >
+                    {item.name}
+                  </button>
+                ))}
+              </div>
+
+              <dialog class="viewer" data-viewer aria-label="Choose a machine">
+                <header class="v-head">
+                  <p class="v-title">Choose a machine</p>
+                  <span class="v-count" data-v-count>
+                    01 / {pad(total)}
+                  </span>
+                  <button
+                    type="button"
+                    class="v-close"
+                    data-viewer-close
+                    aria-label="Close"
+                  >
+                    <Icon name="close" size={20} />
+                  </button>
+                </header>
+
+                <div class="v-body">
+                  <div class="v-list" role="radiogroup" aria-label="Machines">
+                    {groups.map((group) => (
+                      <>
+                        <p class="v-family">{group.family}</p>
+                        {group.items.map((item) => (
+                          <label class="v-row" data-v-row={item.id}>
+                            <input
+                              type="radio"
+                              class="sr-only"
+                              name="category"
+                              value={item.id}
+                            />
+                            <span class="v-row-photo">
+                              {item.image && (
+                                <img
+                                  src={item.image}
+                                  alt=""
+                                  loading="lazy"
+                                  decoding="async"
+                                />
+                              )}
+                            </span>
+                            <span class="flex min-w-0 flex-1 flex-col">
+                              <span class="v-row-name">{item.name}</span>
+                              <span class="v-row-meta">{item.rangeLabel}</span>
+                            </span>
+                            <span class="mark" aria-hidden="true" />
+                          </label>
+                        ))}
+                      </>
+                    ))}
+                    <label
+                      class="v-row v-row-other"
+                      data-v-row={OTHER_CATEGORY}
+                    >
+                      <input
+                        type="radio"
+                        class="sr-only"
+                        name="category"
+                        value={OTHER_CATEGORY}
+                      />
+                      <span class="v-row-photo v-row-plus">
+                        <Icon name="plus" size={18} />
+                      </span>
+                      <span class="flex min-w-0 flex-1 flex-col">
+                        <span class="v-row-name">{OTHER_TILE.label}</span>
+                        <span class="v-row-meta">{OTHER_TILE.note}</span>
+                      </span>
+                      <span class="mark" aria-hidden="true" />
+                    </label>
+                  </div>
+
+                  <div class="v-stage" aria-hidden="true">
+                    {items.map((item, index) => (
+                      <figure class="v-figure" data-v-figure={item.id} hidden>
+                        <div class="v-photo">
+                          {item.image ? (
+                            <img
+                              src={item.image}
+                              alt=""
+                              loading="lazy"
+                              decoding="async"
+                            />
+                          ) : (
+                            <span class="v-photo-none">
+                              <Icon name="wrench" size={32} />
+                            </span>
+                          )}
+                        </div>
+                        <figcaption class="v-caption">
+                          <span class="v-index">
+                            {pad(index + 1)} · {item.family}
+                          </span>
+                          <span class="v-name">{item.name}</span>
+                          <span class="v-meta">{item.rangeLabel}</span>
+                        </figcaption>
+                      </figure>
+                    ))}
+                    <div class="v-flip">
+                      <button
+                        type="button"
+                        class="v-flip-btn"
+                        data-v-step="-1"
+                        aria-label="Previous machine"
+                      >
+                        <Icon name="arrow-right" size={18} class="rotate-180" />
+                      </button>
+                      <button
+                        type="button"
+                        class="v-flip-btn"
+                        data-v-step="1"
+                        aria-label="Next machine"
+                      >
+                        <Icon name="arrow-right" size={18} />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <footer class="v-foot">
+                  <span class="v-picked" data-v-picked>
+                    Nothing picked yet
+                  </span>
+                  <button type="button" class="v-done" data-viewer-close>
+                    Use this machine
+                  </button>
+                </footer>
+              </dialog>
+
+              <p class="readout" data-readout>
+                category = (none)
+              </p>
+            </form>
+          </section>
+
+          {/* ── B · Strip ──────────────────────────────────────── */}
+          <section id="dir-b" class="lab-sec">
+            <div class="lab-head">
+              <span class="font-mono text-tag text-brand">B</span>
+              <div>
+                <h2 class="text-h3 leading-[1.1]">{directions[1].title}</h2>
+                <p class="lab-note">{directions[1].note}</p>
+              </div>
+            </div>
+
+            <form class="frame" data-lab-form data-picker="b">
+              <div class="b-top">
+                <p class="legend mb-0">Which machine? *</p>
+                <div class="b-arrows">
+                  <button
+                    type="button"
+                    class="b-arrow"
+                    data-b-step="-1"
+                    aria-label="Scroll back"
+                  >
+                    <Icon name="arrow-right" size={16} class="rotate-180" />
+                  </button>
+                  <button
+                    type="button"
+                    class="b-arrow"
+                    data-b-step="1"
+                    aria-label="Scroll on"
+                  >
+                    <Icon name="arrow-right" size={16} />
+                  </button>
+                </div>
+              </div>
+
+              <div class="b-tabs" data-b-tabs>
+                <button
+                  type="button"
+                  class="b-tab"
+                  data-b-filter=""
+                  aria-pressed="true"
+                >
+                  All <span class="b-tab-n">{total}</span>
+                </button>
+                {groups.map((group) => (
+                  <button
+                    type="button"
+                    class="b-tab"
+                    data-b-filter={group.family}
+                    aria-pressed="false"
+                  >
+                    {group.family}
+                    <span class="b-tab-n">{group.items.length}</span>
+                  </button>
+                ))}
+              </div>
+
+              <div
+                class="b-rail"
+                data-b-rail
+                role="radiogroup"
+                aria-label="Machines"
+              >
+                {items.map((item) => (
+                  <label class="b-card" data-family={item.family}>
+                    <input
+                      type="radio"
+                      class="sr-only"
+                      name="category"
+                      value={item.id}
+                    />
+                    <span class="b-photo">
+                      {item.image && (
+                        <img
+                          src={item.image}
+                          alt=""
+                          loading="lazy"
+                          decoding="async"
+                        />
+                      )}
+                    </span>
+                    <span class="b-text">
+                      <span class="flex min-w-0 flex-1 flex-col">
+                        <span class="b-name">{item.name}</span>
+                        <span class="b-meta">{item.rangeLabel}</span>
+                      </span>
+                      <span class="mark" aria-hidden="true" />
+                    </span>
+                  </label>
+                ))}
+                <label class="b-card b-card-other" data-family="">
+                  <input
+                    type="radio"
+                    class="sr-only"
+                    name="category"
+                    value={OTHER_CATEGORY}
+                  />
+                  <span class="b-photo b-photo-plus">
+                    <Icon name="plus" size={26} />
+                  </span>
+                  <span class="b-text">
+                    <span class="flex min-w-0 flex-1 flex-col">
+                      <span class="b-name">{OTHER_TILE.label}</span>
+                      <span class="b-meta">{OTHER_TILE.note}</span>
+                    </span>
+                    <span class="mark" aria-hidden="true" />
+                  </span>
+                </label>
+              </div>
+
+              <p class="readout" data-readout>
+                category = (none)
+              </p>
+            </form>
+          </section>
+
+          {/* ── C · Index ──────────────────────────────────────── */}
+          <section id="dir-c" class="lab-sec">
+            <div class="lab-head">
+              <span class="font-mono text-tag text-brand">C</span>
+              <div>
+                <h2 class="text-h3 leading-[1.1]">{directions[2].title}</h2>
+                <p class="lab-note">{directions[2].note}</p>
+              </div>
+            </div>
+
+            <form class="frame" data-lab-form data-picker="c">
+              <p class="legend">Which machine? *</p>
+
+              <div class="c-grid">
+                <div class="c-index" role="radiogroup" aria-label="Machines">
+                  {groups.map((group) => (
+                    <div class="c-group">
+                      <p class="c-family">{group.family}</p>
+                      {group.items.map((item) => (
+                        <label class="c-row" data-c-row={item.id}>
+                          <input
+                            type="radio"
+                            class="sr-only"
+                            name="category"
+                            value={item.id}
+                          />
+                          <span class="c-thumb">
+                            {item.image && (
+                              <img
+                                src={item.image}
+                                alt=""
+                                loading="lazy"
+                                decoding="async"
+                              />
+                            )}
+                          </span>
+                          <span class="c-name">{item.name}</span>
+                          <span class="c-meta">{item.rangeLabel}</span>
+                        </label>
+                      ))}
+                    </div>
+                  ))}
+                  <div class="c-group">
+                    <p class="c-family">Not listed</p>
+                    <label class="c-row" data-c-row={OTHER_CATEGORY}>
+                      <input
+                        type="radio"
+                        class="sr-only"
+                        name="category"
+                        value={OTHER_CATEGORY}
+                      />
+                      <span class="c-thumb c-thumb-plus">
+                        <Icon name="plus" size={14} />
+                      </span>
+                      <span class="c-name">{OTHER_TILE.label}</span>
+                      <span class="c-meta">{OTHER_TILE.note}</span>
+                    </label>
+                  </div>
+                </div>
+
+                <aside class="c-preview" aria-hidden="true">
+                  <div class="c-preview-empty" data-c-empty>
+                    <Icon name="search" size={22} />
+                    <span>Point at a machine to see it</span>
+                  </div>
+                  {items.map((item) => (
+                    <figure class="c-figure" data-c-figure={item.id} hidden>
+                      <div class="c-photo">
+                        {item.image ? (
+                          <img
+                            src={item.image}
+                            alt=""
+                            loading="lazy"
+                            decoding="async"
+                          />
+                        ) : (
+                          <span class="v-photo-none">
+                            <Icon name="wrench" size={28} />
+                          </span>
+                        )}
+                      </div>
+                      <figcaption class="c-caption">
+                        <span class="c-cap-name">{item.name}</span>
+                        <span class="c-cap-meta">{item.rangeLabel}</span>
+                      </figcaption>
+                    </figure>
+                  ))}
+                </aside>
+              </div>
+
+              <p class="readout" data-readout>
+                category = (none)
+              </p>
+            </form>
+          </section>
+        </>
+      )
+    }
+  </div>
+</Base>
+
+<style>
+  /* ── Harness chrome ─────────────────────────────────────────── */
+  .lab-sec {
+    margin-top: 96px;
+    padding-top: 48px;
+    border-top: 1px solid var(--color-line-strong);
+    scroll-margin-top: var(--spacing-header-gap);
+  }
+  .lab-head {
+    display: flex;
+    align-items: baseline;
+    gap: 20px;
+    margin-bottom: 36px;
+  }
+  .lab-note {
+    margin: 12px 0 0;
+    max-width: 640px;
+    font-size: var(--text-base);
+    line-height: 1.6;
+    color: var(--color-muted);
+  }
+  /* Roughly the width of the dialog's steps column, so each direction is
+     judged at the size it will ship at. */
+  .frame {
+    max-width: 1120px;
+    padding: clamp(24px, 3.4vw, 56px);
+    border: 1px solid var(--color-line);
+  }
+  .legend {
+    margin: 0 0 10px;
+    font-size: var(--text-caption);
+    color: var(--color-faint);
+  }
+  .readout {
+    margin: 20px 0 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    color: var(--color-faint);
+  }
+
+  /* The selection mark every direction shares with ChoiceTile. */
+  .mark {
+    display: block;
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    border: 1px solid var(--color-line-strong);
+    border-radius: 9999px;
+    background: #fff;
+  }
+  label:has(input:checked) .mark {
+    border-color: var(--color-brand);
+    background: var(--color-brand);
+    box-shadow: inset 0 0 0 3px #fff;
+  }
+  /* The radios are \`sr-only\` (absolute). Without a positioned label they
+     sit against the page, outside the strip's scroller, and push the whole
+     document sideways on a phone. */
+  label:has(> input) {
+    position: relative;
+  }
+  label:has(input:focus-visible) {
+    outline: 2px solid var(--color-brand-bright);
+    outline-offset: -2px;
+  }
+  img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* ── A · the field ──────────────────────────────────────────── */
+  .a-field {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    width: 100%;
+    padding: 14px 0;
+    border: 0;
+    border-bottom: 1px solid var(--color-line-strong);
+    background: none;
+    text-align: left;
+    cursor: pointer;
+    transition: border-color 200ms var(--ease-out-expo);
+  }
+  .a-field:hover,
+  .a-field:focus-visible {
+    outline: none;
+    border-color: var(--color-brand-bright);
+    box-shadow: 0 1px 0 0 var(--color-brand-bright);
+  }
+  .a-thumb {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 96px;
+    aspect-ratio: 4 / 3;
+    overflow: clip;
+    background: var(--color-surface-2);
+  }
+  .a-name {
+    font-size: var(--text-intro);
+    color: var(--color-ink);
+  }
+  .a-field:not([data-picked]) .a-name {
+    color: var(--color-faint);
+  }
+  .a-meta {
+    margin-top: 3px;
+    font-size: var(--text-note);
+    color: var(--color-muted);
+  }
+  .a-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    color: var(--color-brand);
+  }
+  .a-quick {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 6px 16px;
+    margin-top: 18px;
+  }
+  .a-quick-label {
+    font-family: var(--font-mono);
+    font-size: var(--text-tag);
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--color-faint);
+  }
+  .a-quick-chip {
+    padding: 2px 0;
+    border: 0;
+    border-bottom: 1px solid transparent;
+    background: none;
+    cursor: pointer;
+    font-size: var(--text-note);
+    color: var(--color-muted);
+    transition:
+      color 200ms var(--ease-out-expo),
+      border-color 200ms var(--ease-out-expo);
+  }
+  .a-quick-chip:hover {
+    color: var(--color-ink);
+    border-color: var(--color-line-strong);
+  }
+  .a-quick-chip[aria-pressed="true"] {
+    color: var(--color-brand);
+    border-color: var(--color-brand);
+  }
+
+  /* ── A · the viewer ─────────────────────────────────────────── */
+  .viewer {
+    /* Here, not on [open]: the exit keeps display:flex while it fades. */
+    flex-direction: column;
+    margin: auto;
+    width: min(1280px, calc(100dvw - 48px));
+    max-width: none;
+    height: min(820px, 92dvh);
+    max-height: none;
+    padding: 0;
+    border: 0;
+    background: #fff;
+    overflow: clip;
+    box-shadow: 0 40px 90px -34px rgba(6, 10, 20, 0.5);
+    opacity: 0;
+    translate: 0 10px;
+    transition:
+      opacity 240ms var(--ease-out-expo),
+      translate 240ms var(--ease-out-expo),
+      display 240ms allow-discrete,
+      overlay 240ms allow-discrete;
+  }
+  .viewer[open] {
+    display: flex;
+    opacity: 1;
+    translate: 0 0;
+  }
+  @starting-style {
+    .viewer[open] {
+      opacity: 0;
+      translate: 0 10px;
+    }
+  }
+  .viewer::backdrop {
+    background: color-mix(in srgb, var(--color-scrim) 55%, transparent);
+  }
+  .v-head {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: stretch;
+    border-bottom: 1px solid var(--color-line);
+  }
+  .v-title {
+    flex: 1 1 auto;
+    margin: 0;
+    padding: 20px 28px;
+    font-family: var(--font-mono);
+    font-size: var(--text-subhead);
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+    color: var(--color-ink);
+  }
+  .v-count {
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+    border-left: 1px solid var(--color-line);
+    font-family: var(--font-mono);
+    font-size: var(--text-note);
+    color: var(--color-brand);
+  }
+  .v-close {
+    flex: 0 0 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    border-left: 1px solid var(--color-line);
+    background: #fff;
+    color: var(--color-muted);
+    cursor: pointer;
+  }
+  .v-close:hover {
+    background: var(--color-brand-tint);
+    color: var(--color-brand);
+  }
+  .v-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: minmax(300px, 380px) 1fr;
+  }
+  .v-list {
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    border-right: 1px solid var(--color-line);
+  }
+  .v-family {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    margin: 0;
+    padding: 9px 20px;
+    background: var(--color-surface);
+    border-bottom: 1px solid var(--color-line);
+    font-family: var(--font-mono);
+    font-size: var(--text-tag);
+    font-weight: 500;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    color: var(--color-faint);
+  }
+  .v-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--color-line);
+    cursor: pointer;
+    transition: background-color 160ms var(--ease-out-expo);
+  }
+  .v-row:hover,
+  .v-row[data-current] {
+    background: var(--color-surface);
+  }
+  .v-row:has(input:checked) {
+    background: var(--color-brand-tint);
+    box-shadow: inset 2px 0 0 var(--color-brand);
+  }
+  .v-row-photo {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    aspect-ratio: 4 / 3;
+    overflow: clip;
+    background: var(--color-surface-2);
+    color: var(--color-faint);
+  }
+  .v-row-photo img {
+    filter: grayscale(1);
+    transition: filter 300ms var(--ease-out-expo);
+  }
+  .v-row:hover .v-row-photo img,
+  .v-row[data-current] .v-row-photo img,
+  .v-row:has(input:checked) .v-row-photo img {
+    filter: none;
+  }
+  .v-row-name {
+    font-size: var(--text-detail);
+    font-weight: 500;
+    color: var(--color-ink);
+  }
+  .v-row-meta {
+    margin-top: 2px;
+    font-size: var(--text-caption);
+    color: var(--color-muted);
+  }
+  .v-stage {
+    position: relative;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    background: var(--color-surface);
+  }
+  .v-figure {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+  }
+  .v-figure[hidden] {
+    display: none;
+  }
+  .v-photo {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: clip;
+    background: var(--color-surface-2);
+  }
+  .v-figure:not([hidden]) .v-photo img {
+    animation: v-in 420ms var(--ease-out-expo);
+  }
+  @keyframes v-in {
+    from {
+      opacity: 0.4;
+      scale: 1.03;
+    }
+  }
+  .v-photo-none {
+    display: flex;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-faint);
+  }
+  .v-caption {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 22px 28px 26px;
+    background: #fff;
+    border-top: 1px solid var(--color-line);
+  }
+  .v-index {
+    font-family: var(--font-mono);
+    font-size: var(--text-tag);
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--color-brand);
+  }
+  .v-name {
+    font-family: var(--font-mono);
+    font-size: var(--text-h3);
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    text-transform: uppercase;
+    color: var(--color-ink);
+  }
+  .v-meta {
+    font-size: var(--text-lead);
+    color: var(--color-muted);
+  }
+  .v-flip {
+    position: absolute;
+    right: 20px;
+    bottom: 30px;
+    display: flex;
+    gap: 1px;
+    background: var(--color-line);
+    border: 1px solid var(--color-line);
+  }
+  .v-flip-btn {
+    display: flex;
+    width: 48px;
+    height: 48px;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    background: #fff;
+    color: var(--color-ink);
+    cursor: pointer;
+  }
+  .v-flip-btn:hover {
+    background: var(--color-brand-tint);
+    color: var(--color-brand);
+  }
+  .v-foot {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 14px 20px 14px 28px;
+    border-top: 1px solid var(--color-line);
+  }
+  .v-picked {
+    font-family: var(--font-mono);
+    font-size: var(--text-note);
+    color: var(--color-muted);
+  }
+  .v-done {
+    padding: 13px 26px;
+    border: 0;
+    background: var(--color-brand-bright);
+    color: #fff;
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    cursor: pointer;
+  }
+  .v-done:hover {
+    background: var(--color-brand-hover);
+  }
+
+  /* Phone: no stage. The list itself becomes the photo reel. */
+  @media (max-width: 900px) {
+    .viewer {
+      width: 100dvw;
+      height: 100dvh;
+    }
+    .v-body {
+      display: block;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+    }
+    .v-list {
+      overflow: visible;
+      border-right: 0;
+    }
+    .v-stage {
+      display: none;
+    }
+    .v-row {
+      flex-wrap: wrap;
+      padding: 0 0 14px;
+      gap: 0 14px;
+    }
+    .v-row-photo {
+      order: -1;
+      flex: 0 0 100%;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      margin-bottom: 12px;
+    }
+    .v-row-photo img {
+      filter: none;
+    }
+    .v-row > :not(.v-row-photo) {
+      margin-inline: 20px;
+    }
+    .v-row > .mark {
+      margin-left: 0;
+    }
+    .v-row-plus {
+      aspect-ratio: 5 / 1;
+    }
+    .v-title {
+      padding: 16px 20px;
+      font-size: var(--text-lead);
+    }
+    .v-count {
+      padding: 0 16px;
+    }
+    .v-done {
+      flex: 1 1 auto;
+    }
+    .v-picked {
+      display: none;
+    }
+  }
+
+  /* ── B · strip ──────────────────────────────────────────────── */
+  .b-top {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .b-arrows {
+    display: flex;
+    gap: 1px;
+    background: var(--color-line);
+    border: 1px solid var(--color-line);
+  }
+  .b-arrow {
+    display: flex;
+    width: 40px;
+    height: 40px;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    background: #fff;
+    color: var(--color-ink);
+    cursor: pointer;
+  }
+  .b-arrow:hover {
+    background: var(--color-brand-tint);
+    color: var(--color-brand);
+  }
+  .b-arrow:disabled {
+    color: var(--color-line-strong);
+    background: #fff;
+    cursor: default;
+  }
+  .b-tabs {
+    display: flex;
+    gap: 22px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    border-bottom: 1px solid var(--color-line);
+  }
+  .b-tab {
+    flex: 0 0 auto;
+    padding: 10px 0;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    background: none;
+    cursor: pointer;
+    font-family: var(--font-mono);
+    font-size: var(--text-note);
+    color: var(--color-muted);
+    white-space: nowrap;
+  }
+  .b-tab:hover {
+    color: var(--color-ink);
+  }
+  .b-tab[aria-pressed="true"] {
+    color: var(--color-brand);
+    border-color: var(--color-brand);
+  }
+  .b-tab-n {
+    margin-left: 4px;
+    font-size: var(--text-micro);
+    color: var(--color-faint);
+  }
+  .b-rail {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(220px, calc((100% - 3px) / 4.25));
+    gap: 1px;
+    margin-top: 18px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: 0;
+    scrollbar-width: thin;
+    background: var(--color-line);
+    border: 1px solid var(--color-line);
+  }
+  .b-card {
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    cursor: pointer;
+    scroll-snap-align: start;
+  }
+  .b-card[hidden] {
+    display: none;
+  }
+  .b-photo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 4 / 3;
+    overflow: clip;
+    background: var(--color-surface-2);
+    color: var(--color-faint);
+  }
+  .b-photo img {
+    filter: grayscale(1);
+    transition:
+      filter 300ms var(--ease-out-expo),
+      scale 500ms var(--ease-out-expo);
+  }
+  .b-card:hover .b-photo img,
+  .b-card:has(input:checked) .b-photo img {
+    filter: none;
+    scale: 1.03;
+  }
+  .b-text {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+  }
+  .b-card:has(input:checked) {
+    background: var(--color-brand-tint);
+    box-shadow: inset 0 0 0 1px var(--color-brand);
+  }
+  .b-name {
+    font-size: var(--text-detail);
+    font-weight: 500;
+    color: var(--color-ink);
+  }
+  .b-meta {
+    margin-top: 2px;
+    font-size: var(--text-caption);
+    line-height: 1.4;
+    color: var(--color-muted);
+  }
+  @media (max-width: 600px) {
+    .b-rail {
+      grid-auto-columns: 72%;
+    }
+    .b-arrows {
+      display: none;
+    }
+  }
+
+  /* ── C · index ──────────────────────────────────────────────── */
+  .c-grid {
+    display: grid;
+    grid-template-columns: 1fr minmax(260px, 34%);
+    gap: 0;
+    border: 1px solid var(--color-line);
+  }
+  .c-index {
+    columns: 2;
+    column-gap: 0;
+    column-rule: 1px solid var(--color-line);
+  }
+  .c-group {
+    break-inside: avoid;
+  }
+  .c-family {
+    margin: 0;
+    padding: 9px 18px;
+    background: var(--color-surface);
+    border-bottom: 1px solid var(--color-line);
+    font-family: var(--font-mono);
+    font-size: var(--text-tag);
+    font-weight: 500;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    color: var(--color-faint);
+  }
+  .c-row {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-areas: "thumb name" "thumb meta";
+    column-gap: 0;
+    padding: 11px 18px;
+    border-bottom: 1px solid var(--color-line);
+    cursor: pointer;
+    transition: background-color 160ms var(--ease-out-expo);
+  }
+  .c-row:hover {
+    background: var(--color-surface);
+  }
+  .c-row:has(input:checked) {
+    background: var(--color-brand-tint);
+    box-shadow: inset 2px 0 0 var(--color-brand);
+  }
+  .c-thumb {
+    grid-area: thumb;
+    display: none;
+  }
+  .c-name {
+    grid-area: name;
+    font-size: var(--text-detail);
+    font-weight: 500;
+    color: var(--color-ink);
+  }
+  .c-row:has(input:checked) .c-name {
+    color: var(--color-brand);
+  }
+  .c-meta {
+    grid-area: meta;
+    margin-top: 2px;
+    font-size: var(--text-caption);
+    color: var(--color-muted);
+  }
+  .c-preview {
+    position: sticky;
+    top: var(--spacing-header-gap);
+    align-self: start;
+    border-left: 1px solid var(--color-line);
+    background: var(--color-surface);
+  }
+  .c-preview-empty {
+    display: flex;
+    aspect-ratio: 4 / 3;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    color: var(--color-faint);
+  }
+  .c-preview-empty[hidden],
+  .c-figure[hidden] {
+    display: none;
+  }
+  .c-figure {
+    margin: 0;
+  }
+  .c-photo {
+    aspect-ratio: 4 / 3;
+    overflow: clip;
+    background: var(--color-surface-2);
+  }
+  .c-figure:not([hidden]) .c-photo img {
+    animation: v-in 380ms var(--ease-out-expo);
+  }
+  .c-caption {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding: 16px 18px 18px;
+    background: #fff;
+    border-top: 1px solid var(--color-line);
+  }
+  .c-cap-name {
+    font-family: var(--font-mono);
+    font-size: var(--text-subhead);
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+    color: var(--color-ink);
+  }
+  .c-cap-meta {
+    font-size: var(--text-note);
+    color: var(--color-muted);
+  }
+  @media (max-width: 980px) {
+    .c-index {
+      columns: 1;
+    }
+  }
+  @media (max-width: 760px) {
+    .c-grid {
+      grid-template-columns: 1fr;
+    }
+    .c-preview {
+      display: none;
+    }
+    .c-row {
+      column-gap: 14px;
+    }
+    .c-thumb {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 64px;
+      aspect-ratio: 4 / 3;
+      overflow: clip;
+      background: var(--color-surface-2);
+      color: var(--color-faint);
+    }
+    .c-row {
+      align-items: center;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .viewer,
+    .b-photo img,
+    .v-row-photo img {
+      transition-duration: 1ms;
+    }
+    .v-figure:not([hidden]) .v-photo img,
+    .c-figure:not([hidden]) .c-photo img {
+      animation: none;
+    }
+  }
+</style>
+
+<script>
+  import { untilPageSwap } from "@/scripts/untilPageSwap";
+
+  const readout = (form: HTMLFormElement) => {
+    const value = new FormData(form).get("category");
+    const out = form.querySelector<HTMLElement>("[data-readout]");
+    if (out) out.textContent = `category = ${value ?? "(none)"}`;
+  };
+
+  /** A: the one-line field and its viewer. */
+  const initViewer = (form: HTMLFormElement, signal: AbortSignal) => {
+    const viewer = form.querySelector<HTMLDialogElement>("[data-viewer]");
+    if (!viewer) return;
+    const field = form.querySelector<HTMLElement>("[data-viewer-open]")!;
+    const radios = [
+      ...viewer.querySelectorAll<HTMLInputElement>('input[name="category"]'),
+    ];
+    const figures = [
+      ...viewer.querySelectorAll<HTMLElement>("[data-v-figure]"),
+    ];
+    const count = viewer.querySelector<HTMLElement>("[data-v-count]");
+    const picked = viewer.querySelector<HTMLElement>("[data-v-picked]");
+    let current = 0;
+
+    const nameOf = (input: HTMLInputElement) =>
+      input
+        .closest("label")
+        ?.querySelector(".v-row-name")
+        ?.textContent?.trim() ?? input.value;
+
+    /* The stage follows hover, focus and the arrows; selection is separate,
+       so pointing at a machine never answers the question for you. */
+    const showStage = (index: number) => {
+      current = (index + radios.length) % radios.length;
+      const id = radios[current].value;
+      for (const figure of figures)
+        figure.hidden = figure.dataset.vFigure !== id;
+      for (const row of viewer.querySelectorAll<HTMLElement>("[data-v-row]"))
+        row.toggleAttribute("data-current", row.dataset.vRow === id);
+      if (count)
+        count.textContent = `${String(current + 1).padStart(2, "0")} / ${String(radios.length).padStart(2, "0")}`;
+    };
+
+    const paintField = () => {
+      const chosen = radios.find((r) => r.checked);
+      const thumb = form.querySelector<HTMLImageElement>("[data-a-thumb]")!;
+      const empty = form.querySelector<HTMLElement>("[data-a-thumb-empty]")!;
+      const name = form.querySelector<HTMLElement>("[data-a-name]")!;
+      const meta = form.querySelector<HTMLElement>("[data-a-meta]")!;
+      const cta = form.querySelector<HTMLElement>("[data-a-cta]")!;
+      field.toggleAttribute("data-picked", !!chosen);
+      for (const chip of form.querySelectorAll<HTMLElement>("[data-quick]"))
+        chip.setAttribute(
+          "aria-pressed",
+          String(chip.dataset.quick === chosen?.value),
+        );
+      if (!chosen) return;
+      const row = chosen.closest("label")!;
+      const img = row.querySelector<HTMLImageElement>("img");
+      thumb.hidden = !img;
+      empty.hidden = !!img;
+      if (img) thumb.src = img.currentSrc || img.src;
+      name.textContent = nameOf(chosen);
+      meta.textContent =
+        row.querySelector(".v-row-meta")?.textContent?.trim() ?? "";
+      cta.textContent = "Change";
+      if (picked) picked.textContent = `Picked: ${nameOf(chosen)}`;
+    };
+
+    field.addEventListener(
+      "click",
+      () => {
+        const chosen = radios.findIndex((r) => r.checked);
+        showStage(Math.max(chosen, 0));
+        viewer.showModal();
+        (radios[Math.max(chosen, 0)] as HTMLElement).focus({
+          preventScroll: true,
+        });
+        radios[Math.max(chosen, 0)]
+          .closest("label")
+          ?.scrollIntoView({ block: "nearest" });
+      },
+      { signal },
+    );
+
+    for (const close of viewer.querySelectorAll("[data-viewer-close]"))
+      close.addEventListener("click", () => viewer.close(), { signal });
+    viewer.addEventListener(
+      "click",
+      (event) => {
+        if (event.target === viewer) viewer.close();
+      },
+      { signal },
+    );
+
+    viewer.querySelectorAll<HTMLElement>("[data-v-row]").forEach((row) => {
+      const index = radios.findIndex((r) => r.value === row.dataset.vRow);
+      row.addEventListener("pointerenter", () => showStage(index), {
+        signal,
+      });
+    });
+
+    for (const radio of radios) {
+      radio.addEventListener("focus", () => showStage(radios.indexOf(radio)), {
+        signal,
+      });
+      // Double-click a row to pick and close in one gesture.
+      radio
+        .closest("label")
+        ?.addEventListener("dblclick", () => viewer.close(), { signal });
+    }
+
+    for (const button of viewer.querySelectorAll<HTMLElement>("[data-v-step]"))
+      button.addEventListener(
+        "click",
+        () => {
+          const next =
+            (current + Number(button.dataset.vStep) + radios.length) %
+            radios.length;
+          radios[next].checked = true;
+          radios[next].dispatchEvent(new Event("change", { bubbles: true }));
+          showStage(next);
+          radios[next].closest("label")?.scrollIntoView({ block: "nearest" });
+        },
+        { signal },
+      );
+
+    for (const chip of form.querySelectorAll<HTMLElement>("[data-quick]"))
+      chip.addEventListener(
+        "click",
+        () => {
+          const radio = radios.find((r) => r.value === chip.dataset.quick);
+          if (!radio) return;
+          radio.checked = true;
+          radio.dispatchEvent(new Event("change", { bubbles: true }));
+        },
+        { signal },
+      );
+
+    form.addEventListener(
+      "change",
+      () => {
+        paintField();
+        const chosen = radios.findIndex((r) => r.checked);
+        if (chosen >= 0) showStage(chosen);
+      },
+      { signal },
+    );
+    paintField();
+  };
+
+  /** B: tabs filter the rail; arrows page it. */
+  const initStrip = (form: HTMLFormElement, signal: AbortSignal) => {
+    const rail = form.querySelector<HTMLElement>("[data-b-rail]");
+    if (!rail) return;
+    const tabs = [...form.querySelectorAll<HTMLElement>("[data-b-filter]")];
+    const arrows = [
+      ...form.querySelectorAll<HTMLButtonElement>("[data-b-step]"),
+    ];
+
+    const paintArrows = () => {
+      const max = rail.scrollWidth - rail.clientWidth - 2;
+      arrows[0].disabled = rail.scrollLeft <= 2;
+      arrows[1].disabled = rail.scrollLeft >= max;
+    };
+
+    for (const tab of tabs)
+      tab.addEventListener(
+        "click",
+        () => {
+          const family = tab.dataset.bFilter ?? "";
+          for (const t of tabs)
+            t.setAttribute("aria-pressed", String(t === tab));
+          for (const card of rail.querySelectorAll<HTMLElement>(".b-card"))
+            card.hidden =
+              !!family &&
+              card.dataset.family !== family &&
+              !card.querySelector("input:checked");
+          rail.scrollTo({ left: 0 });
+          requestAnimationFrame(paintArrows);
+        },
+        { signal },
+      );
+
+    for (const arrow of arrows)
+      arrow.addEventListener(
+        "click",
+        () =>
+          rail.scrollBy({
+            left: Number(arrow.dataset.bStep) * rail.clientWidth * 0.75,
+            behavior: matchMedia("(prefers-reduced-motion: reduce)").matches
+              ? "auto"
+              : "smooth",
+          }),
+        { signal },
+      );
+    rail.addEventListener("scroll", paintArrows, { signal, passive: true });
+    paintArrows();
+  };
+
+  /** C: the pinned photo follows the pointer, then falls back to the pick. */
+  const initIndex = (form: HTMLFormElement, signal: AbortSignal) => {
+    const figures = [...form.querySelectorAll<HTMLElement>("[data-c-figure]")];
+    if (!figures.length) return;
+    const empty = form.querySelector<HTMLElement>("[data-c-empty]");
+    const show = (id: string | null) => {
+      let matched = false;
+      for (const figure of figures) {
+        const on = figure.dataset.cFigure === id;
+        figure.hidden = !on;
+        matched ||= on;
+      }
+      if (empty) empty.hidden = matched;
+    };
+    const picked = () =>
+      form.querySelector<HTMLInputElement>('input[name="category"]:checked')
+        ?.value ?? null;
+
+    for (const row of form.querySelectorAll<HTMLElement>("[data-c-row]")) {
+      row.addEventListener("pointerenter", () => show(row.dataset.cRow!), {
+        signal,
+      });
+      row.addEventListener("pointerleave", () => show(picked()), { signal });
+      row
+        .querySelector("input")
+        ?.addEventListener("focus", () => show(row.dataset.cRow!), {
+          signal,
+        });
+    }
+    form.addEventListener("change", () => show(picked()), { signal });
+  };
+
+  document.addEventListener("astro:page-load", () => {
+    const signal = untilPageSwap();
+    for (const form of document.querySelectorAll<HTMLFormElement>(
+      "[data-picker]",
+    )) {
+      form.addEventListener("submit", (e) => e.preventDefault(), { signal });
+      form.addEventListener("change", () => readout(form), { signal });
+      if (form.dataset.picker === "a") initViewer(form, signal);
+      if (form.dataset.picker === "b") initStrip(form, signal);
+      if (form.dataset.picker === "c") initIndex(form, signal);
+    }
+  });
+</script>

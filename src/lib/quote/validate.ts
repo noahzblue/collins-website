@@ -30,6 +30,10 @@ export interface QuoteError {
 /** Deliberately permissive — it catches a typo, not a disposable address. */
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+/** Digits with the usual separators, 7 to 15 digits in all. The server
+ *  (`parse.ts`) refuses anything else, so the form says so first. */
+const PHONE = /^\+?(?:[\s\-().]*\d){7,15}[\s\-().]*$/;
+
 const blank = (value: string | null | undefined) =>
   value === null || value === undefined || value.trim() === "";
 
@@ -85,6 +89,8 @@ export const validate = (state: QuoteState, today?: string): QuoteError[] => {
   if (blank(state.name)) fail("name", "contact", "We need a name.");
   if (blank(state.phone))
     fail("phone", "contact", "We need a number to reach you on.");
+  else if (!PHONE.test(state.phone.trim()))
+    fail("phone", "contact", "Check the number: digits only, 7 to 15 of them.");
   if (state.channel === "email" && blank(state.email)) {
     fail("email", "contact", "Add an email, or pick another way to reply.");
   }

@@ -31,11 +31,12 @@ import type { Availability } from "@/lib/equipment";
 import { toMessage, toPayload, toSummary } from "@/lib/quote/compose";
 import {
   DESTINATIONS,
-  EMAIL_SUBJECT,
+  FIELD_COPY,
   HONEYPOT,
   MODES,
   NAV,
   PREFILL,
+  SECTION_ERRORS,
   SECTIONS,
   SUMMARY,
 } from "@/lib/quote/options";
@@ -53,7 +54,9 @@ import {
 } from "@/lib/quote/schema";
 import { submitQuote } from "@/lib/quote/submit";
 import { validate, type QuoteError } from "@/lib/quote/validate";
+import { lenis } from "@/scripts/scroll";
 import { clearDraft, isDirty, loadDraft, saveDraft } from "./draft";
+import { initCategoryPicker, type CategoryPickerApi } from "./picker";
 
 /** The order of the four sections. `QuoteForm.astro` renders them in it. */
 const ORDER: SectionId[] = ["need", "size", "terms", "contact"];
@@ -139,6 +142,12 @@ export function initQuoteForm(
   const errorPanel = find<HTMLElement>("[data-quote-error]");
   const submitButtons = findAll<HTMLButtonElement>("[data-quote-submit]");
   const submitLabels = findAll<HTMLElement>("[data-submit-label]");
+
+  /* The machine picker's field and viewer. Its radios are ordinary form
+     radios; the picker only paints the field and runs the viewer. */
+  const pickers = findAll<HTMLElement>("[data-category-picker]")
+    .map((picker) => initCategoryPicker(picker, { signal }))
+    .filter((picker): picker is CategoryPickerApi => picker !== null);
 
   /** Below this the four sections become four steps. */
   const sheet = window.matchMedia("(max-width: 900px)");
@@ -272,6 +281,8 @@ export function initQuoteForm(
     // both readings are rendered and one is shown (docs 14 §3).
     form.dataset.mode = state.mode ?? "";
     form.dataset.category = state.category ?? "";
+    // A draft, a prefill or a reset ticks radios without a `change`.
+    for (const picker of pickers) picker.paint();
 
     /* 02 — three shapes, one section. */
     const isOther = state.category === OTHER_CATEGORY;
@@ -348,15 +359,80 @@ export function initQuoteForm(
     }
   };
 
+  /** The control an error belongs to: the first radio of a group, or the
+   *  field itself. The rating's radios live in the visible panel only. */
+  const controlFor = (field: string) =>
+    form.querySelector<HTMLElement>(`[data-chip-group="${field}"] input`) ??
+    form.querySelector<HTMLElement>(`[data-field="${field}"]`) ??
+    form.querySelector<HTMLElement>(
+      `[data-rating-panel]:not([hidden]) input[name="${field}"]`,
+    ) ??
+    form.querySelector<HTMLElement>(`input[name="${field}"]`);
+
+  /**
+   * Each section lists its own errors at its top. The rows are buttons built
+   * here, from `shown`, so the list can never disagree with the fields.
+   */
+  const paintSectionErrors = () => {
+    ORDER.forEach((id, index) => {
+      const box = sections[index]?.querySelector<HTMLElement>(
+        "[data-section-errors]",
+      );
+      if (!box) return;
+      const mine = shown.filter((error) => error.section === id);
+      box.hidden = !mine.length;
+      const title = box.querySelector<HTMLElement>(
+        "[data-section-errors-title]",
+      );
+      const list = box.querySelector<HTMLElement>("[data-section-errors-list]");
+      if (title) title.textContent = SECTION_ERRORS.title(mine.length);
+      list?.replaceChildren(
+        ...mine.map((error) => {
+          const item = document.createElement("li");
+          const button = document.createElement("button");
+          button.type = "button";
+          button.dataset.errorJump = error.field;
+          const label = document.createElement("span");
+          label.className = "q-errors-field";
+          label.textContent =
+            (FIELD_COPY as Record<string, { label: string }>)[error.field]
+              ?.label ?? error.field;
+          button.append(label, error.message);
+          item.append(button);
+          return item;
+        }),
+      );
+    });
+  };
+
   const clearErrors = () => {
     for (const error of shown) paintError(error.field, null);
     shown = [];
+    paintSectionErrors();
   };
 
   const paintErrors = (errors: QuoteError[]) => {
     clearErrors();
     for (const error of errors) paintError(error.field, error.message);
     shown = errors;
+    paintSectionErrors();
+  };
+
+  /**
+   * After an answer changes, drop the errors it fixed. Never adds one: a
+   * field the customer has not reached yet stays quiet until submit.
+   */
+  const refreshShown = () => {
+    if (!shown.length) return;
+    const current = validate(readState(), today());
+    const still: QuoteError[] = [];
+    for (const error of shown) {
+      const match = current.find((c) => c.field === error.field);
+      paintError(error.field, match?.message ?? null);
+      if (match) still.push(match);
+    }
+    shown = still;
+    paintSectionErrors();
   };
 
   /* ── Steps ────────────────────────────────────────────────────── */
@@ -378,8 +454,12 @@ export function initQuoteForm(
     fill?.style.setProperty("--t", String((step + 1) / ORDER.length));
   };
 
-  /** The panel's own scroll, never the document's and never Lenis's (§4). */
-  const scrollTo = (element: HTMLElement | null, smooth = true) => {
+  /**
+   * The panel's own scroll inside the dialog; Lenis on the page inline (§4).
+   * `offset` is extra room to leave above the target, for a pinned section
+   * head that would otherwise cover it.
+   */
+  const scrollTo = (element: HTMLElement | null, smooth = true, offset = 0) => {
     const behavior: ScrollBehavior = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
     ).matches
@@ -389,12 +469,13 @@ export function initQuoteForm(
         : "auto";
 
     if (!scroller) {
-      /* The inline variant: the document is the scroller, so this is the one
-         place `scrollIntoView` is right — `html { scroll-padding-top }` lands
-         it below the fixed header. Instant, because Lenis owns the document's
-         smoothing and two things easing the same scroll is a fight the reader
-         watches. */
-      element?.scrollIntoView({ behavior: "auto", block: "start" });
+      /* The inline variant: the document is the scroller and Lenis owns it,
+         so Lenis does the easing. It reads `scroll-padding-top` itself, which
+         clears the fixed header (scripts/scroll.ts). */
+      lenis.scrollTo(element ?? 0, {
+        offset: -offset,
+        immediate: behavior === "auto",
+      });
       return;
     }
     const top = element
@@ -402,7 +483,27 @@ export function initQuoteForm(
         scroller.getBoundingClientRect().top +
         scroller.scrollTop
       : 0;
-    scroller.scrollTo({ top: Math.max(0, top - 8), behavior });
+    scroller.scrollTo({ top: Math.max(0, top - 8 - offset), behavior });
+  };
+
+  /** Bring one field into view under its section's pinned head, and focus it. */
+  const jumpTo = (field: string) => {
+    const control = controlFor(field);
+    if (!control) return;
+    const section = control.closest<HTMLElement>("[data-section]");
+    const head = section?.querySelector<HTMLElement>("[data-section-head]");
+    // Below 900 the head does not pin, so it takes no room.
+    const pinned =
+      head && getComputedStyle(head).position === "sticky"
+        ? head.offsetHeight + 16
+        : 16;
+    /* Aim at the whole group or field, so its label and message show too. */
+    const target =
+      control.closest<HTMLElement>("fieldset, [data-rating-panel]") ??
+      control.parentElement ??
+      control;
+    scrollTo(target, true, pinned);
+    control.focus({ preventScroll: true });
   };
 
   /**
@@ -423,23 +524,19 @@ export function initQuoteForm(
     scrollTo(sheet.matches ? null : sections[step]);
   };
 
-  /** Where an invalid submit goes: the section, marked, first control focused. */
+  /**
+   * Where an invalid submit goes: the top of the first section with a
+   * problem, where its error box lists everything to fix. Focus goes to the
+   * first control without moving the scroll, so the box stays in view.
+   */
   const focusFirstError = (errors: QuoteError[]) => {
     const first = errors[0];
     if (!first) return;
     const index = ORDER.indexOf(first.section);
-    if (index >= 0 && (sheet.matches ? index !== step : true)) goTo(index);
-
-    const control =
-      form.querySelector<HTMLElement>(
-        `[data-chip-group="${first.field}"] input`,
-      ) ??
-      form.querySelector<HTMLElement>(`[data-field="${first.field}"]`) ??
-      form.querySelector<HTMLElement>(
-        `[data-rating-panel]:not([hidden]) input[name="${first.field}"]`,
-      ) ??
-      form.querySelector<HTMLElement>(`input[name="${first.field}"]`);
-    control?.focus({ preventScroll: true });
+    if (index < 0) return;
+    if (sheet.matches && index === step) scrollTo(null);
+    else goTo(index);
+    controlFor(first.field)?.focus({ preventScroll: true });
   };
 
   /* ── Submitting ───────────────────────────────────────────────── */
@@ -499,50 +596,14 @@ export function initQuoteForm(
     const context = buildContext(state);
     const message = toMessage(state, context);
 
-    /* The handoff opens **synchronously, inside the click**. Awaiting a fetch
-       first and opening afterwards is blocked by Safari and by Chrome's popup
-       heuristics — this order is not a style choice (docs 14 §12). */
-    if (state.channel === "whatsapp") {
-      const base = form.dataset.whatsapp ?? "";
-      if (base) {
-        window.open(
-          `${base}?text=${encodeURIComponent(message)}`,
-          "_blank",
-          "noopener",
-        );
-      }
-    } else if (state.channel === "email") {
-      /* With the composed body, not a bare `mailto:`. After fifteen fields, a
-         desktop visitor without WhatsApp Web would otherwise lose all of them
-         — /contact already gets this right and must not regress (§12). */
-      const address = form.dataset.email ?? "";
-      if (address) {
-        window.location.href =
-          `mailto:${address}` +
-          `?subject=${encodeURIComponent(EMAIL_SUBJECT)}` +
-          `&body=${encodeURIComponent(message)}`;
-      }
-    }
-
+    /* Every request is emailed to Collins by `/api/quote`, whatever the
+       channel — `channel` is only how the customer wants to be answered. The
+       WhatsApp and mailto handoffs were removed on 2026-11-21 (docs 14 §12),
+       so the POST is the only delivery and its result is the answer. */
     setBusy(true);
     show(errorPanel, false);
 
-    const posted = submitQuote(toPayload(state, context), { message });
-
-    if (state.channel === "whatsapp") {
-      // The enquiry has already left by another route, so the POST is
-      // bookkeeping. A failure is logged, never shown (docs 14 §12).
-      showSuccess(state);
-      setBusy(false);
-      posted.then((result) => {
-        if (!result.ok)
-          console.warn("[quote] POST failed behind WhatsApp", result);
-      });
-      return;
-    }
-
-    // Nothing else carried it, so the result is the answer.
-    posted.then((result) => {
+    submitQuote(toPayload(state, context), message).then((result) => {
       setBusy(false);
       if (result.ok) showSuccess(state, result.ref);
       else show(errorPanel, true);
@@ -564,6 +625,8 @@ export function initQuoteForm(
         }
       }
     }
+    // A chip tapped or a box ticked answers the question now, not on blur.
+    refreshShown();
     schedule();
   });
 
@@ -581,9 +644,17 @@ export function initQuoteForm(
       paintError(field, match?.message ?? null);
       shown = shown.filter((error) => error.field !== field);
       if (match) shown = [...shown, match];
+      paintSectionErrors();
     },
     true,
   );
+
+  form.addEventListener("click", (event) => {
+    const jump = (event.target as Element | null)?.closest<HTMLElement>(
+      "[data-error-jump]",
+    );
+    if (jump?.dataset.errorJump) jumpTo(jump.dataset.errorJump);
+  });
 
   find("[data-quote-next]")?.addEventListener("click", () => {
     const errors = validate(readState(), today()).filter(
@@ -639,6 +710,62 @@ export function initQuoteForm(
   });
 
   sheet.addEventListener("change", applyStepVisibility, { signal });
+
+  /* ── Pinned heads ─────────────────────────────────────────────── */
+
+  /* A section head is pinned once the content above it has scrolled past
+     its `top`. A 1px sentinel just before each head leaves the root's top
+     edge at that moment; that is the whole test. The hairline it turns on
+     is CSS (QuoteSection). */
+  const heads = findAll<HTMLElement>("[data-section-head]");
+  if (heads.length && "IntersectionObserver" in window) {
+    let observer: IntersectionObserver | null = null;
+    const watch = () => {
+      observer?.disconnect();
+      const top = parseFloat(getComputedStyle(heads[0]).top) || 0;
+      observer = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            const head = entry.target.nextElementSibling;
+            const rootTop = entry.rootBounds?.top ?? 0;
+            head?.toggleAttribute(
+              "data-stuck",
+              !entry.isIntersecting && entry.boundingClientRect.top < rootTop,
+            );
+          }
+        },
+        { root: scroller, rootMargin: `${-top - 1}px 0px 0px 0px` },
+      );
+      for (const head of heads) {
+        let sentinel = head.previousElementSibling;
+        if (
+          !(sentinel instanceof HTMLElement) ||
+          !sentinel.hasAttribute("data-head-sentinel")
+        ) {
+          sentinel = document.createElement("div");
+          sentinel.setAttribute("data-head-sentinel", "");
+          sentinel.setAttribute("aria-hidden", "true");
+          head.before(sentinel);
+        }
+        observer.observe(sentinel);
+      }
+    };
+    watch();
+    signal.addEventListener("abort", () => observer?.disconnect());
+
+    /* Between 900 and 1240 the summary is a bar pinned across the top, and
+       the heads pin under it. Its height changes as answers fill it, so it
+       is measured rather than guessed. */
+    const bar = form.querySelector<HTMLElement>("[data-quote-summary]");
+    if (bar && "ResizeObserver" in window) {
+      const resize = new ResizeObserver(() => {
+        form.style.setProperty("--q-bar-h", `${bar.offsetHeight}px`);
+        watch();
+      });
+      resize.observe(bar);
+      signal.addEventListener("abort", () => resize.disconnect());
+    }
+  }
 
   /* ── Start ────────────────────────────────────────────────────── */
 

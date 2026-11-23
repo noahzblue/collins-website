@@ -42,7 +42,13 @@ const titleId = scopedId(instance, "section", id);
   data-section={id}
   aria-labelledby={titleId}
 >
-  <div class="flex items-baseline gap-6 max-cmp:gap-4">
+  {
+    /* Number and title pin to the top of the scroll area while the section is
+      on screen, so the customer always knows which part they are filling in.
+      The next section's head pushes this one out: sticky is scoped to the
+      section that contains it. The hint scrolls away; it has been read. */
+  }
+  <div class="q-head" data-section-head>
     {
       /* The number is set at the title's size, not as a small superscript —
         `01` and `WHAT YOU NEED` are one line of a spec sheet, which is the
@@ -50,12 +56,19 @@ const titleId = scopedId(instance, "section", id);
         (mono, uppercase, tracked tight). See docs 14 §14.1b. */
     }
     <span class="q-number" aria-hidden="true">{number}</span>
-    <div class="min-w-0">
-      <h3 id={titleId} class="q-title">{title}</h3>
-      <p class="mt-4 mb-0 max-w-[52ch] text-lead leading-relaxed text-muted">
-        {hint}
-      </p>
-    </div>
+    <h3 id={titleId} class="q-title">{title}</h3>
+  </div>
+  <p class="q-hint">{hint}</p>
+
+  {
+    /* Everything in this section that stops the send, listed at its top. A
+      group's own message sits beside the group, but a picker is taller than
+      the screen and its message used to land out of sight. Filled by
+      `scripts/quote/form.ts`; each row jumps to its field. */
+  }
+  <div class="q-errors" data-section-errors hidden>
+    <p class="q-errors-title" data-section-errors-title></p>
+    <ul class="q-errors-list" data-section-errors-list></ul>
   </div>
 
   <div class="mt-12 max-cmp:mt-9">
@@ -75,12 +88,49 @@ const titleId = scopedId(instance, "section", id);
        (docs 14 §6). */
     padding: clamp(48px, 5vw, 88px) var(--dlg-gutter, 36px);
   }
+  /* The number's fixed width, so the hint below lines up with the title.
+     Two mono digits at -0.03em tracking come to about 1.15em. */
+  .q-section {
+    --q-num-w: calc(var(--text-h3) * 1.25);
+  }
   .q-section + .q-section {
     border-top: 1px solid var(--color-line);
   }
 
+  .q-head {
+    position: sticky;
+    /* `--q-head-top` clears the summary bar between 900 and 1240, where it
+       is pinned across the top too (QuoteForm). */
+    top: var(--q-head-top, var(--q-sticky-top, 0px));
+    z-index: 5;
+    display: flex;
+    align-items: baseline;
+    gap: 24px;
+    /* Full bleed to the panel edge, so the white band hides what scrolls
+       under it. The negative top margin keeps the resting position where the
+       title always sat. */
+    margin: -16px calc(-1 * var(--dlg-gutter, 36px)) 0;
+    padding: 16px var(--dlg-gutter, 36px);
+    background: #ffffff;
+    transition: box-shadow 200ms var(--ease-out-expo);
+  }
+  /* Set by form.ts once the head is pinned: the hairline says "this sits on
+     top of something" only when it does. */
+  .q-head[data-stuck] {
+    box-shadow: 0 1px 0 0 var(--color-line);
+  }
+
+  .q-hint {
+    margin: 4px 0 0 calc(var(--q-num-w) + 24px);
+    max-width: 52ch;
+    font-size: var(--text-lead);
+    line-height: 1.625;
+    color: var(--color-muted);
+  }
+
   .q-number {
     flex-shrink: 0;
+    width: var(--q-num-w);
     font-family: var(--font-mono);
     font-size: var(--text-h3);
     line-height: 1.05;
@@ -88,6 +138,7 @@ const titleId = scopedId(instance, "section", id);
     color: var(--color-brand);
   }
   .q-title {
+    min-width: 0;
     font-family: var(--font-mono);
     font-size: var(--text-h3);
     line-height: 1.05;
@@ -95,9 +146,72 @@ const titleId = scopedId(instance, "section", id);
     letter-spacing: -0.03em;
   }
 
+  /* ── The error box ──────────────────────────────────────────── */
+  .q-errors {
+    margin-top: 28px;
+    padding: 16px 20px 18px;
+    border-left: 2px solid var(--color-error);
+    background: color-mix(in srgb, var(--color-error) 6%, #ffffff);
+  }
+  .q-errors[hidden] {
+    display: none;
+  }
+  .q-errors-title {
+    margin: 0 0 8px;
+    font-family: var(--font-mono);
+    font-size: var(--text-note);
+    font-weight: 500;
+    color: var(--color-error);
+  }
+  .q-errors-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  /* Built at runtime, so these carry no scope class — hence `:global`. */
+  .q-errors-list :global(button) {
+    display: flex;
+    gap: 10px;
+    align-items: baseline;
+    padding: 4px 0;
+    border: 0;
+    background: none;
+    text-align: left;
+    cursor: pointer;
+    font-size: var(--text-note);
+    line-height: 1.5;
+    color: var(--color-ink);
+  }
+  .q-errors-list :global(button:hover) {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .q-errors-list :global(.q-errors-field) {
+    flex-shrink: 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    color: var(--color-muted);
+  }
+
   @media (max-width: 900px) {
     .q-section {
       padding: 34px var(--dlg-gutter, 20px) 44px;
+    }
+    /* A phone shows one section at a time and the step bar already pins its
+       name, so a second pinned title would only eat the screen. */
+    .q-head {
+      position: static;
+      margin: 0;
+      padding: 0;
+      gap: 16px;
+      background: none;
+    }
+    .q-hint {
+      margin-left: 0;
+      margin-top: 12px;
     }
   }
 </style>

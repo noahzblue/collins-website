@@ -9,9 +9,8 @@
  * the chosen reply channel, which is the one case where it is the only way we
  * can answer (docs/site-expansion/14 §7, §8).
  *
- * `channel` is the field the prototype had no equivalent of, and it decides
- * the handoff: WhatsApp opens a chat, email opens a composed message, call
- * shows the numbers. One tap (§12).
+ * `channel` is how the customer wants to be answered, and nothing more: every
+ * request is emailed to Collins whichever one is picked (§12).
  *
  * The honeypot is the whole spam defence here, alongside a minimum
  * render-to-submit interval the script keeps. No CAPTCHA: at this volume it

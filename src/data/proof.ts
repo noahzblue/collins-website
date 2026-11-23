@@ -21,25 +21,25 @@ export const trustFeatures: Feature[] = [
   {
     icon: "clock",
     title: "Readiness",
-    body: "Serviced, fuelled and load tested stock standing in both yards. Mobilisation is measured in hours, not weeks \u2014 most units leave the same day they're confirmed.",
+    body: "Serviced, fuelled and load-tested stock in both yards. Most units leave the day you confirm.",
     image: "/images/why-readiness.jpg",
   },
   {
     icon: "award",
     title: "Reliability",
-    body: "Branded units from established manufacturers, maintained on schedule and documented. Every machine is function tested and handed over with a signed condition report.",
+    body: "Established brands, serviced on schedule. Every machine is tested and handed over with a signed condition report.",
     image: "/images/why-reliability.jpg",
   },
   {
     icon: "phone",
     title: "Accountability",
-    body: "One named contact from enquiry to off hire \u2014 you won't be passed between departments mid-project. Breakdowns are ours to fix, not yours to chase.",
+    body: "One named contact from enquiry to off-hire. Breakdowns are ours to fix, not yours to chase.",
     image: "/images/why-accountability.jpg",
   },
   {
     icon: "tag",
     title: "Fair dealing",
-    body: "Clear rates, honest condition reports and no charges that were not on the agreement. Quotations are issued the same working day wherever possible.",
+    body: "Clear rates, honest condition reports and no hidden charges. Quotes go out the same working day where possible.",
     image: "/images/why-fair-dealing.jpg",
   },
 ];
@@ -69,7 +69,7 @@ export interface Stat {
 }
 
 export const stats: Stat[] = [
-  { value: "2", label: "Yards \u2014 Dubai & Sharjah" },
+  { value: "2", label: "Yards in Dubai & Sharjah" },
   { value: "13", label: "Equipment categories" },
   { value: "7", label: "Emirates served" },
   { value: "1250 KVA", label: "Max generator output" },
@@ -95,9 +95,9 @@ export interface Quote {
 }
 
 export const founderQuote: Quote = {
-  lead: "We would rather turn down a job than send out a machine we have not checked ourselves. ",
-  emphasis: "That is the whole business in one sentence.",
-  tail: " The rest is logistics.",
+  lead: "We would rather turn down a job ",
+  emphasis: "than send out a machine we have not checked ourselves.",
+  tail: "",
   name: "Rohan Robert",
   role: "Managing Director",
 };

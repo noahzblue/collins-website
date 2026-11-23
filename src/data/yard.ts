@@ -129,7 +129,7 @@ export const yardPoints = [
 /** profile p.6 — the four fleet groups and their ranges, each feeding the
  *  catalogue rather than dead-ending in a lightbox. */
 export const galleryIntro =
-  "A look at the fleet leaving our yards — the same units supplied outright or made available on hire, every one Collins branded and inspected before dispatch.";
+  "A look at the fleet leaving our yards: the same units supplied outright or made available on hire, every one Collins branded and inspected before dispatch.";
 
 export const fleetGroups = [
   {
