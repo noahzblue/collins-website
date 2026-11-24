@@ -66,7 +66,7 @@ const enquire = (title: string) => {
   <!-- Beat 3 — the six blocks, sides alternating, siblings of /equipment's rows -->
   <Section tone="gray">
     <RailSections
-      items={services.map((s) => ({ id: s.slug, label: s.title }))}
+      items={services.map((s) => ({ id: s.slug, label: s.railLabel }))}
       ariaLabel="Services"
     >
       {

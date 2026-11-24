@@ -95,15 +95,15 @@
     "dutyGuide": [
       {
         "situation": "Powering a site with no mains supply",
-        "advice": "Size for the largest starting load, not the total. A tower crane draws several times its running current at start, so a crane plus site offices usually needs 250 KVA even when the running load reads 120."
+        "advice": "Size for the biggest starting load, not the total. A crane and site offices usually need 250 KVA, even if they run at 120."
       },
       {
-        "situation": "Standby for a building already on mains",
-        "advice": "Size for the loads you cannot lose: lifts, pumps and fire systems. That is often less than expected, so send us the essential-load schedule, not the building's total."
+        "situation": "Standby for a building on mains",
+        "advice": "Size only for what must keep running, like lifts, pumps and fire systems. Send us that list, not the building's total."
       },
       {
-        "situation": "Long duration on a fixed programme",
-        "advice": "Fuel costs more than the hire rate over time. For anything over three months, ask for the fuel curve at 75% load before choosing a size."
+        "situation": "A long hire on a fixed programme",
+        "advice": "Past three months, fuel costs more than the hire. Ask for the fuel curve at 75% load before you pick a size."
       }
     ],
     "related": ["tower-lights", "air-compressors", "excavators"],

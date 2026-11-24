@@ -31,7 +31,7 @@ export const whoWeAre = {
   ],
   /** Pulled out as a display line between paragraphs 1 and 2. */
   pullQuote:
-    "Sales, hire and service: the same machines, held to the same standard.",
+    "Sales, hire and service. The same machines, held to the same standard.",
   /** The "Who we are" block only. The page banner is `aboutPage.banner`.
    *
    *  Rendered, like the banner and the rest of the site's non-photographic
@@ -97,13 +97,13 @@ export const leadership: Leader[] = [
     name: "Robert C",
     role: "Founder & Chief Executive Officer",
     remit:
-      "Sets the direction of the business and holds ownership of long term investment in fleet, facilities and partnerships.",
+      "Sets the direction of the business and owns long term investment in fleet, facilities and partners.",
   },
   {
     name: "Rohan Robert",
     role: "Managing Director",
     remit:
-      "Runs the company day to day: commercial strategy, key accounts and the standard every machine is held to before it goes out.",
+      "Runs the company day to day, from commercial strategy and key accounts to the standard of every machine.",
   },
   {
     name: "Akbar Nizamudeen",
@@ -115,13 +115,13 @@ export const leadership: Leader[] = [
     name: "Thamanna Adhinal",
     role: "Executive Director",
     remit:
-      "Leads business development and corporate governance, keeping licensing, compliance and growth planning aligned.",
+      "Leads business development and governance, keeping licensing, compliance and growth planning aligned.",
   },
   {
     name: "Alphonsa Ruby Mathew",
     role: "Admin & Procurement Manager",
     remit:
-      "Manages sourcing, supplier relationships, documentation and the administration behind every hire and sale.",
+      "Manages sourcing, suppliers, documentation and the administration behind every hire and sale.",
   },
 ];
 

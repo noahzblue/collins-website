@@ -17,6 +17,9 @@ export interface Service {
   slug: string;
   icon: IconName;
   title: string;
+  /** One word for the side rail on /services. The rail is 140px, and the
+   *  full titles wrapped to two lines there (2026-11-24). */
+  railLabel: string;
   /** One line for the list row and the homepage teaser. */
   lead: string;
   /** The profile's paragraph — the hub block and any future detail page. */
@@ -35,6 +38,7 @@ export const services: Service[] = [
     slug: "equipment-sales",
     icon: "tag",
     title: "Equipment sales",
+    railLabel: "Sales",
     lead: "Supplied outright, commissioned and documented.",
     body: "New and inspected used equipment supplied outright across power, handling, lifting and earthmoving, commissioned, handed over to your operators and documented.",
     points: [
@@ -54,6 +58,7 @@ export const services: Service[] = [
     slug: "equipment-rental",
     icon: "refresh",
     title: "Equipment rental",
+    railLabel: "Rental",
     lead: "Short, long or project duration.",
     body: "Short term, long term and project duration hire, with delivery and collection quoted separately so you can see exactly what the movement costs.",
     points: [
@@ -73,6 +78,7 @@ export const services: Service[] = [
     slug: "sourcing-procurement",
     icon: "search",
     title: "Sourcing & procurement",
+    railLabel: "Sourcing",
     lead: "Specification-led sourcing when it isn't standard stock.",
     body: "Specification led sourcing direct from manufacturers and authorised distributors when the unit you need is not standard stock.",
     points: [
@@ -92,6 +98,7 @@ export const services: Service[] = [
     slug: "transport-trailers",
     icon: "truck",
     title: "Transport & trailers",
+    railLabel: "Transport",
     lead: "Flatbed and low-bed movement across the GCC.",
     body: "Flatbed and low bed movement of plant and cargo across the GCC, including permits and escorts for out of gauge loads.",
     points: [
@@ -111,6 +118,7 @@ export const services: Service[] = [
     slug: "maintenance-spares",
     icon: "wrench",
     title: "Maintenance & spares",
+    railLabel: "Maintenance",
     lead: "Servicing, breakdown response and a parts inventory.",
     body: "Scheduled servicing, breakdown response and a parts inventory for generators, forklifts, compressors and heavy equipment.",
     points: [
@@ -130,6 +138,7 @@ export const services: Service[] = [
     slug: "logistics-export",
     icon: "globe",
     title: "Logistics & export",
+    railLabel: "Logistics",
     lead: "Regional delivery and export handling.",
     body: "Regional delivery and export handling for equipment moving to Oman, Saudi Arabia, Qatar, African markets and beyond.",
     points: [
