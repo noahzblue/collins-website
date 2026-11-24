@@ -104,7 +104,7 @@ const wrappers: Record<NonNullable<Props["variant"]>, string> = {
 
 const faces: Record<NonNullable<Props["variant"]>, string> = {
   rule: "chip-face block border-b-2 border-transparent pb-[7px] font-mono text-sm font-medium whitespace-nowrap text-faint transition-colors",
-  bar: "chip-face inline-flex min-h-[44px] items-center rounded-none border-t border-b border-line-strong px-[18px] font-mono text-sm font-medium whitespace-nowrap text-muted transition-colors",
+  bar: "chip-face inline-flex min-h-[44px] items-center rounded-none border border-line-strong px-[18px] font-mono text-sm font-medium whitespace-nowrap text-muted transition-colors",
   segment:
     "chip-face inline-flex min-h-[46px] items-center px-[20px] font-mono text-sm font-medium whitespace-nowrap text-muted transition-colors",
   display:
@@ -214,13 +214,12 @@ const faces: Record<NonNullable<Props["variant"]>, string> = {
   }
 
   /* ── bar · the Button `outline` lineage ────────────────────────
-     Square, a rule above and below, and the tint arriving on hover — the same
-     move `ui/Button.astro`'s outline variant makes, so a chip and a secondary
-     button belong to one family. */
+     Square and closed on all four sides, with the tint arriving on hover.
+     The box stays drawn on hover: an edge that vanished under the pointer
+     opened the button up again (2026-11-24). */
   @media (hover: hover) and (pointer: fine) {
     [data-variant="bar"] .chip:hover .chip-face {
       background: var(--color-brand-tint);
-      border-color: transparent;
       color: var(--color-ink);
     }
   }

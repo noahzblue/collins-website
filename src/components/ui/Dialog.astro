@@ -462,9 +462,11 @@ const heights: Record<NonNullable<Props["height"]>, string> = {
   .guard-keep:hover {
     background: var(--color-brand-hover);
   }
+  /* A closed box on all four sides. Rules above and below only read as a
+     line of text sitting between two dividers, not as a button
+     (2026-11-24). */
   .guard-discard {
-    border-top: 1px solid var(--color-line-strong);
-    border-bottom: 1px solid var(--color-line-strong);
+    border: 1px solid var(--color-line-strong);
     color: var(--color-error);
   }
   .guard-discard:hover {

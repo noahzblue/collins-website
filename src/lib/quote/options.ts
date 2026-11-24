@@ -321,6 +321,12 @@ export const PREFILL = {
 };
 
 /** The mobile step bar and its two buttons. */
+/** The one-time "there is more below" cue on a wide screen
+ *  (quote/ScrollHint.astro). */
+export const SCROLL_HINT = {
+  label: "More below",
+};
+
 export const NAV = {
   back: "Back",
   next: "Continue",

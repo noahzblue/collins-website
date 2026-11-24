@@ -157,3 +157,52 @@ export function setText(
     { duration: 220, easing: EASE_OUT },
   );
 }
+
+const morphing = new WeakMap<HTMLElement, Animation>();
+
+/**
+ * Change what is inside `container` without the page jumping: the
+ * container's height eases from what it was to what it now is, while
+ * `change` swaps its contents at once.
+ *
+ * This is the rule for any swap of one set of things for another (the hire
+ * rows for the buy rows in the summary, the hire terms for the buy terms).
+ * Growing the new set while collapsing the old one shows both at once, so
+ * the block first gets taller, then shorter; tapped quickly, the rows
+ * squash on top of each other (reported 2026-11-24). Here there is only
+ * ever one set, and only the edge moves.
+ *
+ * Interruptible: a second change mid-move starts from the height on screen.
+ * Inside `change`, use `dissolve` (or `fade`) for what appears, never
+ * `grow`; the container already animates the height.
+ */
+export function morph(
+  container: HTMLElement | null | undefined,
+  change: () => void,
+): void {
+  if (!container) return;
+  const animate = container.getClientRects().length > 0 && !reduced();
+  if (!animate) {
+    change();
+    return;
+  }
+  const from = container.getBoundingClientRect().height;
+  morphing.get(container)?.cancel();
+  change();
+  const to = container.getBoundingClientRect().height;
+  if (Math.abs(to - from) < 1) {
+    morphing.delete(container);
+    container.style.removeProperty("overflow");
+    return;
+  }
+  container.style.overflow = "clip";
+  const animation = container.animate(
+    [{ height: `${from}px` }, { height: `${to}px` }],
+    { duration: 300, easing: EASE_OUT },
+  );
+  morphing.set(container, animation);
+  animation.onfinish = () => {
+    morphing.delete(container);
+    container.style.removeProperty("overflow");
+  };
+}

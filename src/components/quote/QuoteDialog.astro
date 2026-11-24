@@ -68,7 +68,13 @@ const { id = "quote-dialog", instance = "q-dialog" } = Astro.props;
         onDiscard: quote ? quote.reset : undefined,
         // Someone who clicked "Check availability" on a category page has
         // already answered two of the four sections (docs 14 §9a).
-        onOpen: quote ? quote.prefill : undefined,
+        // and on a wide screen, the one-time "More below" cue arms.
+        onOpen: quote
+          ? (intent) => {
+              quote.prefill(intent);
+              quote.opened();
+            }
+          : undefined,
       });
     }
   });

@@ -25,6 +25,7 @@ import { getCollection } from "astro:content";
 import { rangeKey } from "@/lib/equipment";
 import Button from "@/components/ui/Button.astro";
 import QuoteProgress from "@/components/quote/QuoteProgress.astro";
+import ScrollHint from "@/components/quote/ScrollHint.astro";
 import QuoteSummary from "@/components/quote/QuoteSummary.astro";
 import QuoteSuccess from "@/components/quote/QuoteSuccess.astro";
 import SubmitLabel from "@/components/quote/SubmitLabel.astro";
@@ -32,7 +33,13 @@ import StepNeed from "@/components/quote/steps/StepNeed.astro";
 import StepSize from "@/components/quote/steps/StepSize.astro";
 import StepTerms from "@/components/quote/steps/StepTerms.astro";
 import StepContact from "@/components/quote/steps/StepContact.astro";
-import { NAV, PREFILL, SUBMIT_ERROR, SUMMARY } from "@/lib/quote/options";
+import {
+  NAV,
+  PREFILL,
+  SCROLL_HINT,
+  SUBMIT_ERROR,
+  SUMMARY,
+} from "@/lib/quote/options";
 import type { QuoteVariant } from "@/lib/quote/schema";
 import { site } from "@/config/site";
 
@@ -141,6 +148,7 @@ const contactRows = [
         />
         <StepTerms instance={instance} number="03" />
         <StepContact instance={instance} number="04" />
+        <ScrollHint label={SCROLL_HINT.label} />
       </div>
 
       <QuoteSummary instance={instance} promise={site.quotePromise} />

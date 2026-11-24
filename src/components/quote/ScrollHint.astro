@@ -1,0 +1,150 @@
+---
+/**
+ * "More below": a one-time cue that the quote form scrolls.
+ *
+ *   <ScrollHint label={SCROLL_HINT.label} />
+ *
+ * Above 900px the whole form is one long panel, and its first screen (Buy
+ * or hire, Which machine) can read as the whole thing (reported 2026-11-24).
+ * This sits at the foot of the steps column and says there is more.
+ *
+ * It is a lesson, not a fixture. `scripts/quote/scroll-hint.ts` decides
+ * when it shows: only after the customer has sat on the first screen
+ * without scrolling, and never again once they have scrolled, clicked it, or
+ * seen it through one visit. It never shows on a phone, where the form is
+ * paged and Continue already says there is more.
+ *
+ * It is drawn in the form's own language rather than as an overlay: the
+ * panel fades to white at its foot, and in the fade sits a mono link in
+ * brand blue with an arrow, the same voice as "Browse" on the machine field.
+ * A dark floating chip was tried first and read as something bolted on
+ * (2026-11-24).
+ *
+ * Rendered hidden. A zero-height sticky row, so it costs the layout nothing
+ * and rides the bottom edge of the panel while there is content below it.
+ */
+import Icon from "@/components/ui/Icon.astro";
+
+interface Props {
+  /** The words on the cue. */
+  label: string;
+  class?: string;
+}
+
+const { label, class: extra = "" } = Astro.props;
+---
+
+<div class:list={["sh", extra]} data-scroll-hint hidden>
+  <div class="sh-band">
+    <button type="button" class="sh-cue" data-scroll-hint-cue>
+      <span>{label}</span>
+      <span class="sh-arrow" aria-hidden="true">
+        <Icon name="chevron-down" size={16} />
+      </span>
+    </button>
+  </div>
+</div>
+
+<style>
+  .sh {
+    position: sticky;
+    bottom: 0;
+    z-index: 5;
+    height: 0;
+    pointer-events: none;
+  }
+  .sh[hidden] {
+    display: none;
+  }
+
+  /* The fade: the steps column dissolving into white, which says "this
+     goes on" before the words do. It sits above the panel's foot, so the
+     last line of the first screen softens rather than being covered. */
+  .sh-band {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    height: 132px;
+    padding-bottom: 24px;
+    transform: translateY(-100%);
+    background: linear-gradient(
+      to bottom,
+      rgb(255 255 255 / 0),
+      rgb(255 255 255 / 0.92) 62%,
+      #ffffff
+    );
+    opacity: 1;
+    transition: opacity 320ms var(--ease-out-expo);
+  }
+  /* Enters by fading up; leaves faster than it came. */
+  @starting-style {
+    .sh-band {
+      opacity: 0;
+    }
+  }
+  .sh[data-leaving] .sh-band {
+    opacity: 0;
+    transition-duration: 180ms;
+  }
+
+  /* The machine field's "Browse" link, turned to point down. */
+  .sh-cue {
+    pointer-events: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 4px;
+    border: 0;
+    background: none;
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    color: var(--color-brand);
+    cursor: pointer;
+    transition:
+      color 180ms var(--ease-out-expo),
+      transform 160ms var(--ease-out-expo);
+  }
+  @starting-style {
+    .sh-cue {
+      transform: translateY(6px);
+    }
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .sh-cue:hover {
+      color: var(--color-ink);
+    }
+  }
+  .sh-cue:active {
+    transform: scale(0.97);
+  }
+  .sh-cue:focus-visible {
+    outline: 2px solid var(--color-brand-bright);
+    outline-offset: 3px;
+  }
+
+  /* A slow, small nod downward: enough to catch the eye at the edge of
+     vision, slow enough not to nag while it waits. */
+  .sh-arrow {
+    display: inline-flex;
+    animation: sh-nod 1600ms var(--ease-in-out-strong) infinite;
+  }
+  @keyframes sh-nod {
+    0%,
+    100% {
+      transform: translateY(-1px);
+    }
+    50% {
+      transform: translateY(3px);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .sh-band,
+    .sh-cue {
+      transition-duration: 1ms;
+    }
+    .sh-arrow {
+      animation: none;
+    }
+  }
+</style>

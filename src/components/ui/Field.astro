@@ -105,7 +105,12 @@ const shared = {
 };
 ---
 
-<div class:list={["flex flex-col", extra]}>
+{
+  /* A date is ten characters. At the width of a text field, the date sat at
+     one end, the calendar icon at the other, and a long empty rule between
+     them read as a field waiting for a sentence (2026-11-24). */
+}
+<div class:list={["flex flex-col", type === "date" && "max-w-[240px]", extra]}>
   <label for={id} class="mb-[6px] text-note font-medium text-ink">
     {label}{required && " *"}
   </label>

@@ -247,7 +247,11 @@ Anything inside the quote form that appears or disappears goes through
 `setShown` in `scripts/quote/motion.ts`, never a bare `element.hidden = …`:
 `grow` for something that opens in the flow, `fade` for a panel that replaces
 another, `dissolve` for a swap that must not move. Text that changes in place
-goes through `setText` from the same file. Hover styles on form controls sit
+goes through `setText` from the same file. When one set of things replaces
+another (hire rows for buy rows, one panel for another), wrap the swap in
+`morph(container, change)`: the container's height eases and only one set is
+ever on screen. Never grow the new set while collapsing the old one; the block
+jumps taller, then shorter. No layout change on the site may jump. Hover styles on form controls sit
 behind `(hover: hover) and (pointer: fine)`; a finger gets `:active` instead.
 
 ## Component contracts: keep them dumb

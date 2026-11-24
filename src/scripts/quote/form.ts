@@ -56,8 +56,9 @@ import { submitQuote } from "@/lib/quote/submit";
 import { validate, type QuoteError } from "@/lib/quote/validate";
 import { lenis } from "@/scripts/scroll";
 import { clearDraft, isDirty, loadDraft, saveDraft } from "./draft";
-import { setShown, setText, type MotionKind } from "./motion";
+import { morph, setShown, setText, type MotionKind } from "./motion";
 import { initCategoryPicker, type CategoryPickerApi } from "./picker";
+import { initScrollHint } from "./scroll-hint";
 
 /** The order of the four sections. `QuoteForm.astro` renders them in it. */
 const ORDER: SectionId[] = ["need", "size", "terms", "contact"];
@@ -95,6 +96,8 @@ export interface QuoteFormApi {
   reset: () => void;
   /** Pre-answer sections 01 and 02 from a trigger or a link (docs 14 §9). */
   prefill: (intent: QuoteIntent) => void;
+  /** The dialog has just opened. Arms the one-time "More below" cue. */
+  opened: () => void;
 }
 
 export function initQuoteForm(
@@ -262,18 +265,26 @@ export function initQuoteForm(
       slots.map((slot) => [slot.key as string, slot.value]),
     );
 
-    for (const row of findAll<HTMLElement>("[data-summary-slot]")) {
-      const key = row.dataset.summarySlot ?? "";
-      const applies = wanted.has(key);
-      show(row, applies);
-      if (!applies) continue;
+    /* Buy and hire ask different things, so a mode change swaps whole
+       rows. The list's height eases while the rows swap (motion.ts `morph`);
+       growing one set while collapsing the other showed both at once. */
+    for (const list of findAll<HTMLElement>("[data-summary-slots]"))
+      morph(list, () => {
+        for (const row of list.querySelectorAll<HTMLElement>(
+          "[data-summary-slot]",
+        )) {
+          const key = row.dataset.summarySlot ?? "";
+          const applies = wanted.has(key);
+          show(row, applies, "dissolve");
+          if (!applies) continue;
 
-      const value = wanted.get(key) ?? null;
-      const cell = row.querySelector<HTMLElement>("[data-summary-value]");
-      if (!cell) continue;
-      setText(cell, value ?? SUMMARY.pending);
-      cell.toggleAttribute("data-answered", value !== null);
-    }
+          const value = wanted.get(key) ?? null;
+          const cell = row.querySelector<HTMLElement>("[data-summary-value]");
+          if (!cell) continue;
+          setText(cell, value ?? SUMMARY.pending);
+          cell.toggleAttribute("data-answered", value !== null);
+        }
+      });
   };
 
   /**
@@ -290,49 +301,55 @@ export function initQuoteForm(
     // A draft, a prefill or a reset ticks radios without a `change`.
     for (const picker of pickers) picker.paint();
 
-    /* 02 — three shapes, one section. */
+    /* 02 — three shapes, one section. One shape replaces another, so the
+       section's height eases rather than jumping (motion.ts `morph`). */
     const isOther = state.category === OTHER_CATEGORY;
-    show(find("[data-size-empty]"), !state.category, "fade");
-    show(find("[data-size-machine]"), !!state.category && !isOther, "fade");
-    show(find("[data-size-other]"), isOther, "fade");
-
     let panel: HTMLElement | null = null;
-    for (const candidate of findAll<HTMLElement>("[data-rating-panel]")) {
-      const active = candidate.dataset.ratingPanel === state.category;
-      show(candidate, active, "fade");
-      if (active) panel = candidate;
-    }
+    morph(find("[data-size-empty]")?.parentElement, () => {
+      show(find("[data-size-empty]"), !state.category, "fade");
+      show(find("[data-size-machine]"), !!state.category && !isOther, "fade");
+      show(find("[data-size-other]"), isOther, "fade");
+      for (const candidate of findAll<HTMLElement>("[data-rating-panel]")) {
+        const active = candidate.dataset.ratingPanel === state.category;
+        show(candidate, active, "fade");
+        if (active) panel = candidate;
+      }
+    });
+    const activePanel = panel as HTMLElement | null;
 
     const sizingMe = state.rating === UNSURE_RATING;
     /* One duty box, shared by every machine's list: it lives inside the
        "Not sure" answer of whichever list is showing (RatingList.astro).
        Moving the element keeps what was typed in it. */
     const duty = find<HTMLElement>('[data-conditional="duty"]');
-    const dutySlot = panel?.querySelector("[data-unsure-slot]");
+    const dutySlot = activePanel?.querySelector("[data-unsure-slot]");
     if (duty && dutySlot && duty.parentElement !== dutySlot)
       dutySlot.append(duty);
     show(duty, sizingMe);
     // The one moment the sizing guide helps is the moment somebody says they
     // cannot size it themselves (docs 14 §10b).
     if (sizingMe)
-      panel?.querySelector("[data-duty-guide]")?.setAttribute("open", "");
+      activePanel?.querySelector("[data-duty-guide]")?.setAttribute("open", "");
 
     show(
       find('[data-conditional="attachments"]'),
-      !!panel?.hasAttribute("data-attachments"),
+      !!activePanel?.hasAttribute("data-attachments"),
     );
     // Trailers: which one, and where it is going. "How many" is not a
     // question a movement has an answer to.
     show(
       find('[data-conditional="quantity"]'),
-      !panel?.hasAttribute("data-no-quantity"),
+      !activePanel?.hasAttribute("data-no-quantity"),
     );
 
-    /* 03 — one panel per mode, and never two. */
-    show(find("[data-terms-empty]"), !state.mode, "fade");
-    for (const candidate of findAll<HTMLElement>("[data-mode-panel]")) {
-      show(candidate, candidate.dataset.modePanel === state.mode, "fade");
-    }
+    /* 03 — one panel per mode, and never two. The hire and buy terms are
+       different heights; the section eases between them. */
+    morph(find("[data-terms-empty]")?.parentElement, () => {
+      show(find("[data-terms-empty]"), !state.mode, "fade");
+      for (const candidate of findAll<HTMLElement>("[data-mode-panel]")) {
+        show(candidate, candidate.dataset.modePanel === state.mode, "fade");
+      }
+    });
 
     show(
       find("[data-export-note]"),
@@ -1125,9 +1142,16 @@ export function initQuoteForm(
     goTo(0);
   });
 
+  const hintRoot = root.querySelector<HTMLElement>("[data-scroll-hint]");
+  const hint =
+    hintRoot && scroller
+      ? initScrollHint(hintRoot, scroller, { signal })
+      : null;
+
   return {
     isDirty: () => isDirty(readState()),
     reset,
     prefill,
+    opened: () => hint?.arm(),
   };
 }
