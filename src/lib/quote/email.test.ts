@@ -4,7 +4,7 @@
  */
 
 import { describe, expect, test } from "bun:test";
-import { intlDigits, refOf, toEmail, toText } from "./email";
+import { intlDigits, refOf, toEmail, toReceipt, toText } from "./email";
 import { parseQuote } from "./parse";
 import type { QuotePayload } from "./schema";
 
@@ -67,7 +67,8 @@ describe("toEmail", () => {
       }),
     );
     expect(mail.html).not.toContain("<script>");
-    expect(mail.html).not.toContain("<img");
+    // The logo is the only real image; the injected one must be text.
+    expect(mail.html).not.toContain("<img src=x");
     expect(mail.html).not.toContain("<b>pump");
     expect(mail.html).toContain(
       "&lt;script&gt;alert(&quot;x&quot;)&lt;/script&gt;",
@@ -107,15 +108,21 @@ describe("toEmail", () => {
     expect(text).not.toContain("CUSTOMER'S NOTES");
   });
 
-  test("actions: preferred first", () => {
+  test("actions: preferred is the button, the others follow as links", () => {
     const html = toEmail(payload()).html;
     const wa = html.indexOf('href="https://wa.me/971501234567"');
-    const call = html.indexOf(">Call<");
+    const call = html.indexOf('href="tel:+971501234567"');
     expect(wa).toBeGreaterThan(-1);
     expect(call).toBeGreaterThan(wa); // WhatsApp preferred, so it leads
-    expect(html).toContain('href="tel:+971501234567"');
+    expect(html).toContain(">Reply on WhatsApp<");
     expect(html).toContain("mailto:ahmed@example.com?subject=");
-    expect(html).toContain("Preferred");
+    expect(html).toContain("Prefers a reply on WhatsApp.");
+
+    const byPhone = toEmail(payload((b) => (b.contact.channel = "call"))).html;
+    expect(byPhone).toContain(">Call +971 50 123 4567<");
+    expect(byPhone.indexOf('href="tel:')).toBeLessThan(
+      byPhone.indexOf('href="https://wa.me/'),
+    );
 
     // No email-less case: parse.ts refuses a request without one (2026-11-23).
 
@@ -131,6 +138,38 @@ describe("toEmail", () => {
     expect(text).toContain("21 Nov 2026, 14:00 Dubai time");
     expect(text).toContain(`Reference 3F2A9C1B · ${ID}`);
     expect(html).toContain("3F2A9C1B");
+  });
+});
+
+describe("toReceipt", () => {
+  test("thanks by first name, promise, and replies go to the office", () => {
+    const receipt = toReceipt(payload(), { id: ID });
+    expect(receipt.subject).toBe(
+      "We have your quote request: Generators · 250 KVA · ×2",
+    );
+    expect(receipt.html).toContain("Thanks, Ahmed. We have your request.");
+    expect(receipt.text).toContain("We'll reply on WhatsApp.");
+    expect(receipt.text).toContain("Reference: 3F2A9C1B");
+    expect(receipt.replyTo).toBe("info@collinscouae.com");
+  });
+
+  test("leaves out the yard's working rows and escapes user text", () => {
+    const receipt = toReceipt(
+      payload((b) => {
+        b.contact.name = `<b>Eve</b> Smith`;
+        b.request.rating = { label: "250 KVA", powerType: "Diesel" };
+      }),
+    );
+    expect(receipt.text).not.toContain("Stock:");
+    expect(receipt.html).not.toContain("<b>Eve");
+    expect(receipt.html).toContain("&lt;b&gt;Eve&lt;/b&gt;");
+  });
+
+  test("logo is an absolute PNG on the live site", () => {
+    const { html } = toReceipt(payload());
+    expect(html).toContain(
+      'src="https://www.collinscouae.com/email/collins-logo-blue.png"',
+    );
   });
 });
 

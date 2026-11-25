@@ -85,6 +85,7 @@ export class SendError extends Error {
  */
 export async function sendMail(
   mail: Mail,
+  budget: typeof BUDGET = BUDGET,
 ): Promise<{ messageId: string; attempts: number }> {
   let attempts = 0;
   try {
@@ -102,7 +103,7 @@ export async function sendMail(
       },
       {
         retryIf: isTransient,
-        budget: BUDGET,
+        budget,
         onRetry: (error, attempt, delay) =>
           console.warn(
             `[mail] attempt ${attempt} failed, retrying in ${delay}ms:`,

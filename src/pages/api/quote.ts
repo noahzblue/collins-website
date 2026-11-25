@@ -19,7 +19,8 @@
  *      client's `message`, which is accepted and ignored so an older client
  *      keeps working. `sendMail` retries a transient SMTP failure inside a
  *      20s budget so Vercel's 30s limit never cuts it off mid-send.
- *   7. Mark the row 'sent' or 'failed' and answer 200 (with a short `ref`
+ *   7. Mark the row 'sent' or 'failed'. When sent, email the customer their
+ *      receipt (`sendReceipt`, best effort). Answer 200 (with a short `ref`
  *      when stored) or 502 so the browser keeps the form filled in. A row the
  *      function dies before marking stays 'pending' — still findable.
  *
@@ -33,7 +34,7 @@ import type { APIRoute } from "astro";
 import { QUOTE_TO_EMAIL } from "astro:env/server";
 import { site } from "@/config/site";
 import { SendError, mailConfigured, sendMail } from "@/lib/mail";
-import { refOf, toEmail, toText } from "@/lib/quote/email";
+import { refOf, toEmail, toReceipt, toText } from "@/lib/quote/email";
 import { MAX_BODY_BYTES, isSpam, parseQuote } from "@/lib/quote/parse";
 import { recentFrom, recordOutcome, saveRequest } from "@/lib/quote/store";
 
@@ -70,6 +71,35 @@ async function sha256(value: string): Promise<string> {
   return Array.from(new Uint8Array(digest), (b) =>
     b.toString(16).padStart(2, "0"),
   ).join("");
+}
+
+/**
+ * The customer's copy, sent once the yard's is out. Best effort: the request
+ * is stored and the yard has it, so a failure here is logged and the
+ * customer still sees success. Its own short budget keeps the whole function
+ * inside Vercel's 30s even when the yard's send used most of its 20s.
+ */
+const RECEIPT_BUDGET = { totalMs: 6_000, attemptMs: 6_000 };
+
+async function sendReceipt(
+  payload: Parameters<typeof toReceipt>[0],
+  id: string | null,
+) {
+  const address = payload.contact.email;
+  if (!address) return;
+  try {
+    const receipt = toReceipt(payload, { id });
+    await sendMail(
+      { ...receipt, to: [address], fromName: site.name },
+      RECEIPT_BUDGET,
+    );
+  } catch (error) {
+    console.warn(
+      "[quote] receipt not sent:",
+      (error as Error)?.message ?? String(error),
+      id ?? "",
+    );
+  }
 }
 
 export const ALL: APIRoute = () =>
@@ -133,6 +163,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
       fromName: `${site.name} website`,
     });
     await recordOutcome(id, { sent: true, ...sent });
+    await sendReceipt(payload, id);
     return json(200, id ? { ok: true, ref: refOf(id) } : { ok: true });
   } catch (error) {
     const reason = (error as Error)?.message ?? String(error);
