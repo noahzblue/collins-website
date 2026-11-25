@@ -21,6 +21,8 @@
  * inline copy's would be a single group and the second would silently win
  * (§2).
  */
+import { WHATSAPP } from "@/data/whatsapp";
+import { WA_SLOT, whatsappHref } from "@/lib/whatsapp";
 import { getCollection } from "astro:content";
 import { rangeKey } from "@/lib/equipment";
 import Button from "@/components/ui/Button.astro";
@@ -107,7 +109,9 @@ const contactRows = [
   {
     icon: "whatsapp" as const,
     text: site.whatsapp.display,
-    href: site.whatsapp.href,
+    href: whatsappHref(WHATSAPP.general),
+    /* The success screen swaps in the reference once the server answers. */
+    attrs: { "data-wa-ref": whatsappHref(WHATSAPP.quoteSent(WA_SLOT)) },
   },
   { icon: "phone" as const, text: site.phone.display, href: site.phone.href },
   { icon: "mail" as const, text: site.email, href: `mailto:${site.email}` },

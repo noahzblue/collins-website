@@ -36,6 +36,8 @@
  */
 
 import { site } from "@/config/site";
+import { WHATSAPP } from "@/data/whatsapp";
+import { whatsappHref } from "@/lib/whatsapp";
 import { AVAILABILITY_LABEL } from "@/lib/equipment";
 import {
   CHANNELS,
@@ -318,7 +320,10 @@ function actions(p: QuotePayload): Action[] {
     {
       channel: "whatsapp",
       label: COPY.actions.whatsapp,
-      href: `https://wa.me/${digits}`,
+      href: whatsappHref(
+        WHATSAPP.replyToCustomer(firstName(contact.name), headline(p)),
+        `https://wa.me/${digits}`,
+      ),
     },
   ];
   if (contact.email) {
@@ -607,6 +612,9 @@ const receiptLede = (p: QuotePayload) =>
  * yard's copy is out; its replies go to the office, not the sending mailbox.
  */
 export function toReceipt(p: QuotePayload, meta: EmailMeta = {}) {
+  const followUp = whatsappHref(
+    meta.id ? WHATSAPP.quoteFollowUp(refOf(meta.id)) : WHATSAPP.general,
+  );
   const list = receiptRows(p, meta);
   const contactLines = [site.name, `${site.address} · ${site.hours}`];
 
@@ -628,7 +636,7 @@ export function toReceipt(p: QuotePayload, meta: EmailMeta = {}) {
       cls: "t-ink",
       top: 26,
     }),
-    `<div style="padding-top:16px">${button(COPY.receipt.whatsapp, site.whatsapp.href)}</div>`,
+    `<div style="padding-top:16px">${button(COPY.receipt.whatsapp, followUp)}</div>`,
     text(
       `${COPY.or} ${link(COPY.receipt.call(site.phone.display), site.phone.href)}`,
       { size: 14, color: C.muted, cls: "t-muted", top: 14 },
@@ -647,7 +655,7 @@ export function toReceipt(p: QuotePayload, meta: EmailMeta = {}) {
     ...list.map(([name, value]) => `${name}: ${value.replace(/\n/g, "\n  ")}`),
     "",
     COPY.receipt.change,
-    `WhatsApp: ${site.whatsapp.href}`,
+    `WhatsApp: ${followUp}`,
     `Call: ${site.phone.display}`,
     "",
     "--",

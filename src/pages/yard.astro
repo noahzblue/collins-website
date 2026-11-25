@@ -19,6 +19,7 @@ import RailSections from "@/components/ui/RailSections.astro";
 import StickyPoints from "@/components/ui/StickyPoints.astro";
 import ParallaxImage from "@/components/ui/ParallaxImage.astro";
 import PageCTA from "@/components/sections/PageCTA.astro";
+import { WHATSAPP } from "@/data/whatsapp";
 import {
   fleetGroups,
   galleryIntro,
@@ -164,5 +165,5 @@ import {
     </RailSections>
   </Section>
 
-  <PageCTA />
+  <PageCTA whatsappText={WHATSAPP.page.yard} />
 </Base>

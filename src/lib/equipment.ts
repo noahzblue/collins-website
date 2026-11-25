@@ -5,8 +5,9 @@
  * edit instead of thirteen — the JSON carries facts, this file carries copy.
  */
 
-import { site } from "@/config/site";
 import { slug } from "@/lib/forms";
+import { whatsappHref } from "@/lib/whatsapp";
+import { WHATSAPP } from "@/data/whatsapp";
 
 export type Mode = "hire" | "buy";
 export type Availability = "yard" | "on_request";
@@ -101,8 +102,7 @@ export const enquireHref = (name: string, mode: Mode, rangeLabel?: string) => {
   const item = rangeLabel
     ? `a ${rangeLabel} ${singular(name)}`
     : name.toLowerCase();
-  const text = `Hi Collins, I'm interested in ${verb} ${item}.`;
-  return `${site.whatsapp.href}?text=${encodeURIComponent(text)}`;
+  return whatsappHref(WHATSAPP.machine(verb, item));
 };
 
 /**

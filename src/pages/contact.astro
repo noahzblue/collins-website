@@ -38,6 +38,8 @@ import Icon from "@/components/ui/Icon.astro";
 import Breadcrumb from "@/components/ui/Breadcrumb.astro";
 import { site, directionsHref } from "@/config/site";
 import { contactPage } from "@/data/content";
+import { WHATSAPP } from "@/data/whatsapp";
+import { whatsappHref } from "@/lib/whatsapp";
 
 const { dubai, sharjah } = site.places;
 
@@ -106,7 +108,7 @@ const registration = [
         }
         <aside class="rail" aria-label="Direct lines">
           <a
-            href={site.whatsapp.href}
+            href={whatsappHref(WHATSAPP.contact)}
             target="_blank"
             rel="noopener"
             class="rail-row group flex items-start gap-3"

@@ -11,6 +11,8 @@ export interface ContactRow {
   icon: IconName;
   text: string;
   href?: string;
+  /** Extra attributes for the link, such as a `data-*` hook a script reads. */
+  attrs?: Record<string, string>;
 }
 
 interface Props {
@@ -43,6 +45,7 @@ const plain = tone === "muted" ? "text-muted" : "text-body";
       row.href ? (
         <a
           href={row.href}
+          {...row.attrs}
           class:list={[line, "text-body transition-colors hover:text-brand"]}
         >
           <Icon name={row.icon} size={17} class="shrink-0 text-brand" />

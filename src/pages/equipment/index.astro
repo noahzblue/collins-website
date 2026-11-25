@@ -18,7 +18,8 @@ import CategoryRow from "@/components/equipment/CategoryRow.astro";
 import RailSections from "@/components/ui/RailSections.astro";
 import ClosingNote from "@/components/sections/ClosingNote.astro";
 import { equipmentHub } from "@/data/content";
-import { site } from "@/config/site";
+import { WHATSAPP } from "@/data/whatsapp";
+import { whatsappHref } from "@/lib/whatsapp";
 
 const all = (await getCollection("equipment")).sort(
   (a, b) => a.data.sortOrder - b.data.sortOrder,
@@ -86,7 +87,7 @@ const all = (await getCollection("equipment")).sort(
           </Button>
           <Button
             variant="outline"
-            href={site.whatsapp.href}
+            href={whatsappHref(WHATSAPP.page.equipment)}
             target="_blank"
             rel="noopener"
             class="press"

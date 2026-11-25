@@ -16,6 +16,16 @@ import Button from "@/components/ui/Button.astro";
 import Icon from "@/components/ui/Icon.astro";
 import { site } from "@/config/site";
 import { pageCta } from "@/data/content";
+import { WHATSAPP } from "@/data/whatsapp";
+import { whatsappHref } from "@/lib/whatsapp";
+
+interface Props {
+  /** What the WhatsApp button types for the visitor: the page's own line
+   *  from `WHATSAPP.page`. Falls back to the general one. */
+  whatsappText?: string;
+}
+
+const { whatsappText = WHATSAPP.general } = Astro.props;
 ---
 
 <Section>
@@ -49,7 +59,7 @@ import { pageCta } from "@/data/content";
         </Button>
         <Button
           variant="outline"
-          href={site.whatsapp.href}
+          href={whatsappHref(whatsappText)}
           target="_blank"
           rel="noopener"
           size="lg"

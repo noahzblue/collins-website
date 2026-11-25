@@ -17,6 +17,7 @@ import RailSections from "@/components/ui/RailSections.astro";
 import ParallaxImage from "@/components/ui/ParallaxImage.astro";
 import ClosingNote from "@/components/sections/ClosingNote.astro";
 import PageCTA from "@/components/sections/PageCTA.astro";
+import { WHATSAPP } from "@/data/whatsapp";
 import { site } from "@/config/site";
 import { aboutPage } from "@/data/content";
 import { founderQuote } from "@/data/proof";
@@ -413,7 +414,7 @@ const initials = (name: string) =>
     </div>
   </Section>
 
-  <PageCTA />
+  <PageCTA whatsappText={WHATSAPP.page.about} />
 </Base>
 
 <style>

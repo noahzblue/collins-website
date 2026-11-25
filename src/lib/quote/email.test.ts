@@ -110,13 +110,18 @@ describe("toEmail", () => {
 
   test("actions: preferred is the button, the others follow as links", () => {
     const html = toEmail(payload()).html;
-    const wa = html.indexOf('href="https://wa.me/971501234567"');
+    const wa = html.indexOf('href="https://wa.me/971501234567?text=');
     const call = html.indexOf('href="tel:+971501234567"');
     expect(wa).toBeGreaterThan(-1);
     expect(call).toBeGreaterThan(wa); // WhatsApp preferred, so it leads
     expect(html).toContain(">Reply on WhatsApp<");
     expect(html).toContain("mailto:ahmed@example.com?subject=");
     expect(html).toContain("Prefers a reply on WhatsApp.");
+    expect(html).toContain(
+      encodeURIComponent(
+        "Hi Ahmed, this is Collins Equipments about your quote request for Generators, 250 KVA × 2.",
+      ),
+    );
 
     const byPhone = toEmail(payload((b) => (b.contact.channel = "call"))).html;
     expect(byPhone).toContain(">Call +971 50 123 4567<");
@@ -151,6 +156,9 @@ describe("toReceipt", () => {
     expect(receipt.text).toContain("We'll reply on WhatsApp.");
     expect(receipt.text).toContain("Reference: 3F2A9C1B");
     expect(receipt.replyTo).toBe("info@collinscouae.com");
+    expect(receipt.text).toContain(
+      encodeURIComponent("Hi Collins, about my quote request 3F2A9C1B: "),
+    );
   });
 
   test("leaves out the yard's working rows and escapes user text", () => {

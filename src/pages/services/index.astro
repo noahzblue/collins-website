@@ -23,16 +23,13 @@ import AlternatingRow from "@/components/ui/AlternatingRow.astro";
 import FollowerList from "@/components/ui/FollowerList.astro";
 import ClosingNote from "@/components/sections/ClosingNote.astro";
 import PageCTA from "@/components/sections/PageCTA.astro";
+import { WHATSAPP } from "@/data/whatsapp";
+import { whatsappHref } from "@/lib/whatsapp";
 import { services } from "@/data/services";
 import { servicesSection } from "@/data/content";
-import { site } from "@/config/site";
 
-/** Nested template literals confuse the compiler's frontmatter scan — build
- *  the message first, then the URL. */
-const enquire = (title: string) => {
-  const text = `Hi Collins, I'd like to talk about ${title.toLowerCase()}.`;
-  return `${site.whatsapp.href}?text=${encodeURIComponent(text)}`;
-};
+const enquire = (title: string) =>
+  whatsappHref(WHATSAPP.service(title.toLowerCase()));
 ---
 
 <Base
@@ -150,5 +147,5 @@ const enquire = (title: string) => {
     </div>
   </Section>
 
-  <PageCTA />
+  <PageCTA whatsappText={WHATSAPP.page.services} />
 </Base>

@@ -24,6 +24,7 @@ import SectionHeading from "@/components/ui/SectionHeading.astro";
 import IndustryTile from "@/components/industries/IndustryTile.astro";
 import CoverageMatrix from "@/components/industries/CoverageMatrix.astro";
 import PageCTA from "@/components/sections/PageCTA.astro";
+import { WHATSAPP } from "@/data/whatsapp";
 import { industries, matrixCategoryIds } from "@/data/industries";
 import { industriesSection } from "@/data/content";
 import { resolveCategories } from "@/lib/equipment";
@@ -115,5 +116,5 @@ const rows = industries.map((industry) => ({
     </div>
   </Section>
 
-  <PageCTA />
+  <PageCTA whatsappText={WHATSAPP.page.industries} />
 </Base>

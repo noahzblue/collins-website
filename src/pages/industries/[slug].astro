@@ -18,6 +18,8 @@ import Icon from "@/components/ui/Icon.astro";
 import PageBanner from "@/components/ui/PageBanner.astro";
 import ParallaxImage from "@/components/ui/ParallaxImage.astro";
 import PageCTA from "@/components/sections/PageCTA.astro";
+import { WHATSAPP } from "@/data/whatsapp";
+import { whatsappHref } from "@/lib/whatsapp";
 import { industries } from "@/data/industries";
 import { resolveCategories } from "@/lib/equipment";
 import { site } from "@/config/site";
@@ -38,10 +40,8 @@ const categories = resolveCategories(industry.categories, all);
 
 const siblings = industries.filter((other) => other.slug !== industry.slug);
 
-/** Nested template literals confuse the compiler's frontmatter scan — build
- *  the message first, then the URL. */
-const enquiryText = `Hi Collins, I'm enquiring about equipment for a ${industry.name.toLowerCase()} project.`;
-const enquiryHref = `${site.whatsapp.href}?text=${encodeURIComponent(enquiryText)}`;
+const enquiryText = WHATSAPP.industry(industry.name.toLowerCase());
+const enquiryHref = whatsappHref(enquiryText);
 ---
 
 <Base
@@ -186,5 +186,5 @@ const enquiryHref = `${site.whatsapp.href}?text=${encodeURIComponent(enquiryText
     </div>
   </Section>
 
-  <PageCTA />
+  <PageCTA whatsappText={enquiryText} />
 </Base>

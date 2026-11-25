@@ -53,6 +53,7 @@ import {
   type SectionId,
 } from "@/lib/quote/schema";
 import { submitQuote } from "@/lib/quote/submit";
+import { WA_SLOT_ENCODED } from "@/lib/whatsapp";
 import { validate, type QuoteError } from "@/lib/quote/validate";
 import { lenis } from "@/scripts/scroll";
 import { clearDraft, isDirty, loadDraft, saveDraft } from "./draft";
@@ -789,6 +790,14 @@ export function initQuoteForm(
     );
     if (refRow) refRow.hidden = !ref;
     if (refValue && ref) refValue.textContent = ref;
+    if (ref)
+      for (const link of successPanel.querySelectorAll<HTMLAnchorElement>(
+        "[data-wa-ref]",
+      ))
+        link.href = (link.dataset.waRef ?? link.href).replace(
+          WA_SLOT_ENCODED,
+          encodeURIComponent(ref),
+        );
 
     form.hidden = true;
     toTop();
