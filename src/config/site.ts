@@ -62,7 +62,7 @@ export const site = {
 
   whatsapp: {
     display: "WhatsApp",
-    href: "https://wa.me/971523995373",
+    href: "https://wa.me/971509132703",
   } satisfies ContactLink,
 
   email: "info@collinscouae.com",
