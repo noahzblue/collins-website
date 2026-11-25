@@ -143,7 +143,12 @@ export function initQuoteForm(
   );
   const live = find<HTMLElement>("[data-quote-live]");
   const successPanel = root.querySelector<HTMLElement>("[data-quote-success]");
-  const errorPanel = find<HTMLElement>("[data-quote-error]");
+  /* Two copies: one at the end of the form for phones, one in the summary
+     rail under its Send button. CSS shows the one for the current width. */
+  const errorPanels = findAll<HTMLElement>("[data-quote-error]");
+  const showError = (on: boolean) => {
+    for (const panel of errorPanels) show(panel, on);
+  };
   const submitButtons = findAll<HTMLButtonElement>("[data-quote-submit]");
   const submitLabels = findAll<HTMLElement>("[data-submit-label]");
 
@@ -803,7 +808,7 @@ export function initQuoteForm(
        WhatsApp and mailto handoffs were removed on 2026-11-21 (docs 14 §12),
        so the POST is the only delivery and its result is the answer. */
     setBusy(true);
-    show(errorPanel, false);
+    showError(false);
 
     /* Never shorter than a moment. A reply that lands in 150ms flashed the
        loader and the success screen arrived as a jolt; held for most of a
@@ -813,7 +818,7 @@ export function initQuoteForm(
       ([result]) => {
         setBusy(false);
         if (result.ok) showSuccess(state, result.ref);
-        else show(errorPanel, true);
+        else showError(true);
       },
     );
   };

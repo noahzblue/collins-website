@@ -359,6 +359,13 @@ const contactRows = [
   .q-error[hidden] {
     display: none;
   }
+  /* From 900px up the summary rail shows its own copy under the Send button;
+     this one would open far below it, out of sight. */
+  @media (min-width: 901px) {
+    .q-error {
+      display: none;
+    }
+  }
   .q-error-title {
     margin: 0 0 6px;
     font-family: var(--font-mono);

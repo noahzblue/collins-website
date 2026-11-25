@@ -24,7 +24,7 @@
  */
 import Button from "@/components/ui/Button.astro";
 import SubmitLabel from "@/components/quote/SubmitLabel.astro";
-import { SUMMARY } from "@/lib/quote/options";
+import { SUBMIT_ERROR, SUMMARY } from "@/lib/quote/options";
 
 interface Props {
   /** Per-instance id prefix — two forms on one page must not collide. */
@@ -83,6 +83,17 @@ const slots = Object.entries(SUMMARY.labels) as [string, string][];
         <SubmitLabel label={SUMMARY.submit} />
       </Button>
       <p class="q-rail-promise">{promise}</p>
+    </div>
+
+    {
+      /* The failed-send message, beside the button that was pressed. From
+        900px up this rail holds the only Send button, and the copy at the end
+        of the form would open far below it, out of sight. QuoteForm hides
+        that copy at this width; the script toggles both. */
+    }
+    <div class="q-rail-error" data-quote-error hidden>
+      <p class="q-rail-error-title">{SUBMIT_ERROR.title}</p>
+      <p class="q-rail-error-body">{SUBMIT_ERROR.body}</p>
     </div>
   </div>
 </aside>
@@ -170,6 +181,28 @@ const slots = Object.entries(SUMMARY.labels) as [string, string][];
     color: var(--color-faint);
   }
 
+  .q-rail-error {
+    padding: 14px 16px;
+    border-left: 2px solid var(--color-error);
+    background: var(--color-surface);
+  }
+  .q-rail-error[hidden] {
+    display: none;
+  }
+  .q-rail-error-title {
+    margin: 0 0 4px;
+    font-family: var(--font-mono);
+    font-size: var(--text-detail);
+    font-weight: 500;
+    color: var(--color-error);
+  }
+  .q-rail-error-body {
+    margin: 0;
+    font-size: var(--text-note);
+    line-height: 1.55;
+    color: var(--color-muted);
+  }
+
   /* ── 900–1240: the rail flattens ────────────────────────────────
      No room for a 300px column beside a two-column rating table, so it
      becomes a bar across the top of the scroll area. Same component, same
@@ -186,8 +219,9 @@ const slots = Object.entries(SUMMARY.labels) as [string, string][];
     }
     .q-rail-inner {
       flex-direction: row;
+      flex-wrap: wrap;
       align-items: center;
-      gap: 20px;
+      gap: 12px 20px;
       padding: 12px var(--dlg-gutter, 36px);
     }
     .q-rail-title {
@@ -233,6 +267,10 @@ const slots = Object.entries(SUMMARY.labels) as [string, string][];
     }
     .q-rail-promise {
       display: none;
+    }
+    /* Its own line under the spec bar, full width. */
+    .q-rail-error {
+      flex: 1 0 100%;
     }
   }
 
